@@ -6,4 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UniAttend.Application\UniAttend.Application.csproj" />
+    <ProjectReference Include="..\UniAttend.Infrastructure\UniAttend.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

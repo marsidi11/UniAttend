@@ -1,17 +1,16 @@
 using UniAttend.Core.Entities;
-using System.Collections.Generic;
 
 namespace UniAttend.Core.Interfaces.Repositories
 {
     /// <summary>
     /// Interface for student repository to handle CRUD operations for Student entities.
     /// </summary>
-    public interface IStudentRepository
+    public interface IStudentRepository : IRepository<Student>
     {
-        Student? GetById(int id);
-        List<Student> GetAll();
-        void Add(Student student);
-        void Update(Student student);
-        void Delete(int id);
+        Task<Student?> GetByCardIdAsync(string cardId, CancellationToken cancellationToken = default);
+        Task<Student?> GetByStudentIdAsync(string studentId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Student>> GetByDepartmentIdAsync(int departmentId, CancellationToken cancellationToken = default);
+        Task<bool> CardIdExistsAsync(string cardId, CancellationToken cancellationToken = default);
+        Task<bool> StudentIdExistsAsync(string studentId, CancellationToken cancellationToken = default);
     }
 }

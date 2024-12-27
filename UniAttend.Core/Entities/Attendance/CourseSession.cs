@@ -3,9 +3,9 @@ using System;
 
 namespace UniAttend.Core.Entities.Attendance
 {
-    public class Class : Entity
+    public class CourseSession : Entity
     {
-        public Class(int groupId, int classroomId, DateTime date, TimeSpan startTime, TimeSpan endTime, string status)
+        public CourseSession(int groupId, int classroomId, DateTime date, TimeSpan startTime, TimeSpan endTime, string status)
         {
             GroupId = groupId;
             ClassroomId = classroomId;

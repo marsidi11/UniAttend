@@ -6,12 +6,14 @@ namespace UniAttend.Core.Interfaces.Repositories
     /// <summary>
     /// Interface for managing attendance records.
     /// </summary>
-    public interface IAttendanceRecordRepository
+    public interface IAttendanceRecordRepository : IRepository<AttendanceRecord>
     {
-        void Add(AttendanceRecord attendanceRecord);
-        List<AttendanceRecord> GetByClassId(int classId);
-        AttendanceRecord? GetById(int id);
-        void Update(AttendanceRecord attendanceRecord);
-        void Delete(int id);
+        Task<IEnumerable<AttendanceRecord>> GetByClassIdAsync(int classId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AttendanceRecord>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AttendanceRecord>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+        Task<AttendanceRecord?> GetStudentAttendanceForClassAsync(int studentId, int classId, CancellationToken cancellationToken = default);
+        Task<double> GetStudentAttendancePercentageAsync(int studentId, int groupId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AttendanceRecord>> GetUnconfirmedRecordsAsync(int classId, CancellationToken cancellationToken = default);
+        Task ConfirmAttendanceRecordsAsync(int classId, CancellationToken cancellationToken = default);
     }
 }

@@ -2,10 +2,11 @@ using UniAttend.Core.Entities.Base;
 
 namespace UniAttend.Core.Entities
 {
+    /// <summary>
+    /// Represents a many-to-many relationship between StudyGroup and Student entities.
+    /// </summary>
     public class GroupStudent : Entity
     {
-        private GroupStudent() { } // For EF Core
-
         public GroupStudent(int groupId, int studentId)
         {
             GroupId = groupId;
@@ -14,9 +15,7 @@ namespace UniAttend.Core.Entities
 
         public int GroupId { get; private set; }
         public int StudentId { get; private set; }
-
-        // Navigation properties
-        public StudyGroup Group { get; private set; }
-        public Student Student { get; private set; }
+        public virtual StudyGroup Group { get; private set; }
+        public virtual Student Student { get; private set; }
     }
 }

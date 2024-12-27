@@ -4,7 +4,7 @@
 /// </summary>
 namespace UniAttend.Core.Entities.Base
 {
-    public abstract class ActiveEntity : BaseEntity
+    public abstract class ActiveEntity : Entity
     {
         public bool IsActive { get; protected set; } = true;
 
