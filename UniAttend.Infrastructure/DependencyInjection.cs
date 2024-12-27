@@ -9,6 +9,7 @@ using UniAttend.Core.Interfaces.Services;
 using UniAttend.Infrastructure.Data;
 using UniAttend.Infrastructure.Data.Repositories;
 using UniAttend.Infrastructure.Services;
+using UniAttend.Infrastructure.Settings;
 
 /// <summary>
 /// Provides extension methods for configuring infrastructure services in the dependency injection container.
@@ -51,9 +52,18 @@ namespace UniAttend.Infrastructure
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
 
             // Register Services
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IOtpService, OtpService>();
+            services.AddScoped<ICardReaderService, CardReaderService>();
+            services.AddScoped<IAuditService, AuditService>();
+
+            // Add Repositories
+            services.AddScoped<IClassroomRepository, ClassroomRepository>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+
+            // Configure email settings
+            services.Configure<EmailSettings>(
+                configuration.GetSection("EmailSettings"));
 
             // Add Application Layer Services
             services.AddApplication();
