@@ -40,6 +40,17 @@ namespace UniAttend.Core.Entities.Identity
         public string? RefreshToken { get; private set; }
         public DateTime? RefreshTokenExpiryTime { get; private set; }
 
+        public void UpdateProfile(string firstName, string lastName, string email)
+        {
+            ValidateName(firstName, nameof(firstName));
+            ValidateName(lastName, nameof(lastName));
+            ValidateEmail(email);
+
+            FirstName = firstName.Trim();
+            LastName = lastName.Trim();
+            Email = email.Trim().ToLower();
+        }
+
         public void UpdatePassword(string newPasswordHash)
         {
             PasswordHash = newPasswordHash ?? throw new ArgumentNullException(nameof(newPasswordHash));

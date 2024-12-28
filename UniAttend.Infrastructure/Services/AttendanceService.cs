@@ -20,47 +20,42 @@ namespace UniAttend.Infrastructure.Services
             _groupStudentRepository = groupStudentRepository;
         }
 
-        public async Task<AttendanceRecord> RecordCardAttendanceAsync(
-            string cardId, 
-            string readerDeviceId, 
+        public Task<AttendanceRecord> RecordCardAttendanceAsync(
+            string cardId,
+            string readerDeviceId,
             CancellationToken cancellationToken = default)
         {
-            // Implementation for card-based attendance
             throw new NotImplementedException();
         }
 
-        public async Task<AttendanceRecord> RecordOtpAttendanceAsync(
-            string otpCode, 
-            int studentId, 
-            int classId, 
+        public Task<AttendanceRecord> RecordOtpAttendanceAsync(
+            string otpCode,
+            int studentId,
+            int classId,
             CancellationToken cancellationToken = default)
         {
-            // Implementation for OTP-based attendance
             throw new NotImplementedException();
         }
 
-        public async Task<bool> ConfirmAttendanceAsync(
-            int classId, 
-            int professorId, 
+        public Task<bool> ConfirmAttendanceAsync(
+            int classId,
+            int professorId,
             CancellationToken cancellationToken = default)
         {
-            // Implementation for confirming attendance
             throw new NotImplementedException();
         }
 
-        public async Task GenerateAbsenceAlertsAsync(
+        public Task GenerateAbsenceAlertsAsync(
             CancellationToken cancellationToken = default)
         {
-            // Implementation for generating absence alerts
             throw new NotImplementedException();
         }
 
-        public async Task<bool> CanRecordAttendanceAsync(
-            int studentId, 
-            int classId, 
+        public Task<bool> CanRecordAttendanceAsync(
+            int studentId,
+            int classId,
             CancellationToken cancellationToken = default)
         {
-            // Implementation for attendance validation
             throw new NotImplementedException();
         }
     }

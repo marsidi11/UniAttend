@@ -5,18 +5,19 @@ using UniAttend.Infrastructure.Data.Repositories;
 
 namespace UniAttend.Infrastructure.Data
 {
-    public class UnitOfWork : IUnitOfWork
+    public sealed class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
-        private IDbContextTransaction _transaction;
+        private IDbContextTransaction? _transaction;
         
-        private IUserRepository _users;
-        private IStudentRepository _students;
-        private IProfessorRepository _professors;
-        private IAttendanceRecordRepository _attendanceRecords;
-        private ICourseRepository _courses;
-        private IStudyGroupRepository _studyGroups;
-        private IOtpCodeRepository _otpCodes;
+        // Repositories are lazily initialized
+        private IUserRepository? _users;
+        private IStudentRepository? _students; 
+        private IProfessorRepository? _professors;
+        private IAttendanceRecordRepository? _attendanceRecords;
+        private ICourseRepository? _courses;
+        private IStudyGroupRepository? _studyGroups;
+        private IOtpCodeRepository? _otpCodes;
         private bool _disposed;
 
         public UnitOfWork(ApplicationDbContext context)
@@ -24,6 +25,7 @@ namespace UniAttend.Infrastructure.Data
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Thread-safe lazy initialization using null-coalescing operator
         public IUserRepository Users => 
             _users ??= new UserRepository(_context);
 
@@ -55,7 +57,10 @@ namespace UniAttend.Infrastructure.Data
             try
             {
                 await SaveChangesAsync(cancellationToken);
-                await _transaction.CommitAsync(cancellationToken);
+                if (_transaction is not null)
+                {
+                    await _transaction.CommitAsync(cancellationToken);
+                }
             }
             catch
             {
@@ -71,13 +76,13 @@ namespace UniAttend.Infrastructure.Data
 
         public async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-            if (_transaction != null)
+            if (_transaction is not null)
             {
                 await _transaction.RollbackAsync(cancellationToken);
             }
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposed && disposing)
             {

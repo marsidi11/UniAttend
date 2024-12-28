@@ -15,8 +15,15 @@ namespace UniAttend.Infrastructure.Services
 
         public string HashPassword(string password)
         {
+            ArgumentNullException.ThrowIfNull(password);
+            
             byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations);
+            var pbkdf2 = new Rfc2898DeriveBytes(
+                password, 
+                salt, 
+                Iterations, 
+                HashAlgorithmName.SHA256);
+                
             byte[] hash = pbkdf2.GetBytes(HashSize);
 
             byte[] hashBytes = new byte[SaltSize + HashSize];
@@ -28,11 +35,19 @@ namespace UniAttend.Infrastructure.Services
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
+            ArgumentNullException.ThrowIfNull(password);
+            ArgumentNullException.ThrowIfNull(hashedPassword);
+
             byte[] hashBytes = Convert.FromBase64String(hashedPassword);
             byte[] salt = new byte[SaltSize];
             Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations);
+            var pbkdf2 = new Rfc2898DeriveBytes(
+                password, 
+                salt, 
+                Iterations,
+                HashAlgorithmName.SHA256);
+                
             byte[] hash = pbkdf2.GetBytes(HashSize);
 
             for (var i = 0; i < HashSize; i++)

@@ -16,7 +16,9 @@ namespace UniAttend.Core.Entities
             StudentId = studentId;
             GroupId = groupId;
             AbsencePercentage = absencePercentage;
+            CreatedAt = DateTime.UtcNow;
         }
+        
         public int StudentId { get; }
         public int GroupId { get; }
         public decimal AbsencePercentage { get; }
