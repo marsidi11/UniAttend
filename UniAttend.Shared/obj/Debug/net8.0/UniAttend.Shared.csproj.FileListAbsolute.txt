@@ -1,0 +1,12 @@
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\bin\Debug\net8.0\UniAttend.Shared.deps.json
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\bin\Debug\net8.0\UniAttend.Shared.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\bin\Debug\net8.0\UniAttend.Shared.pdb
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\UniAttend.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\UniAttend.Shared.AssemblyInfoInputs.cache
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\UniAttend.Shared.AssemblyInfo.cs
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\UniAttend.Shared.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\UniAttend.Shared.sourcelink.json
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\UniAttend.Shared.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\refint\UniAttend.Shared.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\UniAttend.Shared.pdb
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Shared\obj\Debug\net8.0\ref\UniAttend.Shared.dll

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "g/MO7X92F5xanNhIVnYDjcYcAmDCThHbdqonMSdBZBA=",
+  "Source": "UniAttend.API",
+  "BasePath": "_content/UniAttend.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

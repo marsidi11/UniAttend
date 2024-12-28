@@ -19,6 +19,4 @@
     <ProjectReference Include="..\UniAttend.Application\UniAttend.Application.csproj" />
   </ItemGroup>
 
-
-
 </Project>

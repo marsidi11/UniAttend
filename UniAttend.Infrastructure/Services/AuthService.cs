@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using UniAttend.Application.Common.Interfaces;
 using UniAttend.Application.Auth.Common;
 using UniAttend.Core.Entities.Identity;
+using UniAttend.Core.Interfaces.Repositories;
 
 namespace UniAttend.Infrastructure.Services
 {

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using UniAttend.Core.Entities;
 using UniAttend.Core.Entities.Attendance;
 using UniAttend.Core.Interfaces.Repositories;
 
@@ -49,9 +50,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<IEnumerable<AttendanceRecord>> GetByClassIdAsync(int classId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AttendanceRecord>> GetByCourseIdAsync(int courseId, CancellationToken cancellationToken = default)
             => await _context.Set<AttendanceRecord>()
-                .Where(a => a.ClassId == classId)
+                .Where(a => a.CourseId == courseId)
                 .ToListAsync(cancellationToken);
 
         public async Task<IEnumerable<AttendanceRecord>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
@@ -64,31 +65,31 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Where(a => a.CheckInTime >= startDate && a.CheckInTime <= endDate)
                 .ToListAsync(cancellationToken);
 
-        public async Task<AttendanceRecord?> GetStudentAttendanceForClassAsync(int studentId, int classId, CancellationToken cancellationToken = default)
+        public async Task<AttendanceRecord?> GetStudentAttendanceForCourseAsync(int studentId, int courseId, CancellationToken cancellationToken = default)
             => await _context.Set<AttendanceRecord>()
-                .FirstOrDefaultAsync(a => a.StudentId == studentId && a.ClassId == classId, cancellationToken);
+                .FirstOrDefaultAsync(a => a.StudentId == studentId && a.CourseId == courseId, cancellationToken);
 
         public async Task<double> GetStudentAttendancePercentageAsync(int studentId, int groupId, CancellationToken cancellationToken = default)
         {
-            var totalClasses = await _context.Set<Class>()
-                .CountAsync(c => c.GroupId == groupId, cancellationToken);
+            var totalCourses = await _context.Set<Course>()
+                .CountAsync(c => c.StudyGroupId == groupId && c.IsActive, cancellationToken);
 
-            if (totalClasses == 0) return 0;
+            if (totalCourses == 0) return 0;
 
             var attendedClasses = await _context.Set<AttendanceRecord>()
                 .CountAsync(a => a.StudentId == studentId && a.IsConfirmed, cancellationToken);
 
-            return (double)attendedClasses / totalClasses * 100;
+            return (double)attendedClasses / totalCourses * 100;
         }
 
-        public async Task<IEnumerable<AttendanceRecord>> GetUnconfirmedRecordsAsync(int classId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AttendanceRecord>> GetUnconfirmedRecordsAsync(int courseId, CancellationToken cancellationToken = default)
             => await _context.Set<AttendanceRecord>()
-                .Where(a => a.ClassId == classId && !a.IsConfirmed)
+                .Where(a => a.CourseId == courseId && !a.IsConfirmed)
                 .ToListAsync(cancellationToken);
 
-        public async Task ConfirmAttendanceRecordsAsync(int classId, CancellationToken cancellationToken = default)
+        public async Task ConfirmAttendanceRecordsAsync(int courseId, CancellationToken cancellationToken = default)
         {
-            var records = await GetUnconfirmedRecordsAsync(classId, cancellationToken);
+            var records = await GetUnconfirmedRecordsAsync(courseId, cancellationToken);
             foreach (var record in records)
             {
                 record.IsConfirmed = true;
