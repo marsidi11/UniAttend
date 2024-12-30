@@ -16,6 +16,8 @@ namespace UniAttend.Infrastructure.Data
         private IProfessorRepository? _professors;
         private IAttendanceRecordRepository? _attendanceRecords;
         private ICourseRepository? _courses;
+        private IDepartmentRepository? _departments;
+        private IScheduleRepository? _schedules;
         private IStudyGroupRepository? _studyGroups;
         private IOtpCodeRepository? _otpCodes;
         private bool _disposed;
@@ -40,6 +42,12 @@ namespace UniAttend.Infrastructure.Data
 
         public ICourseRepository Courses =>
             _courses ??= new CourseRepository(_context);
+
+        public IDepartmentRepository Departments =>
+            _departments ??= new DepartmentRepository(_context);
+        
+        public IScheduleRepository Schedules =>
+            _schedules ??= new ScheduleRepository(_context);
 
         public IStudyGroupRepository StudyGroups =>
             _studyGroups ??= new StudyGroupRepository(_context);

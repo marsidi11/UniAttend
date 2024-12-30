@@ -11,5 +11,7 @@ namespace UniAttend.Core.Interfaces.Services
             decimal absencePercentage, CancellationToken cancellationToken = default);
         Task SendOtpCodeAsync(string email, string otpCode, string className, 
             DateTime expiryTime, CancellationToken cancellationToken = default);
+        Task SendEmailAsync(string to, string subject, string body, 
+            CancellationToken cancellationToken = default);
     }
 }

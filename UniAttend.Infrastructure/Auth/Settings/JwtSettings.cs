@@ -2,7 +2,7 @@
 /// Contains JSON Web Token (JWT) configuration settings used for authentication and authorization.
 /// It includes essential properties required for JWT token generation and validation.
 /// </summary>
-namespace UniAttend.Application.Auth.Common
+namespace UniAttend.Infrastructure.Auth.Settings
 {
     public class JwtSettings
     {

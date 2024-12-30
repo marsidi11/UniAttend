@@ -1,9 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
-using UniAttend.Application.Common.Interfaces;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Core.Interfaces.Services;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Interfaces.Repositories;
 
@@ -11,16 +10,16 @@ namespace UniAttend.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly JwtSettings _jwtSettings;
+        private readonly IJwtService _jwtService;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IUserRepository _userRepository;
 
         public AuthService(
-            JwtSettings jwtSettings,
+            IJwtService jwtService,
             IPasswordHasher passwordHasher,
             IUserRepository userRepository)
         {
-            _jwtSettings = jwtSettings;
+            _jwtService = jwtService;
             _passwordHasher = passwordHasher;
             _userRepository = userRepository;
         }
@@ -35,21 +34,8 @@ namespace UniAttend.Infrastructure.Services
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-            var credentials = new SigningCredentials(
-                key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: credentials);
-
-            var accessToken = new JwtSecurityTokenHandler()
-                .WriteToken(token);
-            var refreshToken = GenerateRefreshToken();
+            var accessToken = _jwtService.GenerateToken(claims);
+            var refreshToken = _jwtService.GenerateRefreshToken();
 
             return (accessToken, refreshToken);
         }
@@ -59,21 +45,12 @@ namespace UniAttend.Infrastructure.Services
             return _passwordHasher.HashPassword(password);
         }
 
-        public async Task<bool> ValidateCredentialsAsync(
-            string username, string password)
+        public async Task<bool> ValidateCredentialsAsync(string username, string password)
         {
             var user = await _userRepository.GetByUsernameAsync(username);
             if (user == null) return false;
 
-            return _passwordHasher.VerifyPassword(
-                password, user.PasswordHash);
-        }
-
-        private static string GenerateRefreshToken()
-        {
-            return Convert.ToBase64String(
-                System.Security.Cryptography.RandomNumberGenerator
-                    .GetBytes(64));
+            return _passwordHasher.VerifyPassword(password, user.PasswordHash);
         }
     }
 }

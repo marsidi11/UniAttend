@@ -13,36 +13,37 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-// Add Authentication
-var jwtKey = builder.Configuration["Jwt:SecretKey"] ??
-    throw new InvalidOperationException("JWT Secret Key is not configured");
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// Add Authentication & Authorization
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey))
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
+    };
+});
 
 // Add Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireAdminRole",
+    options.AddPolicy("RequireAdminRole", 
         policy => policy.RequireRole("Admin"));
-    options.AddPolicy("RequireProfessorRole",
+    options.AddPolicy("RequireProfessorRole", 
         policy => policy.RequireRole("Professor"));
-    options.AddPolicy("RequireSecretaryRole",
-    policy => policy.RequireRole("Secretary"));
-    options.AddPolicy("RequireStudentRole",
+    options.AddPolicy("RequireSecretaryRole", 
+        policy => policy.RequireRole("Secretary"));
+    options.AddPolicy("RequireStudentRole", 
         policy => policy.RequireRole("Student"));
 });
 

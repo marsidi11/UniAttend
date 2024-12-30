@@ -1,22 +1,24 @@
-using System;
-
 namespace UniAttend.Application.Common.Exceptions
 {
     public class ValidationException : Exception
     {
-        public ValidationException()
-            : base()
+        public IEnumerable<string> Errors { get; }
+
+        public ValidationException() : base()
         {
+            Errors = new List<string>();
         }
 
         public ValidationException(string message)
             : base(message)
         {
+            Errors = new[] { message };
         }
 
-        public ValidationException(string message, Exception innerException)
-            : base(message, innerException)
+        public ValidationException(string message, IEnumerable<string> errors)
+            : base(message)
         {
+            Errors = errors;
         }
     }
 }

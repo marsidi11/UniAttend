@@ -41,12 +41,23 @@ namespace UniAttend.Infrastructure.Services
             await SendEmailAsync(email, subject, body, cancellationToken);
         }
 
-        private async Task SendEmailAsync(string to, string subject, 
-            string body, CancellationToken cancellationToken)
+        /// <summary>
+        /// Sends an email using configured SMTP settings
+        /// </summary>
+        /// <param name="to">Recipient email address</param>
+        /// <param name="subject">Email subject</param>
+        /// <param name="body">Email body content</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        public async Task SendEmailAsync(string to, string subject, 
+            string body, CancellationToken cancellationToken = default)
         {
             try
             {
-                using var client = new SmtpClient(_settings.SmtpServer, _settings.Port);
+                using var client = new SmtpClient(_settings.SmtpServer, _settings.Port)
+                {
+                    EnableSsl = _settings.EnableSsl,
+                    Credentials = new System.Net.NetworkCredential(_settings.Username, _settings.Password)
+                };
                 using var message = new MailMessage(_settings.FromAddress, to, subject, body);
                 await client.SendMailAsync(message, cancellationToken);
             }

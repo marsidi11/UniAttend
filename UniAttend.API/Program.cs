@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using UniAttend.Application;
 using UniAttend.Infrastructure;
+using UniAttend.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<JwtMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

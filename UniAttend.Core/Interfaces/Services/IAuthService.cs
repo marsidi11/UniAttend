@@ -4,6 +4,8 @@ namespace UniAttend.Core.Interfaces.Services
 {
     public interface IAuthService
     {
-        Task<(string accessToken, string refreshToken)> GenerateTokensAsync(User user);
+        Task<(string AccessToken, string RefreshToken)> GenerateTokensAsync(User user);
+        Task<bool> ValidateCredentialsAsync(string username, string password);
+        string HashPassword(string password);
     }
 }

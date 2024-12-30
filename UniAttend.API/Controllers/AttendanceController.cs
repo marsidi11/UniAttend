@@ -9,25 +9,25 @@ using UniAttend.API.Extensions;
 
 namespace UniAttend.API.Controllers
 {
-    [Authorize]
-    [ApiController]
+        [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class AttendanceController : ControllerBase
     {
         private readonly IMediator _mediator;
-
+    
         public AttendanceController(IMediator mediator)
         {
             _mediator = mediator;
         }
-
+    
         [HttpPost("card")]
         public async Task<IActionResult> RecordCardAttendance(RecordCardAttendanceCommand command)
         {
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-
+    
         [HttpPost("otp")]
         public async Task<IActionResult> RecordOtpAttendance(RecordOtpAttendanceCommand command)
         {
@@ -35,9 +35,9 @@ namespace UniAttend.API.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-
+    
         [Authorize(Policy = "RequireProfessorRole")]
-        [HttpPost("confirm/{classId}")]
+        [HttpPost("classes/{classId}/confirm")]
         public async Task<IActionResult> ConfirmAttendance(int classId)
         {
             var command = new ConfirmAttendanceCommand 

@@ -1,6 +1,6 @@
 using MediatR;
-using UniAttend.Application.Common.Interfaces;
 using UniAttend.Application.Common.Exceptions;
+using UniAttend.Core.Interfaces.Services;
 using UniAttend.Core.Interfaces.Repositories;
 
 namespace UniAttend.Application.Features.Users.Commands.ChangePassword

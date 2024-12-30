@@ -7,6 +7,8 @@ namespace UniAttend.Core.Interfaces.Repositories
         IProfessorRepository Professors { get; }
         IAttendanceRecordRepository AttendanceRecords { get; }
         ICourseRepository Courses { get; }
+        IDepartmentRepository Departments { get; }
+        IScheduleRepository Schedules { get; }
         IStudyGroupRepository StudyGroups { get; }
         IOtpCodeRepository OtpCodes { get; }
         

@@ -1,5 +1,4 @@
 using MediatR;
-using UniAttend.Application.Common.Interfaces;
 using UniAttend.Application.Common.Exceptions;
 using UniAttend.Core.Interfaces.Repositories;
 using System.Threading;

@@ -8,18 +8,18 @@ using UniAttend.Application.Features.Students.Queries.GetStudentGroups;
 
 namespace UniAttend.API.Controllers
 {
-    [Authorize]
-    [ApiController]
+        [ApiController]
     [Route("api/[controller]")]
-    public class StudentsController : ControllerBase
+    [Authorize(Policy = "RequireStudentRole")]
+    public class StudentController : ControllerBase
     {
         private readonly IMediator _mediator;
-
-        public StudentsController(IMediator mediator)
+    
+        public StudentController(IMediator mediator)
         {
             _mediator = mediator;
         }
-
+    
         [HttpGet("attendance")]
         public async Task<IActionResult> GetAttendanceRecords([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
@@ -32,7 +32,7 @@ namespace UniAttend.API.Controllers
             var result = await _mediator.Send(query);
             return Ok(result);
         }
-
+    
         [HttpGet("enrolled-groups")]
         public async Task<IActionResult> GetEnrolledGroups()
         {
@@ -40,7 +40,7 @@ namespace UniAttend.API.Controllers
             var result = await _mediator.Send(query);
             return Ok(result);
         }
-
+    
         [HttpGet("absence-alerts")]
         public async Task<IActionResult> GetAbsenceAlerts()
         {
