@@ -18,5 +18,8 @@ namespace UniAttend.Core.Entities.Attendance
         public DateTime CheckInTime { get; }
         public string CheckInMethod { get; }
         public bool IsConfirmed { get; set; } = false;
+
+        public virtual Course Course { get; set; } = null!;
+        public virtual Student Student { get; set; } = null!;
     }
 }

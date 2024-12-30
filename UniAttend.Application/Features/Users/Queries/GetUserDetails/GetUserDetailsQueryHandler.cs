@@ -1,6 +1,6 @@
 using MediatR;
 using UniAttend.Application.Auth.Common;
-using UniAttend.Application.Common.Exceptions;
+using UniAttend.Shared.Exceptions;
 using UniAttend.Core.Interfaces.Repositories;
 
 namespace UniAttend.Application.Features.Users.Queries.GetUserDetails

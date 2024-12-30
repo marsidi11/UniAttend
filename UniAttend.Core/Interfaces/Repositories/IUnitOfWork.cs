@@ -9,6 +9,9 @@ namespace UniAttend.Core.Interfaces.Repositories
         ICourseRepository Courses { get; }
         IDepartmentRepository Departments { get; }
         IScheduleRepository Schedules { get; }
+        IAcademicYearRepository AcademicYears { get; }
+        ISubjectRepository Subjects { get; }
+        IReportRepository Reports { get; }
         IStudyGroupRepository StudyGroups { get; }
         IOtpCodeRepository OtpCodes { get; }
         

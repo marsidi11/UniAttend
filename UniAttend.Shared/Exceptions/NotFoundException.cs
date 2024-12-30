@@ -1,4 +1,4 @@
-namespace UniAttend.Application.Common.Exceptions
+namespace UniAttend.Shared.Exceptions
 {
     /// <summary>
     /// Exception thrown when a requested entity is not found in the system.

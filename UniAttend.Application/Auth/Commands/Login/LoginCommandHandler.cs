@@ -1,7 +1,7 @@
 using MediatR;
 using UniAttend.Application.Auth.Common;
 using UniAttend.Core.Interfaces.Services;
-using UniAttend.Application.Common.Exceptions;
+using UniAttend.Shared.Exceptions;
 using UniAttend.Core.Interfaces.Repositories;
 
 /// <summary>

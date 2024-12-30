@@ -638,7 +638,8 @@
         "dependencies": {
           "FluentValidation": "11.11.0",
           "MediatR": "12.4.1",
-          "UniAttend.Core": "1.0.0"
+          "UniAttend.Core": "1.0.0",
+          "UniAttend.Shared": "1.0.0"
         },
         "runtime": {
           "UniAttend.Application.dll": {
@@ -668,6 +669,14 @@
         },
         "runtime": {
           "UniAttend.Infrastructure.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "UniAttend.Shared/1.0.0": {
+        "runtime": {
+          "UniAttend.Shared.dll": {
             "assemblyVersion": "1.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -1077,6 +1086,11 @@
       "sha512": ""
     },
     "UniAttend.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UniAttend.Shared/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

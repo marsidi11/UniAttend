@@ -9,9 +9,14 @@ namespace UniAttend.Core.Interfaces.Services
     {
         Task SendAbsenceAlertAsync(string email, string studentName, string courseName, 
             decimal absencePercentage, CancellationToken cancellationToken = default);
+
         Task SendOtpCodeAsync(string email, string otpCode, string className, 
             DateTime expiryTime, CancellationToken cancellationToken = default);
+            
         Task SendEmailAsync(string to, string subject, string body, 
             CancellationToken cancellationToken = default);
+
+        Task SendWelcomeEmailAsync(string email, string fullName, string username, 
+        string temporaryPassword, CancellationToken cancellationToken = default);
     }
 }

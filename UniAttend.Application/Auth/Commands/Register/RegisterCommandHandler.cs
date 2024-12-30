@@ -6,7 +6,7 @@ using UniAttend.Core.Enums;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Core.Interfaces.Services;
-using UniAttend.Application.Common.Exceptions;
+using UniAttend.Shared.Exceptions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

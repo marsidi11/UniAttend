@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UniAttend.Core\UniAttend.Core.csproj" />
+    <ProjectReference Include="..\UniAttend.Shared\UniAttend.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

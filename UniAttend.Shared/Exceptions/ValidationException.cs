@@ -1,4 +1,4 @@
-namespace UniAttend.Application.Common.Exceptions
+namespace UniAttend.Shared.Exceptions
 {
     public class ValidationException : Exception
     {

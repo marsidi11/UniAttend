@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using UniAttend.Core.Interfaces.Services;
 using UniAttend.Application.Common.Exceptions;
+using UniAttend.Shared.Exceptions;
 
 namespace UniAttend.Infrastructure.Services
 {

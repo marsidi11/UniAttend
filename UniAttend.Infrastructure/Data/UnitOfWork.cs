@@ -18,6 +18,9 @@ namespace UniAttend.Infrastructure.Data
         private ICourseRepository? _courses;
         private IDepartmentRepository? _departments;
         private IScheduleRepository? _schedules;
+        private IAcademicYearRepository? _academicYears;
+        private ISubjectRepository? _subjects;
+        private IReportRepository? _reports;
         private IStudyGroupRepository? _studyGroups;
         private IOtpCodeRepository? _otpCodes;
         private bool _disposed;
@@ -51,6 +54,15 @@ namespace UniAttend.Infrastructure.Data
 
         public IStudyGroupRepository StudyGroups =>
             _studyGroups ??= new StudyGroupRepository(_context);
+
+        public IAcademicYearRepository AcademicYears =>
+            _academicYears ??= new AcademicYearRepository(_context);
+
+        public ISubjectRepository Subjects =>
+            _subjects ??= new SubjectRepository(_context);
+
+        public IReportRepository Reports =>
+            _reports ??= new ReportRepository(_context);
 
         public IOtpCodeRepository OtpCodes =>
             _otpCodes ??= new OtpCodeRepository(_context);

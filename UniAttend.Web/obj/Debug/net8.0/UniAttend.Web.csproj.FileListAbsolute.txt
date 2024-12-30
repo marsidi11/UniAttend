@@ -67,9 +67,11 @@ C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Application.dll
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Core.dll
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Infrastructure.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Shared.dll
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Application.pdb
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Infrastructure.pdb
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Core.pdb
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\bin\Debug\net8.0\UniAttend.Shared.pdb
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\obj\Debug\net8.0\UniAttend.Web.csproj.AssemblyReference.cache
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\obj\Debug\net8.0\UniAttend.Web.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Web\obj\Debug\net8.0\UniAttend.Web.AssemblyInfoInputs.cache

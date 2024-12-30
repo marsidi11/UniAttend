@@ -4,7 +4,7 @@ using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Enums;
 using UniAttend.Core.Interfaces.Services;
 using MediatR;
-using UniAttend.Application.Common.Exceptions;
+using UniAttend.Shared.Exceptions;
 
 namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
 {

@@ -17,8 +17,8 @@ namespace UniAttend.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task SendAbsenceAlertAsync(string email, string studentName, 
-            string courseName, decimal absencePercentage, 
+        public async Task SendAbsenceAlertAsync(string email, string studentName,
+            string courseName, decimal absencePercentage,
             CancellationToken cancellationToken = default)
         {
             var subject = "Attendance Alert";
@@ -30,8 +30,8 @@ namespace UniAttend.Infrastructure.Services
             await SendEmailAsync(email, subject, body, cancellationToken);
         }
 
-        public async Task SendOtpCodeAsync(string email, string otpCode, 
-            string className, DateTime expiryTime, 
+        public async Task SendOtpCodeAsync(string email, string otpCode,
+            string className, DateTime expiryTime,
             CancellationToken cancellationToken = default)
         {
             var subject = "Attendance OTP Code";
@@ -48,7 +48,7 @@ namespace UniAttend.Infrastructure.Services
         /// <param name="subject">Email subject</param>
         /// <param name="body">Email body content</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public async Task SendEmailAsync(string to, string subject, 
+        public async Task SendEmailAsync(string to, string subject,
             string body, CancellationToken cancellationToken = default)
         {
             try
@@ -66,6 +66,32 @@ namespace UniAttend.Infrastructure.Services
                 _logger.LogError(ex, "Failed to send email to {Email}", to);
                 throw;
             }
+        }
+
+        public async Task SendWelcomeEmailAsync(
+        string email,
+        string fullName,
+        string username,
+        string temporaryPassword,
+        CancellationToken cancellationToken = default)
+        {
+            var subject = "Welcome to UniAttend - Account Details";
+            var body = $"""
+            Dear {fullName},
+
+            Welcome to UniAttend! Your account has been created successfully.
+
+            Here are your login credentials:
+            Username: {username}
+            Temporary Password: {temporaryPassword}
+
+            For security reasons, please change your password after your first login.
+
+            Best regards,
+            The UniAttend Team
+            """;
+
+            await SendEmailAsync(email, subject, body, cancellationToken);
         }
     }
 }

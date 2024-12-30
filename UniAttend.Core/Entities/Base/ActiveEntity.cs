@@ -6,7 +6,17 @@ namespace UniAttend.Core.Entities.Base
 {
     public abstract class ActiveEntity : Entity
     {
-        public bool IsActive { get; protected set; } = true;
+        protected ActiveEntity()
+        {
+            IsActive = true;
+        }
+
+        protected ActiveEntity(bool isActive)
+        {
+            IsActive = isActive;
+        }
+
+        public bool IsActive { get; protected set; }
 
         protected void Deactivate() => IsActive = false;
         protected void Activate() => IsActive = true;

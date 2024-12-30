@@ -2159,7 +2159,8 @@
         "dependencies": {
           "FluentValidation": "11.11.0",
           "MediatR": "12.4.1",
-          "UniAttend.Core": "1.0.0"
+          "UniAttend.Core": "1.0.0",
+          "UniAttend.Shared": "1.0.0"
         },
         "compile": {
           "bin/placeholder/UniAttend.Application.dll": {}

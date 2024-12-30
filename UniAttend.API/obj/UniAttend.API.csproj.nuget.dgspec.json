@@ -117,6 +117,9 @@
             "projectReferences": {
               "C:\\Users\\User\\Documents\\Coding Projects\\UniAttend\\UniAttend.Core\\UniAttend.Core.csproj": {
                 "projectPath": "C:\\Users\\User\\Documents\\Coding Projects\\UniAttend\\UniAttend.Core\\UniAttend.Core.csproj"
+              },
+              "C:\\Users\\User\\Documents\\Coding Projects\\UniAttend\\UniAttend.Shared\\UniAttend.Shared.csproj": {
+                "projectPath": "C:\\Users\\User\\Documents\\Coding Projects\\UniAttend\\UniAttend.Shared\\UniAttend.Shared.csproj"
               }
             }
           }
