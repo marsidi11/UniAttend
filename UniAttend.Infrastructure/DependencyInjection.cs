@@ -88,6 +88,24 @@ namespace UniAttend.Infrastructure
                 configuration.GetSection("EmailSettings"));
             services.Configure<CardReaderSettings>(
                 configuration.GetSection("CardReaderSettings"));
+            services.Configure<NetworkSettings>(
+                configuration.GetSection("NetworkSettings"));
+
+            // Add Core Services
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IOtpService, OtpService>();
+            services.AddScoped<ICardReaderService, CardReaderService>();
+            services.AddScoped<IAuditService, AuditService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IPrintService, PdfPrintService>();
+            services.AddScoped<INetworkValidationService, NetworkValidationService>();
+
+            // Add Cross-Cutting Concerns
+            services.AddScoped<ILoggerService, LoggerService>();
+            services.AddScoped<IExceptionHandler, ExceptionHandler>();
 
 
             // Add Cross-Cutting Concerns

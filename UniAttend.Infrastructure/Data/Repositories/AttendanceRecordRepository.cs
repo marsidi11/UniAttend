@@ -61,5 +61,45 @@ namespace UniAttend.Infrastructure.Data.Repositories
             }
             await Context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<IEnumerable<AttendanceRecord>> GetGroupAttendanceAsync(
+        int groupId,
+        DateTime startDate,
+        DateTime endDate,
+        CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(ar => ar.Student)
+                    .ThenInclude(s => s.User)
+                .Include(ar => ar.Course)
+                    .ThenInclude(c => c.StudyGroup)
+                .Where(ar =>
+                    ar.Course.StudyGroupId == groupId &&
+                    ar.CheckInTime >= startDate &&
+                    ar.CheckInTime <= endDate)
+                .OrderByDescending(ar => ar.CheckInTime)
+                .ThenBy(ar => ar.Student.User.LastName)
+                .ThenBy(ar => ar.Student.User.FirstName)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<CourseSession> GetSessionWithDetailsAsync(
+    int sessionId,
+    CancellationToken cancellationToken = default)
+        {
+            var session = await Context.Set<CourseSession>()
+                .Include(cs => cs.Group)
+                    .ThenInclude(g => g.Students)
+                        .ThenInclude(gs => gs.Student) // Add this level
+                            .ThenInclude(s => s.User) // Then access User through Student
+                .FirstOrDefaultAsync(cs => cs.Id == sessionId, cancellationToken);
+
+            if (session == null)
+            {
+                throw new KeyNotFoundException($"Course session with ID {sessionId} not found");
+            }
+
+            return session;
+        }
     }
 }

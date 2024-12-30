@@ -15,5 +15,14 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<double> GetStudentAttendancePercentageAsync(int studentId, int groupId, CancellationToken cancellationToken = default);
         Task<IEnumerable<AttendanceRecord>> GetUnconfirmedRecordsAsync(int courseId, CancellationToken cancellationToken = default);
         Task ConfirmAttendanceRecordsAsync(int courseId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AttendanceRecord>> GetGroupAttendanceAsync(
+            int groupId,
+            DateTime startDate,
+            DateTime endDate,
+            CancellationToken cancellationToken = default);
+
+        Task<CourseSession> GetSessionWithDetailsAsync(
+            int sessionId,
+            CancellationToken cancellationToken = default);
     }
 }
