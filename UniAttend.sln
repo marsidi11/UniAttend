@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniAttend.Web", "UniAttend.Web\UniAttend.Web.csproj", "{BC37857B-0F59-4D09-AD45-7D33FBF6742A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniAttend.Core", "UniAttend.Core\UniAttend.Core.csproj", "{6A6D10C0-C077-4ED1-AF25-7A0E7476CC0E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniAttend.Application", "UniAttend.Application\UniAttend.Application.csproj", "{D7C07084-51AD-4A83-B21C-B669650DBC83}"
