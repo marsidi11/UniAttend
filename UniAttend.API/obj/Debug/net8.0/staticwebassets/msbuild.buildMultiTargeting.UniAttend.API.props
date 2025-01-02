@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\UniAttend.API.props" />
-</Project>
