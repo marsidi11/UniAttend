@@ -1,37 +1,29 @@
-export interface LoginCredentials {
+import type { Role, BaseEntity } from './base.types';
+
+export interface User extends BaseEntity {
   username: string;
-  password: string;
+  email: string;
+  role: Role;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
 }
 
 export interface AuthResponse {
   token: string;
-  refreshToken: string;
-  userId: number;
-  role: string;
+  user: User;
 }
 
-export interface UserProfile {
-  id: number;
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  username: string;
+  password: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
-  role: 'student' | 'professor' | 'admin' | 'secretary';
+  role: Role;
 }
-
-export interface RegisterCredentials {
-    username: string;
-    password: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: 'student' | 'professor' | 'admin' | 'secretary';
-    studentId?: string;
-    departmentId?: number;
-    cardId?: string;
-  }
-  
-  export interface ResetPasswordCredentials {
-    email: string;
-    token: string;
-    newPassword: string;
-  }

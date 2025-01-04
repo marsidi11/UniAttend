@@ -1,56 +1,27 @@
-export interface Department {
-    id: number;
-    name: string;
-    isActive: boolean;
-    subjects?: Subject[];
-    students?: Student[];
-    professors?: Professor[];
+import type { ActiveEntity } from './base.types';
+
+export interface Department extends ActiveEntity {
+  name: string;
+  subjects?: Subject[];
+  students?: Student[];
+  professors?: Professor[];
+  subjectsCount?: number;
+  studentsCount?: number;
+  professorsCount?: number;
 }
 
-export interface Subject {
-    id: number;
-    name: string;
-    description?: string;
-    credits: number;
-    departmentId: number;
+export interface Subject extends ActiveEntity {
+  name: string;
+  description?: string;
+  credits: number;
+  departmentId: number;
 }
 
-export interface Student {
-    id: number;
-    studentId: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    departmentId: number;
-}
-
-export interface Professor {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-    departmentId: number;
-}
-
-// DTOs for API requests
 export interface CreateDepartmentRequest {
-    name: string;
+  name: string;
 }
 
 export interface UpdateDepartmentRequest {
-    name: string;
-    isActive: boolean;
-}
-
-// DTOs for API responses
-export interface DepartmentResponse extends Department {
-    subjectsCount: number;
-    studentsCount: number;
-    professorsCount: number;
-}
-
-export interface DepartmentDetailResponse extends Department {
-    subjects: Subject[];
-    students: Student[];
-    professors: Professor[];
+  name: string;
+  isActive: boolean;
 }

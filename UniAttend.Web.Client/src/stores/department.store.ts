@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Department } from '@/types/department.types';
+import type { 
+  Department, 
+  CreateDepartmentRequest, 
+  UpdateDepartmentRequest 
+} from '@/types/department.types';
 import { departmentApi } from '@/api/endpoints/departmentApi';
 
 export const useDepartmentStore = defineStore('department', () => {
@@ -12,20 +16,17 @@ export const useDepartmentStore = defineStore('department', () => {
 
   // Getters
   const activeDepartments = computed(() => 
-    departments.value.filter(dept => dept.isActive)
+    departments.value.filter(d => d.isActive)
   );
 
   // Actions
   async function fetchDepartments() {
     isLoading.value = true;
-    error.value = null;
     try {
-      const { data } = await departmentApi.getDepartments();
+      const { data } = await departmentApi.getAll();
       departments.value = data;
-      return data;
-    } catch (err: any) {
-      error.value = err?.response?.data?.message || 'Failed to fetch departments';
-      throw err;
+    } catch (err) {
+      handleError(err);
     } finally {
       isLoading.value = false;
     }
@@ -33,39 +34,33 @@ export const useDepartmentStore = defineStore('department', () => {
 
   async function fetchDepartmentById(id: number) {
     isLoading.value = true;
-    error.value = null;
     try {
-      const { data } = await departmentApi.getDepartmentById(id);
+      const { data } = await departmentApi.getById(id);
       currentDepartment.value = data;
-      return data;
-    } catch (err: any) {
-      error.value = err?.response?.data?.message || 'Failed to fetch department';
-      throw err;
+    } catch (err) {
+      handleError(err);
     } finally {
       isLoading.value = false;
     }
   }
 
-  async function createDepartment(name: string) {
+  async function createDepartment(request: CreateDepartmentRequest) {
     isLoading.value = true;
-    error.value = null;
     try {
-      const { data } = await departmentApi.createDepartment({ name });
+      const { data } = await departmentApi.create(request);
       departments.value.push(data);
-      return data;
-    } catch (err: any) {
-      error.value = err?.response?.data?.message || 'Failed to create department';
+    } catch (err) {
+      handleError(err);
       throw err;
     } finally {
       isLoading.value = false;
     }
   }
 
-  async function updateDepartment(id: number, payload: { name: string; isActive: boolean }) {
+  async function updateDepartment(id: number, request: UpdateDepartmentRequest) {
     isLoading.value = true;
-    error.value = null;
     try {
-      const { data } = await departmentApi.updateDepartment(id, payload);
+      const { data } = await departmentApi.update(id, request);
       const index = departments.value.findIndex(d => d.id === id);
       if (index !== -1) {
         departments.value[index] = data;
@@ -73,30 +68,16 @@ export const useDepartmentStore = defineStore('department', () => {
       if (currentDepartment.value?.id === id) {
         currentDepartment.value = data;
       }
-      return data;
-    } catch (err: any) {
-      error.value = err?.response?.data?.message || 'Failed to update department';
+    } catch (err) {
+      handleError(err);
       throw err;
     } finally {
       isLoading.value = false;
     }
   }
 
-  async function deleteDepartment(id: number) {
-    isLoading.value = true;
-    error.value = null;
-    try {
-      await departmentApi.deleteDepartment(id);
-      departments.value = departments.value.filter(d => d.id !== id);
-      if (currentDepartment.value?.id === id) {
-        currentDepartment.value = null;
-      }
-    } catch (err: any) {
-      error.value = err?.response?.data?.message || 'Failed to delete department';
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
+  function handleError(err: unknown) {
+    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {
@@ -113,7 +94,6 @@ export const useDepartmentStore = defineStore('department', () => {
     fetchDepartments,
     fetchDepartmentById,
     createDepartment,
-    updateDepartment,
-    deleteDepartment
+    updateDepartment
   };
 });

@@ -1,63 +1,79 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { authApi } from '@/api/endpoints/authApi'
-import type { 
-  LoginCredentials, 
-  RegisterCredentials, 
-  ResetPasswordCredentials,
-  AuthResponse, 
-  UserProfile 
-} from '@/types/auth.types'
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import type { User, AuthResponse, LoginRequest, RegisterRequest } from '@/types/user.types';
+import { authApi } from '@/api/endpoints/authApi';
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<UserProfile | null>(null)
-  const token = ref<string | null>(localStorage.getItem('token'))
+  // State
+  const user = ref<User | null>(null);
+  const token = ref<string | null>(localStorage.getItem('token'));
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
 
-  const isAuthenticated = computed(() => !!token.value)
-  const userRole = computed(() => user.value?.role)
+  // Getters
+  const isAuthenticated = computed(() => !!token.value);
+  const userRole = computed(() => user.value?.role.toLowerCase());
+  const fullName = computed(() => 
+    user.value ? `${user.value.firstName} ${user.value.lastName}` : '');
 
-  async function login(credentials: LoginCredentials) {
-    const { data } = await authApi.login(credentials)
-    setAuthData(data)
-    return true
+  // Actions
+  async function login(credentials: LoginRequest) {
+    isLoading.value = true;
+    try {
+      const { data } = await authApi.login(credentials);
+      setAuthData(data);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  async function register(credentials: RegisterCredentials) {
-    const { data } = await authApi.register(credentials)
-    setAuthData(data)
-    return true
-  }
-
-  async function resetPassword(credentials: ResetPasswordCredentials) {
-    await authApi.resetPassword(credentials)
-    return true
-  }
-
-  async function requestPasswordReset(email: string) {
-    await authApi.requestPasswordReset(email)
-    return true
-  }
-
-  function setAuthData(auth: AuthResponse) {
-    token.value = auth.token
-    localStorage.setItem('token', auth.token)
+  async function register(userData: RegisterRequest) {
+    isLoading.value = true;
+    try {
+      const { data } = await authApi.register(userData);
+      setAuthData(data);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   function logout() {
-    token.value = null
-    user.value = null
-    localStorage.removeItem('token')
+    user.value = null;
+    token.value = null;
+    localStorage.removeItem('token');
+  }
+
+  function setAuthData(data: AuthResponse) {
+    user.value = data.user;
+    token.value = data.token;
+    localStorage.setItem('token', data.token);
+  }
+
+  function handleError(err: unknown) {
+    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {
+    // State
     user,
     token,
+    isLoading,
+    error,
+    
+    // Getters
     isAuthenticated,
     userRole,
+    fullName,
+    
+    // Actions
     login,
     register,
-    resetPassword,
-    requestPasswordReset,
     logout
-  }
-})
+  };
+});

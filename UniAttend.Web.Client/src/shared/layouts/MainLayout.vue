@@ -25,17 +25,6 @@
               >
                 Home
               </router-link>
-              <router-link
-                to="/about"
-                class="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2"
-                :class="[
-                  $route.path === '/about'
-                    ? 'border-indigo-500'
-                    : 'border-transparent hover:border-gray-300'
-                ]"
-              >
-                About
-              </router-link>
             </div>
           </div>
 
