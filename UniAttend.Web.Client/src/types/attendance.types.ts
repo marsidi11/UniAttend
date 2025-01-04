@@ -1,12 +1,14 @@
-export interface AttendanceRecord {
-  id: number;
+import type { BaseEntity } from './base.types';
+
+export interface AttendanceRecord extends BaseEntity {
   studentId: number;
   classId: number;
   checkInTime: Date;
   checkInMethod: 'Card' | 'OTP';
   isConfirmed: boolean;
-  studentName: string;
-  courseName: string;
+  studentName?: string;
+  courseName?: string;
+  professorName?: string;
 }
 
 export interface AttendanceStats {
@@ -16,14 +18,16 @@ export interface AttendanceStats {
   absentStudents: number;
 }
 
-export interface ClassAttendance {
-  id: number;
+export interface ClassSession extends BaseEntity {
   groupId: number;
   classroomId: number;
   date: Date;
   startTime: string;
   endTime: string;
   status: 'Active' | 'Completed';
+}
+
+export interface ClassAttendance extends ClassSession {
   records: AttendanceRecord[];
   stats: AttendanceStats;
 }
@@ -31,9 +35,19 @@ export interface ClassAttendance {
 export interface RecordCardAttendanceRequest {
   cardId: string;
   deviceId: string;
+  classId: number;
 }
 
 export interface RecordOtpAttendanceRequest {
   otpCode: string;
   classId: number;
+  studentId?: number;
+}
+
+export interface AttendanceReport {
+  groupId: number;
+  totalClasses: number;
+  attendedClasses: number;
+  absenceRate: number;
+  records: AttendanceRecord[];
 }

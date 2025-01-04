@@ -1,25 +1,46 @@
 import apiClient from '../apiClient';
-import type { AttendanceRecord, AttendanceStats } from '@/types/attendance.types';
+import type { 
+  AttendanceRecord, 
+  AttendanceStats,
+  ClassSession,
+  ClassAttendance,
+  RecordCardAttendanceRequest,
+  RecordOtpAttendanceRequest,
+  AttendanceReport
+} from '@/types/attendance.types';
 
 export const attendanceApi = {
+  // Student attendance
   getStudentAttendance: (startDate?: Date, endDate?: Date) =>
-    apiClient.get<AttendanceRecord[]>('/attendance', { params: { startDate, endDate } }),
+    apiClient.get<AttendanceRecord[]>('/attendance/student', { 
+      params: { startDate, endDate } 
+    }),
 
-  getAttendanceStats: (groupId: number) =>
+  checkInWithCard: (request: RecordCardAttendanceRequest) =>
+    apiClient.post<AttendanceRecord>('/attendance/check-in/card', request),
+
+  checkInWithOtp: (request: RecordOtpAttendanceRequest) =>
+    apiClient.post<AttendanceRecord>('/attendance/check-in/otp', request),
+
+  getStudentStats: (groupId: number) =>
     apiClient.get<AttendanceStats>(`/attendance/stats/${groupId}`),
 
-  recordCardAttendance: (cardId: string, deviceId: string) =>
-    apiClient.post('/attendance/card', { cardId, deviceId }),
+  // Professor attendance management
+  openClassSession: (data: Omit<ClassSession, 'id'>) =>
+    apiClient.post<ClassSession>('/classes/open', data),
 
-  recordOtpAttendance: (otpCode: string, classId: number) =>
-    apiClient.post('/attendance/otp', { otpCode, classId }),
-
-  confirmAttendance: (classId: number) =>
-    apiClient.post(`/classes/${classId}/confirm`),
+  closeClassSession: (classId: number) =>
+    apiClient.post(`/classes/${classId}/close`),
 
   getClassAttendance: (classId: number) =>
-    apiClient.get<AttendanceRecord[]>(`/classes/${classId}/attendance`),
+    apiClient.get<ClassAttendance>(`/classes/${classId}/attendance`),
 
   confirmClassAttendance: (classId: number) =>
-    apiClient.post(`/classes/${classId}/attendance/confirm`)
+    apiClient.post(`/classes/${classId}/confirm`),
+
+  generateAttendanceList: (groupId: number) =>
+    apiClient.get<AttendanceRecord[]>(`/attendance/list/${groupId}`),
+
+  getAbsenceReport: (groupId: number) =>
+    apiClient.get<AttendanceReport>(`/attendance/absence-report/${groupId}`)
 };

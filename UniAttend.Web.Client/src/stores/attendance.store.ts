@@ -128,6 +128,32 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
+  async function generateAttendanceList(groupId: number) {
+    isLoading.value = true;
+    try {
+      const { data } = await attendanceApi.generateList(groupId);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function getAbsenceReport(groupId: number) {
+    isLoading.value = true;
+    try {
+      const { data } = await attendanceApi.getAbsenceReport(groupId);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   function handleError(err: unknown) {
     error.value = err instanceof Error ? err.message : 'An error occurred';
   }
@@ -152,6 +178,8 @@ export const useAttendanceStore = defineStore('attendance', () => {
     confirmAttendance,
     fetchClassAttendance,
     openClassSession,
-    closeClassSession
+    closeClassSession,
+    generateAttendanceList,
+    getAbsenceReport
   };
 });

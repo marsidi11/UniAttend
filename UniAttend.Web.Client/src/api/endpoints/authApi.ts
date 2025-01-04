@@ -1,26 +1,38 @@
 import apiClient from '../apiClient';
 import type { 
-  LoginCredentials, 
-  RegisterCredentials, 
-  ResetPasswordCredentials, 
-  AuthResponse 
+  LoginRequest, 
+  RegisterRequest, 
+  AuthResponse,
+  ResetPasswordRequest,
+  ChangePasswordRequest,
+  RefreshTokenRequest 
 } from '@/types/auth.types';
 
 export const authApi = {
-  login: (credentials: LoginCredentials) => 
+  login: (credentials: LoginRequest) => 
     apiClient.post<AuthResponse>('/auth/login', credentials),
     
-  register: (credentials: RegisterCredentials) =>
+  register: (credentials: RegisterRequest) =>
     apiClient.post<AuthResponse>('/auth/register', credentials),
     
-  resetPassword: (credentials: ResetPasswordCredentials) =>
-    apiClient.post('/auth/reset-password', credentials),
+  logout: () => 
+    apiClient.post('/auth/logout'),
+    
+  refreshToken: (data: RefreshTokenRequest) => 
+    apiClient.post<AuthResponse>('/auth/refresh-token', data),
+    
+  changePassword: (data: ChangePasswordRequest) =>
+    apiClient.post('/auth/change-password', data),
     
   requestPasswordReset: (email: string) =>
     apiClient.post('/auth/request-reset', { email }),
-
-  refreshToken: (token: string) => 
-    apiClient.post<AuthResponse>('/auth/refresh-token', { token }),
     
-  logout: () => apiClient.post('/auth/logout')
+  resetPassword: (data: ResetPasswordRequest) =>
+    apiClient.post('/auth/reset-password', data),
+    
+  verifyToken: (token: string) =>
+    apiClient.post('/auth/verify-token', { token }),
+    
+  getCurrentUser: () =>
+    apiClient.get<AuthResponse>('/auth/me')
 };

@@ -1,24 +1,66 @@
-import type { User } from './user.types';
+import type { BaseEntity } from './base.types';
+import type { Department } from './department.types';
+import type { StudyGroup } from './group.types';
 
-export interface Student extends User {
+// Student Profile
+export interface StudentProfile extends BaseEntity {
   studentId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   cardId?: string;
   departmentId: number;
-  departmentName?: string;
+  department?: Department;
+  groups?: StudyGroup[];
+  isActive: boolean;
 }
 
-export interface StudentAttendance {
-  courseId: number;
-  courseName: string;
+// Attendance Record
+export interface AttendanceRecord extends BaseEntity {
+  studentId: number;
+  classId: number;
   checkInTime: Date;
   checkInMethod: 'Card' | 'OTP';
   isConfirmed: boolean;
+  studentName?: string;
+  className?: string;
 }
 
-export interface StudentGroup {
+// Student Absence Alert
+export interface AbsenceAlert extends BaseEntity {
+  studentId: number;
+  groupId: number;
+  groupName?: string;
+  subjectName?: string;
+  absencePercentage: number;
+  emailSent: boolean;
+  createdAt: Date;
+}
+
+// Student Dashboard Stats
+export interface StudentStats {
+  totalClasses: number;
+  attendedClasses: number;
+  absenceRate: number;
+  alertCount: number;
+}
+
+// Student Group Details
+export interface StudentGroupDetails {
   groupId: number;
   groupName: string;
   subjectName: string;
   professorName: string;
-  academicYear: string;
+  attendanceRate: number;
+  totalClasses: number;
+  attendedClasses: number;
+}
+
+// Update Student Request
+export interface UpdateStudentRequest {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  departmentId?: number;
+  isActive?: boolean;
 }

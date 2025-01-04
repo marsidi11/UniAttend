@@ -108,6 +108,33 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
+  async function getAbsencePercentage(groupId: number) {
+    isLoading.value = true;
+    try {
+      const { data } = await studentApi.getAbsencePercentage(groupId);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function getAttendanceHistory(startDate?: Date, endDate?: Date) {
+    isLoading.value = true;
+    try {
+      const { data } = await studentApi.getAttendanceHistory(startDate, endDate);
+      attendance.value = data;
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   function handleError(err: unknown) {
     error.value = err instanceof Error ? err.message : 'An error occurred';
   }
@@ -131,6 +158,8 @@ export const useStudentStore = defineStore('student', () => {
     fetchStudentAttendance,
     fetchStudentGroups,
     checkAbsenceStatus,
-    getAttendancePercentage
+    getAttendancePercentage,
+    getAbsencePercentage,
+    getAttendanceHistory
   };
 });

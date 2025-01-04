@@ -1,31 +1,45 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Classroom, ReaderDevice } from '@/types/classroom.types';
-import { classroomApi } from '@/api/endpoints/classroomApi';
+import type { 
+  Schedule, 
+  CreateScheduleRequest, 
+  UpdateScheduleRequest 
+} from '@/types/schedule.types';
+import { scheduleApi } from '@/api/endpoints/scheduleApi';
 
-export const useClassroomStore = defineStore('classroom', () => {
+export const useScheduleStore = defineStore('schedule', () => {
   // State
-  const classrooms = ref<Classroom[]>([]);
-  const currentClassroom = ref<Classroom | null>(null);
-  const readerDevices = ref<ReaderDevice[]>([]);
+  const schedules = ref<Schedule[]>([]);
+  const currentSchedule = ref<Schedule | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   // Getters
-  const availableClassrooms = computed(() => 
-    classrooms.value.filter(c => c.isAvailable)
+  const schedulesByDay = computed(() => {
+    const grouped = new Map<number, Schedule[]>();
+    schedules.value.forEach(schedule => {
+      if (!grouped.has(schedule.dayOfWeek)) {
+        grouped.set(schedule.dayOfWeek, []);
+      }
+      grouped.get(schedule.dayOfWeek)?.push(schedule);
+    });
+    return grouped;
+  });
+
+  const groupSchedules = computed(() => 
+    (groupId: number) => schedules.value.filter(s => s.groupId === groupId)
   );
 
-  const classroomsWithDevices = computed(() => 
-    classrooms.value.filter(c => c.readerDeviceId)
+  const classroomSchedules = computed(() => 
+    (classroomId: number) => schedules.value.filter(s => s.classroomId === classroomId)
   );
 
   // Actions
-  async function fetchClassrooms() {
+  async function fetchSchedules(params?: { groupId?: number; classroomId?: number }) {
     isLoading.value = true;
     try {
-      const { data } = await classroomApi.getAll();
-      classrooms.value = data;
+      const { data } = await scheduleApi.getAll(params);
+      schedules.value = data;
     } catch (err) {
       handleError(err);
     } finally {
@@ -33,54 +47,11 @@ export const useClassroomStore = defineStore('classroom', () => {
     }
   }
 
-  async function fetchClassroomById(id: number) {
+  async function fetchScheduleById(id: number) {
     isLoading.value = true;
     try {
-      const { data } = await classroomApi.getById(id);
-      currentClassroom.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function fetchReaderDevices() {
-    isLoading.value = true;
-    try {
-      const { data } = await classroomApi.getReaderDevices();
-      readerDevices.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function assignReaderDevice(classroomId: number, deviceId: string) {
-    isLoading.value = true;
-    try {
-      const { data } = await classroomApi.assignReader(classroomId, deviceId);
-      const index = classrooms.value.findIndex(c => c.id === classroomId);
-      if (index !== -1) {
-        classrooms.value[index] = data;
-      }
-      if (currentClassroom.value?.id === classroomId) {
-        currentClassroom.value = data;
-      }
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function addReaderDevice(device: Partial<ReaderDevice>) {
-    isLoading.value = true;
-    try {
-      const { data } = await classroomApi.addReaderDevice(device);
-      readerDevices.value.push(data);
+      const { data } = await scheduleApi.getById(id);
+      currentSchedule.value = data;
       return data;
     } catch (err) {
       handleError(err);
@@ -89,14 +60,31 @@ export const useClassroomStore = defineStore('classroom', () => {
       isLoading.value = false;
     }
   }
-  
-  async function updateReaderDevice(id: string, status: 'Active' | 'Inactive') {
+
+  async function createSchedule(schedule: CreateScheduleRequest) {
     isLoading.value = true;
     try {
-      const { data } = await classroomApi.updateReaderDevice(id, { status });
-      const index = readerDevices.value.findIndex(d => d.id === id);
+      const { data } = await scheduleApi.create(schedule);
+      schedules.value.push(data);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateSchedule(id: number, schedule: UpdateScheduleRequest) {
+    isLoading.value = true;
+    try {
+      const { data } = await scheduleApi.update(id, schedule);
+      const index = schedules.value.findIndex(s => s.id === id);
       if (index !== -1) {
-        readerDevices.value[index] = data;
+        schedules.value[index] = data;
+      }
+      if (currentSchedule.value?.id === id) {
+        currentSchedule.value = data;
       }
       return data;
     } catch (err) {
@@ -106,20 +94,30 @@ export const useClassroomStore = defineStore('classroom', () => {
       isLoading.value = false;
     }
   }
-  
-  async function removeReaderDevice(classroomId: number) {
+
+  async function deleteSchedule(id: number) {
     isLoading.value = true;
     try {
-      await classroomApi.removeReaderDevice(classroomId);
-      const classroom = classrooms.value.find(c => c.id === classroomId);
-      if (classroom) {
-        classroom.readerDeviceId = undefined;
+      await scheduleApi.delete(id);
+      schedules.value = schedules.value.filter(s => s.id !== id);
+      if (currentSchedule.value?.id === id) {
+        currentSchedule.value = null;
       }
     } catch (err) {
       handleError(err);
       throw err;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  async function checkScheduleConflict(request: ScheduleConflictRequest) {
+    try {
+      const { data } = await scheduleApi.checkConflict(request);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
     }
   }
 
@@ -128,19 +126,23 @@ export const useClassroomStore = defineStore('classroom', () => {
   }
 
   return {
-    classrooms,
-    currentClassroom,
-    readerDevices,
+    // State
+    schedules,
+    currentSchedule,
     isLoading,
     error,
-    availableClassrooms,
-    classroomsWithDevices,
-    fetchClassrooms,
-    fetchClassroomById,
-    fetchReaderDevices,
-    assignReaderDevice,
-    addReaderDevice,
-    updateReaderDevice,
-    removeReaderDevice
+
+    // Getters
+    schedulesByDay,
+    groupSchedules,
+    classroomSchedules,
+
+    // Actions
+    fetchSchedules,
+    fetchScheduleById,
+    createSchedule,
+    updateSchedule,
+    deleteSchedule,
+    checkScheduleConflict
   };
 });

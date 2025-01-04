@@ -101,6 +101,44 @@ export const useProfessorStore = defineStore('professor', () => {
     }
   }
 
+  async function getAssignedGroups(professorId: number) {
+    isLoading.value = true;
+    try {
+      const { data } = await professorApi.getAssignedGroups(professorId);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function getTodayClasses(professorId: number) {
+    isLoading.value = true;
+    try {
+      const { data } = await professorApi.getTodayClasses(professorId);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function confirmAttendance(classId: number) {
+    isLoading.value = true;
+    try {
+      await professorApi.confirmAttendance(classId);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   function handleError(err: unknown) {
     error.value = err instanceof Error ? err.message : 'An error occurred';
   }
@@ -124,6 +162,9 @@ export const useProfessorStore = defineStore('professor', () => {
     fetchProfessorById,
     fetchAssignedCourses,
     fetchSchedule,
-    updateProfessor
+    updateProfessor,
+    getAssignedGroups,
+    getTodayClasses,
+    confirmAttendance
   };
 });
