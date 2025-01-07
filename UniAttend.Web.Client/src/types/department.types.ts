@@ -1,4 +1,6 @@
 import type { ActiveEntity } from './base.types';
+import type { Student } from './student.types';
+import type { Professor } from './professor.types';
 
 export interface Department extends ActiveEntity {
   name: string;

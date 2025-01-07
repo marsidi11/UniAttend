@@ -14,9 +14,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public OtpCodeRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<OtpCode?> GetValidCodeAsync(
-            string code, 
-            int studentId, 
-            int classId, 
+            string code,
+            int studentId,
+            int classId,
             CancellationToken cancellationToken = default)
             => await DbSet.FirstOrDefaultAsync(c =>
                 c.Code == code &&
@@ -27,9 +27,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 cancellationToken);
 
         public async Task<bool> IsCodeValidAsync(
-            string code, 
-            int studentId, 
-            int classId, 
+            string code,
+            int studentId,
+            int classId,
             CancellationToken cancellationToken = default)
             => await DbSet.AnyAsync(c =>
                 c.Code == code &&
@@ -38,5 +38,15 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 !c.IsUsed &&
                 c.ExpiryTime > DateTime.UtcNow,
                 cancellationToken);
+
+        public async Task<OtpCode?> GetCurrentOtpForClassAsync(int classId, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Where(c => c.ClassId == classId &&
+                           !c.IsUsed &&
+                           c.ExpiryTime > DateTime.UtcNow)
+                .OrderByDescending(c => c.ExpiryTime)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

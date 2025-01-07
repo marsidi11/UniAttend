@@ -1,5 +1,6 @@
 import type { BaseEntity, Role } from './base.types';
 
+// Core User Interface
 export interface User extends BaseEntity {
   username: string;
   email: string;
@@ -9,14 +10,35 @@ export interface User extends BaseEntity {
   isActive: boolean;
 }
 
-export interface Student extends User {
-  studentId: string;
-  cardId?: string;
-  departmentId: number;
-  departmentName?: string;
+// User Profile 
+export interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
 }
 
-export interface Professor extends User {
-  departmentId: number;
+// User Details
+export interface UserDetails extends UserProfile {
+  role: Role;
   departmentName?: string;
+  lastLoginDate?: Date;
+  attendanceStats?: {
+    totalClasses: number;
+    attendedClasses: number;
+    attendanceRate: number;
+  };
+}
+
+// Request Types
+export interface UpdateProfileRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }

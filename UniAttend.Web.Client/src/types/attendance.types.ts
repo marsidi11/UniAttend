@@ -3,6 +3,7 @@ import type { BaseEntity } from './base.types';
 export interface AttendanceRecord extends BaseEntity {
   studentId: number;
   classId: number;
+  groupId: number;
   checkInTime: Date;
   checkInMethod: 'Card' | 'OTP';
   isConfirmed: boolean;
@@ -12,19 +13,39 @@ export interface AttendanceRecord extends BaseEntity {
 }
 
 export interface AttendanceStats {
-  totalStudents: number;
-  presentToday: number;
+  totalClasses: number;
+  attendedClasses: number;
   attendanceRate: number;
-  absentStudents: number;
+  absentStudents?: number; 
+  totalStudents?: number;  
+  presentToday?: number;   
+  pendingConfirmations: number;
 }
 
-export interface ClassSession extends BaseEntity {
+export interface ClassAttendance extends BaseEntity {
   groupId: number;
   classroomId: number;
   date: Date;
   startTime: string;
   endTime: string;
   status: 'Active' | 'Completed';
+  records: AttendanceRecord[];
+  stats: AttendanceStats;
+}
+
+export interface ClassSession extends BaseEntity {
+  groupId: number;
+  classroomId: number;
+  groupName: string;
+  classroom: string;
+  subjectName: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  status: 'Active' | 'Completed';
+  attended?: boolean;
+  absenceRate?: number;
+  absenceAlert?: boolean;
 }
 
 export interface ClassAttendance extends ClassSession {

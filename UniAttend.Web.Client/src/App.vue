@@ -15,6 +15,7 @@ import DashboardLayout from '@/shared/layouts/DashboardLayout.vue';
 
 const route = useRoute();
 const getLayout = computed(() => {
+  if (route.path === '/') return MainLayout;
   if (route.meta.requiresAuth === false) return AuthLayout;
   if (route.path.includes('dashboard')) return DashboardLayout;
   return MainLayout;

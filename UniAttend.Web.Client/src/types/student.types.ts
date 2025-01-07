@@ -10,10 +10,13 @@ export interface StudentProfile extends BaseEntity {
   email: string;
   cardId?: string;
   departmentId: number;
+  departmentName?: string;
   department?: Department;
   groups?: StudyGroup[];
   isActive: boolean;
 }
+
+export type Student = StudentProfile
 
 // Attendance Record
 export interface AttendanceRecord extends BaseEntity {

@@ -53,6 +53,36 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
+  async function updateGroup(id: number, data: Partial<StudyGroup>) {
+    isLoading.value = true;
+    try {
+      const response = await groupApi.update(id, data);
+      if (currentGroup.value?.id === id) {
+        currentGroup.value = { ...currentGroup.value, ...response.data };
+      }
+      return response.data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function createGroup(groupData: Partial<StudyGroup>) {
+    isLoading.value = true;
+    try {
+      const { data } = await groupApi.create(groupData);
+      groups.value.push(data);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function fetchGroupStudents(groupId: number) {
     isLoading.value = true;
     try {
@@ -160,6 +190,8 @@ export const useGroupStore = defineStore('group', () => {
     fetchGroups,
     fetchGroupById,
     fetchGroupStudents,
+    updateGroup,
+    createGroup,
     addStudentToGroup,
     removeStudentFromGroup,
     enrollStudents,

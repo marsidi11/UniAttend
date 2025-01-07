@@ -8,4 +8,4 @@ export interface ActiveEntity extends BaseEntity {
   isActive: boolean;
 }
 
-export type Role = 'Admin' | 'Secretary' | 'Professor' | 'Student';
+export type Role = 'admin' | 'secretary' | 'professor' | 'student';

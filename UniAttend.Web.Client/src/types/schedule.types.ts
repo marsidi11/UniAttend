@@ -6,6 +6,8 @@ export interface Schedule extends BaseEntity {
   dayOfWeek: number;
   startTime: string;
   endTime: string;
+  duration?: number,
+  type: ScheduleType;
   groupName?: string;
   classroomName?: string;
   professorName?: string;

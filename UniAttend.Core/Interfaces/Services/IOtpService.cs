@@ -7,9 +7,8 @@ namespace UniAttend.Core.Interfaces.Services
 {
     public interface IOtpService
     {
-        Task<OtpCode> GenerateOtpAsync(int studentId, int classId, 
-            CancellationToken cancellationToken = default);
-        Task<bool> ValidateOtpAsync(string code, int studentId, int classId, 
-            CancellationToken cancellationToken = default);
+        Task<OtpCode> GenerateOtpAsync(int classId, int studentId, CancellationToken cancellationToken = default);
+        Task<bool> ValidateOtpAsync(string code, int classId, int studentId, CancellationToken cancellationToken = default);
+        Task<OtpCode?> GetCurrentOtpAsync(int classId, CancellationToken cancellationToken = default);
     }
 }

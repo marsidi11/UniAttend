@@ -103,8 +103,18 @@ export const useAttendanceStore = defineStore('attendance', () => {
     isLoading.value = true;
     try {
       const { data } = await attendanceApi.openClass({ groupId, classroomId });
-      currentClass.value = data;
-      return data;
+      const classAttendance: ClassAttendance = {
+        ...data,
+        records: data.records || [],
+        stats: data.stats || {
+          totalStudents: 0,
+          presentToday: 0,
+          attendanceRate: 0,
+          absentStudents: 0
+        }
+      };
+      currentClass.value = classAttendance;
+      return classAttendance;
     } catch (err) {
       handleError(err);
       throw err;
@@ -128,6 +138,20 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
+  async function getAttendanceStats(): Promise<AttendanceStats> {
+    isLoading.value = true;
+    try {
+      const { data } = await attendanceApi.getStudentAttendanceStats();
+      stats.value = data;
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function generateAttendanceList(groupId: number) {
     isLoading.value = true;
     try {
@@ -138,6 +162,32 @@ export const useAttendanceStore = defineStore('attendance', () => {
       throw err;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  async function fetchTodaySessions() {
+    isLoading.value = true
+    try {
+      const { data } = await attendanceApi.getTodaySessions()
+      return data
+    } catch (err) {
+      handleError(err)
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function fetchRecentRecords() {
+    isLoading.value = true
+    try {
+      const { data } = await attendanceApi.getRecentRecords()
+      return data
+    } catch (err) {
+      handleError(err)
+      throw err
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -159,24 +209,22 @@ export const useAttendanceStore = defineStore('attendance', () => {
   }
 
   return {
-    // State
     records,
     stats,
     currentClass,
     isLoading,
     error,
-    
-    // Getters
     attendanceRate,
     hasUnconfirmedRecords,
-    
-    // Actions
     fetchAttendance,
     fetchStats,
     recordCardAttendance,
     recordOtpAttendance,
     confirmAttendance,
     fetchClassAttendance,
+    fetchTodaySessions,
+    fetchRecentRecords,
+    getAttendanceStats,
     openClassSession,
     closeClassSession,
     generateAttendanceList,

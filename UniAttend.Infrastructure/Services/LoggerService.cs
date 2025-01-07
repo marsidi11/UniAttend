@@ -12,7 +12,7 @@ namespace UniAttend.Infrastructure.Services
             _logger = logger;
         }
 
-        public void LogInformation(string message, params object[] args)
+        public void LogInformation(string message, params object[] args) 
             => _logger.LogInformation(message, args);
 
         public void LogWarning(string message, params object[] args)
@@ -23,5 +23,11 @@ namespace UniAttend.Infrastructure.Services
 
         public void LogDebug(string message, params object[] args)
             => _logger.LogDebug(message, args);
+
+        public Task LogErrorAsync(string message, Exception exception)
+        {
+            LogError(exception, message);
+            return Task.CompletedTask;
+        }
     }
 }

@@ -35,55 +35,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useAttendanceStore } from '@/stores/attendance.store';
-import { useRoute } from 'vue-router';
-import Button from '@/shared/components/ui/Button.vue';
-import StatCard from '@/shared/components/ui/StatCard.vue';
-import AttendanceList from '../components/AttendanceList.vue';
-import type { AttendanceRecord, ClassAttendanceResponse } from '@/types/attendance.types';
+import { ref, computed, onMounted } from 'vue'
+import { useAttendanceStore } from '@/stores/attendance.store'
+import { useRoute } from 'vue-router'
+import Button from '@/shared/components/ui/Button.vue'
+import StatCard from '@/shared/components/ui/StatCard.vue'
+import AttendanceList from '../components/AttendanceList.vue'
+import type { AttendanceRecord, ClassAttendance, AttendanceStats } from '@/types/attendance.types'
 
-interface ClassStats {
-  totalStudents: number;
-  presentToday: number;
-  attendanceRate: number;
-}
+type ClassStats = AttendanceStats
 
-const route = useRoute();
-const attendanceStore = useAttendanceStore();
-const selectedRecords = ref<number[]>([]);
-const currentClassRecords = ref<AttendanceRecord[]>([]);
+const route = useRoute()
+const attendanceStore = useAttendanceStore()
+const selectedRecords = ref<number[]>([])
+const currentClassRecords = ref<AttendanceRecord[]>([])
 const stats = ref<ClassStats>({
   totalStudents: 0,
   presentToday: 0,
   attendanceRate: 0
-});
+})
 
-const classId = computed(() => Number(route.params.classId));
+const classId = computed(() => Number(route.params.id))
 const hasUnconfirmedRecords = computed(() => 
-  currentClassRecords.value.some(r => !r.isConfirmed)
-);
+  currentClassRecords.value.some(record => !record.isConfirmed)
+)
 
 async function loadClassAttendance() {
   try {
-    const response = await attendanceStore.fetchClassAttendance(classId.value) as ClassAttendanceResponse;
-    currentClassRecords.value = response.records;
-    stats.value = response.stats;
+    const response = await attendanceStore.fetchClassAttendance(classId.value)
+    if (response) {
+      currentClassRecords.value = response.records
+      stats.value = response.stats
+    }
   } catch (error) {
-    console.error('Failed to load class attendance:', error);
+    console.error('Failed to load class attendance:', error)
   }
 }
 
 async function confirmAttendance() {
   try {
-    await attendanceStore.confirmAttendance(classId.value);
-    await loadClassAttendance();
+    await attendanceStore.confirmAttendance(classId.value)
+    await loadClassAttendance()
   } catch (error) {
-    console.error('Failed to confirm attendance:', error);
+    console.error('Failed to confirm attendance:', error)
   }
 }
 
 onMounted(() => {
-  loadClassAttendance();
-});
+  loadClassAttendance()
+})
 </script>

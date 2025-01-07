@@ -4,6 +4,7 @@ export interface Professor extends User {
   departmentId: number;
   departmentName?: string;
   specialization?: string;
+  subjects?: number[];
 }
 
 export interface Course {

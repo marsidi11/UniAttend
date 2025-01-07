@@ -36,12 +36,6 @@
             >
               Login
             </router-link>
-            <router-link
-              to="/register"
-              class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
-            >
-              Register
-            </router-link>
           </div>
         </div>
       </nav>
@@ -62,7 +56,3 @@
     </footer>
   </div>
 </template>
-
-<script setup lang="ts">
-// No additional logic needed for MainLayout
-</script>

@@ -6,5 +6,6 @@ namespace UniAttend.Core.Interfaces.Repositories
     {
         Task<OtpCode?> GetValidCodeAsync(string code, int studentId, int classId, CancellationToken cancellationToken = default);
         Task<bool> IsCodeValidAsync(string code, int studentId, int classId, CancellationToken cancellationToken = default);
+        Task<OtpCode?> GetCurrentOtpForClassAsync(int classId, CancellationToken cancellationToken = default);
     }
 }

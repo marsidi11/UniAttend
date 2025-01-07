@@ -139,20 +139,20 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia' 
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
-import type { RegisterCredentials } from '@/types/auth.types'
+import type { RegisterRequest } from '@/types/auth.types'
 import { useDepartmentStore } from '@/stores/department.store'
-import type { Department } from '@/types/department.types'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const departmentStore = useDepartmentStore()
+const { departments } = storeToRefs(departmentStore) 
 const isLoading = ref(false)
 const error = ref('')
-const departments = ref<Department[]>([]) // Add proper typing here
 
-const form = ref<RegisterCredentials>({
+const form = ref<RegisterRequest>({
   username: '',
   password: '',
   email: '',
@@ -166,7 +166,7 @@ const form = ref<RegisterCredentials>({
 
 onMounted(async () => {
   try {
-    departments.value = await departmentStore.fetchDepartments()
+    await departmentStore.fetchDepartments()
   } catch (err) {
     console.error('Failed to load departments:', err)
   }

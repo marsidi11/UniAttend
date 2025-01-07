@@ -1,4 +1,5 @@
 using UniAttend.Core.Entities.Base;
+using UniAttend.Core.Entities.Attendance;
 
 namespace UniAttend.Core.Entities
 {
@@ -19,10 +20,11 @@ namespace UniAttend.Core.Entities
         public int ProfessorId { get; }
 
         // Navigation properties
-        public Subject Subject { get; private set; } = null!;
-        public AcademicYear AcademicYear { get; private set; } = null!;
-        public Professor Professor { get; private set; } = null!;
-        public ICollection<GroupStudent> Students { get; private init; } = new List<GroupStudent>();
-        public ICollection<AbsenceAlert> AbsenceAlerts { get; private init; } = new List<AbsenceAlert>();
+        public virtual Subject Subject { get; private set; } = null!;
+        public virtual AcademicYear AcademicYear { get; private set; } = null!;
+        public virtual Professor Professor { get; private set; } = null!;
+        public virtual ICollection<GroupStudent> Students { get; private init; } = new List<GroupStudent>();
+        public virtual ICollection<Schedule> Schedules { get; private init; } = new List<Schedule>();
+        public virtual ICollection<AttendanceRecord> AttendanceRecords { get; private init; } = new List<AttendanceRecord>();
     }
 }

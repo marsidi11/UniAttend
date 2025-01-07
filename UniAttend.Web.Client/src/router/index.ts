@@ -1,5 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { 
+  createRouter, 
+  createWebHistory,
+  type RouteLocationNormalized,
+  type NavigationGuardNext
+} from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
+import type { Role } from '@/types/base.types';
 
 // Layouts
 import MainLayout from '@/shared/layouts/MainLayout.vue';
@@ -9,7 +15,6 @@ import DashboardLayout from '@/shared/layouts/DashboardLayout.vue';
 // Public pages
 import HomePage from '@/features/home/pages/HomePage.vue';
 import LoginPage from '@/features/auth/pages/LoginPage.vue';
-import RegisterPage from '@/features/auth/pages/RegisterPage.vue';
 
 // Dashboard pages
 import AdminDashboard from '@/features/dashboard/pages/AdminDashboard.vue';
@@ -28,7 +33,7 @@ import AcademicYearList from '@/features/academic/pages/AcademicYearList.vue';
 import UserManagement from '@/features/users/pages/UserManagement.vue';
 import StudentList from '@/features/students/pages/StudentList.vue';
 import StudentDetails from '@/features/students/pages/StudentDetails.vue';
-import ProfessorList from '@/features/users/pages/ProfessorList.vue';
+import ProfessorList from '@/features/professors/pages/ProfessorList.vue';
 import CardManagement from '@/features/cards/pages/CardManagement.vue';
 
 // Schedule & Groups
@@ -47,15 +52,24 @@ import OtpCheckIn from '@/features/attendance/pages/OtpCheckIn.vue';
 import Reports from '@/features/reports/pages/Reports.vue';
 import AbsenceAlerts from '@/features/reports/pages/AbsenceAlerts.vue';
 
+const dashboardRedirectMap: Record<string, string> = {
+  admin: 'admin-dashboard',
+  secretary: 'secretary-dashboard',
+  professor: 'professor-dashboard',
+  student: 'student-dashboard'
+};
+
 const routes = [
   {
     path: '/',
-    component: MainLayout,
-    children: [
-      { path: '', name: 'home', component: HomePage },
-      { path: 'login', name: 'login', component: LoginPage, meta: { requiresAuth: false, layout: 'auth' } },
-      { path: 'register', name: 'register', component: RegisterPage, meta: { requiresAuth: false, layout: 'auth' } }
-    ]
+    name: 'home',
+    component: HomePage
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage,
+    meta: { requiresAuth: false, layout: 'auth' }
   },
   {
     path: '/dashboard',
@@ -65,15 +79,10 @@ const routes = [
       {
         path: '',
         name: 'dashboard',
-        redirect: to => {
+        redirect: () => {
           const authStore = useAuthStore();
-          const roleMap = {
-            admin: 'admin-dashboard',
-            secretary: 'secretary-dashboard',
-            professor: 'professor-dashboard',
-            student: 'student-dashboard'
-          };
-          return { name: roleMap[authStore.userRole.toLowerCase()] };
+          const userRole = authStore.userRole?.toLowerCase() || '';
+          return { name: dashboardRedirectMap[userRole] || 'login' };
         }
       },
       // Admin routes
@@ -226,10 +235,14 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((
+  to: RouteLocationNormalized, 
+  _from: RouteLocationNormalized, 
+  next: NavigationGuardNext
+) => {
   const authStore = useAuthStore();
   const isAuthenticated = !!authStore.token;
-  const userRole = authStore.userRole?.toLowerCase();
+  const userRole = authStore.userRole?.toLowerCase() as Role | undefined;
 
   // Handle authentication
   if (to.meta.requiresAuth && !isAuthenticated) {
@@ -237,8 +250,10 @@ router.beforeEach((to, from, next) => {
   }
 
   // Handle role-based access
-  if (to.meta.roles && !to.meta.roles.includes(userRole)) {
-    return next({ name: 'dashboard' });
+  if (to.meta.roles && Array.isArray(to.meta.roles) && userRole) {
+    if (!to.meta.roles.includes(userRole)) {
+      return next({ name: 'dashboard' });
+    }
   }
 
   // Handle authenticated users accessing auth pages

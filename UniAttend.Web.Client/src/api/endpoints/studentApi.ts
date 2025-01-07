@@ -1,6 +1,6 @@
 import apiClient from '../apiClient';
-import type { 
-  StudentProfile, 
+import type {
+  StudentProfile,
   AttendanceRecord,
   AbsenceAlert,
   StudentStats,
@@ -9,6 +9,9 @@ import type {
 } from '@/types/student.types';
 
 export const studentApi = {
+  getAll: () => 
+    apiClient.get<Student[]>('/student'),
+  
   getProfile: () =>
     apiClient.get<StudentProfile>('/student/profile'),
 
@@ -36,5 +39,11 @@ export const studentApi = {
     apiClient.post('/student/card', { cardId }),
 
   requestOtp: (classId: number) =>
-    apiClient.post<{ otpCode: string }>('/student/request-otp', { classId })
+    apiClient.post<{ otpCode: string }>('/student/request-otp', { classId }),
+
+  assignCard: (studentId: number, cardId: string) =>
+    apiClient.put(`/student/${studentId}/card`, { cardId }),
+
+  removeCard: (studentId: number) =>
+    apiClient.delete(`/student/${studentId}/card`)
 };

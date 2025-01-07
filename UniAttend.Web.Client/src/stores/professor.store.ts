@@ -58,6 +58,20 @@ export const useProfessorStore = defineStore('professor', () => {
     }
   }
 
+  async function createProfessor(professorData: Partial<Professor>) {
+    isLoading.value = true;
+    try {
+      const { data } = await professorApi.create(professorData);
+      professors.value.push(data);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function fetchAssignedCourses(professorId: number) {
     isLoading.value = true;
     try {
@@ -163,6 +177,7 @@ export const useProfessorStore = defineStore('professor', () => {
     fetchAssignedCourses,
     fetchSchedule,
     updateProfessor,
+    createProfessor,
     getAssignedGroups,
     getTodayClasses,
     confirmAttendance

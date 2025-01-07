@@ -40,6 +40,19 @@ export const useSubjectStore = defineStore('subject', () => {
     }
   }
 
+  async function fetchSubjectGroups(subjectId: number): Promise<StudyGroup[]> {
+    isLoading.value = true;
+    try {
+      const { data } = await subjectApi.getGroups(subjectId);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function fetchSubjectById(id: number) {
     isLoading.value = true;
     try {
@@ -102,6 +115,7 @@ export const useSubjectStore = defineStore('subject', () => {
     // Actions
     fetchSubjects,
     fetchSubjectById,
+    fetchSubjectGroups,
     createSubject,
     updateSubject
   };

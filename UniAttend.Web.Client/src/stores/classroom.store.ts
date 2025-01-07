@@ -1,45 +1,31 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { 
-  Schedule, 
-  CreateScheduleRequest, 
-  UpdateScheduleRequest 
-} from '@/types/schedule.types';
-import { scheduleApi } from '@/api/endpoints/scheduleApi';
+import type { Classroom, CreateClassroomRequest, ReaderDevice } from '@/types/classroom.types';
+import { classroomApi } from '@/api/endpoints/classroomApi';
 
-export const useScheduleStore = defineStore('schedule', () => {
+export const useClassroomStore = defineStore('classroom', () => {
   // State
-  const schedules = ref<Schedule[]>([]);
-  const currentSchedule = ref<Schedule | null>(null);
+  const classrooms = ref<Classroom[]>([]);
+  const currentClassroom = ref<Classroom | null>(null);
+  const readers = ref<ReaderDevice[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   // Getters
-  const schedulesByDay = computed(() => {
-    const grouped = new Map<number, Schedule[]>();
-    schedules.value.forEach(schedule => {
-      if (!grouped.has(schedule.dayOfWeek)) {
-        grouped.set(schedule.dayOfWeek, []);
-      }
-      grouped.get(schedule.dayOfWeek)?.push(schedule);
-    });
-    return grouped;
-  });
-
-  const groupSchedules = computed(() => 
-    (groupId: number) => schedules.value.filter(s => s.groupId === groupId)
+  const availableClassrooms = computed(() => 
+    classrooms.value.filter(c => c.status === 'available')
   );
 
-  const classroomSchedules = computed(() => 
-    (classroomId: number) => schedules.value.filter(s => s.classroomId === classroomId)
+  const classroomsWithReaders = computed(() =>
+    classrooms.value.filter(c => c.readerDeviceId)
   );
 
   // Actions
-  async function fetchSchedules(params?: { groupId?: number; classroomId?: number }) {
+  async function fetchClassrooms() {
     isLoading.value = true;
     try {
-      const { data } = await scheduleApi.getAll(params);
-      schedules.value = data;
+      const { data } = await classroomApi.getAll();
+      classrooms.value = data;
     } catch (err) {
       handleError(err);
     } finally {
@@ -47,12 +33,24 @@ export const useScheduleStore = defineStore('schedule', () => {
     }
   }
 
-  async function fetchScheduleById(id: number) {
+  async function fetchReaders() {
     isLoading.value = true;
     try {
-      const { data } = await scheduleApi.getById(id);
-      currentSchedule.value = data;
-      return data;
+      const { data } = await classroomApi.getAllReaders();
+      readers.value = data;
+    } catch (err) {
+      handleError(err);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function createClassroom(data: CreateClassroomRequest) {
+    isLoading.value = true;
+    try {
+      const response = await classroomApi.create(data);
+      classrooms.value.push(response.data);
+      return response.data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -61,63 +59,20 @@ export const useScheduleStore = defineStore('schedule', () => {
     }
   }
 
-  async function createSchedule(schedule: CreateScheduleRequest) {
+  async function updateClassroom(id: number, data: Partial<CreateClassroomRequest>) {
     isLoading.value = true;
     try {
-      const { data } = await scheduleApi.create(schedule);
-      schedules.value.push(data);
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function updateSchedule(id: number, schedule: UpdateScheduleRequest) {
-    isLoading.value = true;
-    try {
-      const { data } = await scheduleApi.update(id, schedule);
-      const index = schedules.value.findIndex(s => s.id === id);
+      const response = await classroomApi.update(id, data);
+      const index = classrooms.value.findIndex(c => c.id === id);
       if (index !== -1) {
-        schedules.value[index] = data;
+        classrooms.value[index] = response.data;
       }
-      if (currentSchedule.value?.id === id) {
-        currentSchedule.value = data;
-      }
-      return data;
+      return response.data;
     } catch (err) {
       handleError(err);
       throw err;
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  async function deleteSchedule(id: number) {
-    isLoading.value = true;
-    try {
-      await scheduleApi.delete(id);
-      schedules.value = schedules.value.filter(s => s.id !== id);
-      if (currentSchedule.value?.id === id) {
-        currentSchedule.value = null;
-      }
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function checkScheduleConflict(request: ScheduleConflictRequest) {
-    try {
-      const { data } = await scheduleApi.checkConflict(request);
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
     }
   }
 
@@ -126,23 +81,16 @@ export const useScheduleStore = defineStore('schedule', () => {
   }
 
   return {
-    // State
-    schedules,
-    currentSchedule,
+    classrooms,
+    currentClassroom,
+    readers,
     isLoading,
     error,
-
-    // Getters
-    schedulesByDay,
-    groupSchedules,
-    classroomSchedules,
-
-    // Actions
-    fetchSchedules,
-    fetchScheduleById,
-    createSchedule,
-    updateSchedule,
-    deleteSchedule,
-    checkScheduleConflict
+    availableClassrooms,
+    classroomsWithReaders,
+    fetchClassrooms,
+    fetchReaders,
+    createClassroom,
+    updateClassroom
   };
 });

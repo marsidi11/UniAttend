@@ -64,14 +64,14 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
-import type { LoginCredentials } from '@/types/auth.types'
+import type { LoginRequest } from '@/types/auth.types'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const isLoading = ref(false)
 const error = ref('')
 
-const form = ref<LoginCredentials>({
+const form = ref<LoginRequest>({
   username: '',
   password: ''
 })

@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { 
-  Student, 
-  StudentAttendance, 
-  StudentGroup 
+  Student,
+  StudentProfile, 
+  StudentGroupDetails,
+  StudentStats,
+  AttendanceRecord,
+  UpdateStudentRequest 
 } from '@/types/student.types';
 import { studentApi } from '@/api/endpoints/studentApi';
 
@@ -11,8 +14,8 @@ export const useStudentStore = defineStore('student', () => {
   // State
   const students = ref<Student[]>([]);
   const currentStudent = ref<Student | null>(null);
-  const attendance = ref<StudentAttendance[]>([]);
-  const groups = ref<StudentGroup[]>([]);
+  const attendance = ref<AttendanceRecord[]>([]);
+  const groups = ref<StudentGroupDetails[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -22,25 +25,61 @@ export const useStudentStore = defineStore('student', () => {
   );
 
   const groupedByDepartment = computed(() => {
-    const grouped = new Map();
+    const grouped = new Map<string, Student[]>();
     students.value.forEach(student => {
-      const dept = student.departmentName;
+      const dept = student.departmentName || 'Unassigned';
       if (!grouped.has(dept)) {
         grouped.set(dept, []);
       }
-      grouped.get(dept).push(student);
+      grouped.get(dept)?.push(student);
     });
     return grouped;
   });
 
   // Actions
-  async function fetchStudents(departmentId?: number) {
+  async function fetchStudentsList() {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getAll(departmentId);
-      students.value = data;
+        const { data } = await studentApi.getAll();
+        students.value = data;
+        return data;
+    } catch (err) {
+        handleError(err);
+        throw err;
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+  async function createStudent(studentData: UpdateStudentRequest) {
+    isLoading.value = true;
+    try {
+      const { data } = await studentApi.getProfile();
+      students.value.push(data);
+      return data;
     } catch (err) {
       handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateStudent(id: number, studentData: UpdateStudentRequest) {
+    isLoading.value = true;
+    try {
+      const { data } = await studentApi.updateProfile(studentData);
+      const index = students.value.findIndex(s => s.id === id);
+      if (index !== -1) {
+        students.value[index] = { ...students.value[index], ...data };
+      }
+      if (currentStudent.value?.id === id) {
+        currentStudent.value = { ...currentStudent.value, ...data };
+      }
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
     } finally {
       isLoading.value = false;
     }
@@ -49,7 +88,7 @@ export const useStudentStore = defineStore('student', () => {
   async function fetchStudentById(id: number) {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getById(id);
+      const { data } = await studentApi.getProfile();
       currentStudent.value = data;
     } catch (err) {
       handleError(err);
@@ -61,10 +100,12 @@ export const useStudentStore = defineStore('student', () => {
   async function fetchStudentAttendance(studentId: number, startDate?: Date, endDate?: Date) {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getAttendance(studentId, startDate, endDate);
+      const { data } = await studentApi.getAttendanceHistory(startDate, endDate);
       attendance.value = data;
+      return data;
     } catch (err) {
       handleError(err);
+      throw err;
     } finally {
       isLoading.value = false;
     }
@@ -73,19 +114,8 @@ export const useStudentStore = defineStore('student', () => {
   async function fetchStudentGroups(studentId: number) {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getGroups(studentId);
+      const { data } = await studentApi.getGroupDetails(studentId);
       groups.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function checkAbsenceStatus(studentId: number, groupId: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await studentApi.getAbsenceStatus(studentId, groupId);
       return data;
     } catch (err) {
       handleError(err);
@@ -93,12 +123,12 @@ export const useStudentStore = defineStore('student', () => {
     } finally {
       isLoading.value = false;
     }
-  } 
-  
-  async function getAttendancePercentage(studentId: number, groupId: number) {
+  }
+
+  async function getAttendanceStats(studentId: number): Promise<StudentStats> {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getAttendancePercentage(studentId, groupId);
+      const { data } = await studentApi.getDashboardStats();
       return data;
     } catch (err) {
       handleError(err);
@@ -121,12 +151,35 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
-  async function getAttendanceHistory(startDate?: Date, endDate?: Date) {
+  // New card management functions
+  async function assignCard(studentId: number, cardId: string) {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getAttendanceHistory(startDate, endDate);
-      attendance.value = data;
-      return data;
+      await studentApi.assignCard(studentId, cardId);
+      if (currentStudent.value?.id === studentId) {
+        currentStudent.value = { 
+          ...currentStudent.value, 
+          cardId 
+        };
+      }
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function removeCard(studentId: number) {
+    isLoading.value = true;
+    try {
+      await studentApi.removeCard(studentId);
+      if (currentStudent.value?.id === studentId) {
+        currentStudent.value = { 
+          ...currentStudent.value, 
+          cardId: undefined 
+        };
+      }
     } catch (err) {
       handleError(err);
       throw err;
@@ -153,13 +206,15 @@ export const useStudentStore = defineStore('student', () => {
     groupedByDepartment,
     
     // Actions
-    fetchStudents,
+    fetchStudentsList,
+    createStudent,
+    updateStudent,
     fetchStudentById,
     fetchStudentAttendance,
     fetchStudentGroups,
-    checkAbsenceStatus,
-    getAttendancePercentage,
     getAbsencePercentage,
-    getAttendanceHistory
+    getAttendanceStats,
+    assignCard,
+    removeCard
   };
 });

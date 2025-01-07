@@ -3,11 +3,17 @@ import type { Schedule } from './schedule.types';
 
 export interface Classroom extends BaseEntity {
   name: string;
-  readerDeviceId?: string;
-  capacity?: number;
-  location?: string;
-  isAvailable: boolean;
-  schedule?: Schedule[];
+  readerDeviceId?: string | null;
+  status: ClassroomStatus;
+}
+
+export type ClassroomStatus = 'available' | 'inUse' | 'maintenance';
+
+export interface CreateClassroomRequest {
+  name: string;
+  status: ClassroomStatus;
+  readerDeviceId?: string | null;
+  createdAt: Date;
 }
 
 export interface ReaderDevice {

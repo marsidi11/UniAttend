@@ -16,6 +16,9 @@ export const professorApi = {
   getById: (id: number) =>
     apiClient.get<Professor>(`/professor/${id}`),
 
+  create: (data: Partial<Professor>) =>
+    apiClient.post<Professor>('/professor', data),
+
   update: (id: number, data: Partial<Professor>) =>
     apiClient.put<Professor>(`/professor/${id}`, data),
 
