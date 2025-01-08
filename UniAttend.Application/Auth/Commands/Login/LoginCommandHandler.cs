@@ -53,7 +53,6 @@ namespace UniAttend.Application.Auth.Commands.Login
 
             // Update user's refresh token
             user.UpdateRefreshToken(refreshToken, DateTime.UtcNow.AddDays(7));
-            user.RecordLogin();
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

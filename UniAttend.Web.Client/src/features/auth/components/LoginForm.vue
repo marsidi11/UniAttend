@@ -81,9 +81,16 @@ async function handleSubmit() {
   isLoading.value = true
   
   try {
+    console.log('Login attempt:', form.value);
     await authStore.login(form.value)
-    router.push('/dashboard')
+    console.log('Login successful, redirecting...');
+    await router.push('/dashboard')
   } catch (err: any) {
+    console.error('Login error:', {
+      error: err,
+      response: err?.response,
+      data: err?.response?.data
+    });
     error.value = err?.response?.data?.message || 'Failed to sign in'
   } finally {
     isLoading.value = false

@@ -1,34 +1,40 @@
 using UniAttend.Core.Entities.Base;
+using UniAttend.Core.Exceptions;
 
 namespace UniAttend.Core.Entities
 {
-    /// <summary>
-    /// Represents an alert for student absences that tracks attendance percentage and notification status.
-    /// </summary>
-    /// <remarks>
-    /// This class is used to monitor and manage alerts for students who have exceeded certain absence thresholds.
-    /// </remarks>
     public class AbsenceAlert : Entity
     {
+        private AbsenceAlert() { } // For domain events/serialization
+
         public AbsenceAlert(int studentId, int groupId, decimal absencePercentage)
         {
+            ValidateAbsencePercentage(absencePercentage);
+            
             StudentId = studentId;
             GroupId = groupId;
             AbsencePercentage = absencePercentage;
-            CreatedAt = DateTime.UtcNow;
+            EmailSent = false;
         }
 
+        // Identity properties - immutable
         public int StudentId { get; }
-        public Student Student { get; private set; }
-        public StudyGroup Group { get; private set; }
         public int GroupId { get; }
         public decimal AbsencePercentage { get; }
-        public bool EmailSent { get; set; } = false;
-        public DateTime CreatedAt { get; }
+        public bool EmailSent { get; private set; }
 
-        public void MarkAsSent()
+        // Domain references without EF Core annotations
+        public Student Student { get; }
+        public StudyGroup Group { get; }
+
+        // Domain methods
+        public void MarkAsSent() => EmailSent = true;
+
+        // Domain validation
+        private void ValidateAbsencePercentage(decimal percentage)
         {
-            EmailSent = true;
+            if (percentage < 0 || percentage > 100)
+                throw new DomainException("Absence percentage must be between 0 and 100");
         }
     }
 }

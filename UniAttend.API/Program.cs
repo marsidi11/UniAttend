@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -6,6 +8,7 @@ using UniAttend.API.Middleware;
 using UniAttend.Application;
 using UniAttend.Infrastructure;
 using UniAttend.Infrastructure.Auth.Settings;
+using UniAttend.Infrastructure.Data;
 using UniAttend.Core.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,6 +82,12 @@ builder.Services.AddSwaggerGen(c =>
 // Add Infrastructure & Application services
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")),
+        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
 // Build app
 var app = builder.Build();

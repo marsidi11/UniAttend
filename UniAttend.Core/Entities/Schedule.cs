@@ -1,18 +1,17 @@
 using UniAttend.Core.Entities.Base;
+using UniAttend.Core.Exceptions;
 
 namespace UniAttend.Core.Entities
 {
     public class Schedule : Entity
     {
-        private Schedule() { } // For EF Core
+        private Schedule() { } // For domain events/serialization
 
         public Schedule(int groupId, int classroomId, int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
         {
-            if (dayOfWeek < 1 || dayOfWeek > 7)
-                throw new ArgumentOutOfRangeException(nameof(dayOfWeek));
-            if (startTime >= endTime)
-                throw new ArgumentException("Start time must be before end time");
-
+            ValidateTimeRange(startTime, endTime);
+            ValidateDayOfWeek(dayOfWeek);
+            
             GroupId = groupId;
             ClassroomId = classroomId;
             DayOfWeek = dayOfWeek;
@@ -20,14 +19,28 @@ namespace UniAttend.Core.Entities
             EndTime = endTime;
         }
 
-        public int GroupId { get; private set; }
-        public int ClassroomId { get; private set; }
-        public int DayOfWeek { get; private set; }
-        public TimeSpan StartTime { get; private set; }
-        public TimeSpan EndTime { get; private set; }
+        // Identity properties - immutable
+        public int GroupId { get; }
+        public int ClassroomId { get; }
+        public int DayOfWeek { get; }
+        public TimeSpan StartTime { get; }
+        public TimeSpan EndTime { get; }
 
-        // Navigation properties
-        public StudyGroup Group { get; private set; }
-        public Classroom Classroom { get; private set; }
+        // Domain references without EF Core annotations
+        public StudyGroup Group { get; }
+        public Classroom Classroom { get; }
+
+        // Domain validation
+        private void ValidateTimeRange(TimeSpan start, TimeSpan end)
+        {
+            if (start >= end)
+                throw new DomainException("Start time must be before end time");
+        }
+
+        private void ValidateDayOfWeek(int dayOfWeek)
+        {
+            if (dayOfWeek < 1 || dayOfWeek > 7)
+                throw new DomainException("Day of week must be between 1 and 7");
+        }
     }
 }

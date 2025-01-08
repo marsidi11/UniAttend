@@ -36,7 +36,6 @@ namespace UniAttend.Core.Entities.Identity
         public UserRole Role { get; private set; }
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
-        public DateTime? LastLoginDate { get; private set; }
         public string? RefreshToken { get; private set; }
         public DateTime? RefreshTokenExpiryTime { get; private set; }
 
@@ -61,8 +60,6 @@ namespace UniAttend.Core.Entities.Identity
             RefreshToken = refreshToken;
             RefreshTokenExpiryTime = expiryTime;
         }
-
-        public void RecordLogin() => LastLoginDate = DateTime.UtcNow;
 
         private static void ValidateUsername(string username)
         {

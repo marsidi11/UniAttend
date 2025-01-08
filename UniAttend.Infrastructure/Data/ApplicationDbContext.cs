@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Entities.Attendance;
+using UniAttend.Infrastructure.Data.Configurations;
 
 namespace UniAttend.Infrastructure.Data
 {
@@ -26,6 +27,11 @@ namespace UniAttend.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+        .Property(e => e.Role)
+        .HasConversion<string>()
+        .HasMaxLength(50);
+        
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
     }

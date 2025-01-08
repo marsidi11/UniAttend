@@ -27,8 +27,7 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
                 user.Email,
                 user.FirstName,
                 user.LastName,
-                user.Role,
-                user.LastLoginDate);
+                user.Role);
         }
     }
 }

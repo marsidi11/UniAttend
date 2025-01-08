@@ -33,9 +33,9 @@ namespace UniAttend.Infrastructure.Services
         {
             var otpCode = await _otpRepository.GetValidCodeAsync(code, studentId, classId, cancellationToken);
 
-            if (otpCode == null) return false;
+            if (otpCode == null || !otpCode.IsValid()) return false;
 
-            otpCode.IsUsed = true;
+            otpCode.MarkAsUsed(); // Use domain method instead of property assignment
             await _otpRepository.UpdateAsync(otpCode, cancellationToken);
             return true;
         }

@@ -11,7 +11,6 @@ namespace UniAttend.Application.Auth.Common
         string Email,
         string FirstName,
         string LastName,
-        UserRole Role,
-        DateTime? LastLoginDate
+        UserRole Role
     );
 }

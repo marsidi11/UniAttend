@@ -18,8 +18,8 @@ namespace UniAttend.Application.Features.Students.Commands.AssignCard
         {
             var student = await _studentRepository.GetByIdAsync(request.StudentId)
                 ?? throw new NotFoundException(nameof(Student), request.StudentId);
-
-            student.CardId = request.CardId;
+        
+            student.AssignCard(request.CardId);
             await _studentRepository.UpdateAsync(student);
         }
     }

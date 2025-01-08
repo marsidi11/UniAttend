@@ -1,10 +1,10 @@
-import type { Role, BaseEntity } from './base.types';
+import type { BaseEntity, NumericRole, StringRole } from './base.types';
 
 // Core User interface
 export interface User extends BaseEntity {
   username: string;
   email: string;
-  role: Role;
+  role: NumericRole | StringRole;
   firstName: string;
   lastName: string;
   isActive: boolean;
@@ -12,10 +12,17 @@ export interface User extends BaseEntity {
 
 // Auth Response Types
 export interface AuthResponse {
-  token: string;
-  refreshToken?: string;
-  user: User;
-  expiresIn?: number;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: number; 
+  };
 }
 
 // Auth Request Types

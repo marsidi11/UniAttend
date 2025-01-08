@@ -9,15 +9,24 @@ using UniAttend.Infrastructure.Auth.Settings;
 namespace UniAttend.Infrastructure.Auth.Services
 {
     public class JwtService : IJwtService
+{
+    private readonly JwtSettings _jwtSettings;
+
+    public JwtService(JwtSettings jwtSettings)
     {
-        private readonly JwtSettings _jwtSettings;
+        _jwtSettings = jwtSettings ?? throw new ArgumentNullException(nameof(jwtSettings));
+        
+        if (string.IsNullOrEmpty(jwtSettings.SecretKey))
+            throw new InvalidOperationException("JWT:Key is not configured in appsettings.json");
+        
+        if (string.IsNullOrEmpty(jwtSettings.Issuer))
+            throw new InvalidOperationException("JWT:Issuer is not configured in appsettings.json");
+        
+        if (string.IsNullOrEmpty(jwtSettings.Audience))
+            throw new InvalidOperationException("JWT:Audience is not configured in appsettings.json");
+    }
 
-        public JwtService(JwtSettings jwtSettings)
-        {
-            _jwtSettings = jwtSettings;
-        }
-
-        public string GenerateToken(IEnumerable<Claim> claims)
+    public string GenerateToken(IEnumerable<Claim> claims)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

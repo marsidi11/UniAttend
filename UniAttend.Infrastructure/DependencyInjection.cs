@@ -10,6 +10,7 @@ using UniAttend.Infrastructure.Data;
 using UniAttend.Infrastructure.Data.Repositories;
 using UniAttend.Infrastructure.Services;
 using UniAttend.Infrastructure.Settings;
+using Microsoft.Extensions.Options;
 
 namespace UniAttend.Infrastructure
 {
@@ -19,16 +20,26 @@ namespace UniAttend.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            // Configure JWT Settings first
+    var jwtSettings = new JwtSettings
+    {
+        SecretKey = configuration["Jwt:Key"] ?? 
+            throw new InvalidOperationException("Jwt:Key not found in configuration"),
+        Issuer = configuration["Jwt:Issuer"] ?? 
+            throw new InvalidOperationException("Jwt:Issuer not found in configuration"),
+        Audience = configuration["Jwt:Audience"] ?? 
+            throw new InvalidOperationException("Jwt:Audience not found in configuration"),
+        TokenExpirationInMinutes = int.Parse(configuration["Jwt:TokenExpirationInMinutes"] ?? "60")
+    };
+
+    services.AddSingleton(jwtSettings);
+    
             // Configure Database
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection"),
-                    b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-
-            // JWT Settings
-            var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()
-                ?? throw new InvalidOperationException("JWT settings are not configured");
-            services.AddSingleton(jwtSettings);
+            options.UseMySql(
+                configuration.GetConnectionString("DefaultConnection"),
+                ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection")),
+                b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
             services.AddHttpContextAccessor();
 

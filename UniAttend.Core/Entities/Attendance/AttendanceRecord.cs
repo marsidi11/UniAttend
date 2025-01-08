@@ -3,10 +3,9 @@ using System;
 
 namespace UniAttend.Core.Entities.Attendance
 {
-    public class AttendanceRecord : Entity
+    public class AttendanceRecord : Entity  
     {
-        // Add this protected parameterless constructor for EF Core
-        protected AttendanceRecord() { }
+        private AttendanceRecord() { } // For reflection/serialization
     
         public AttendanceRecord(int courseId, int studentId, DateTime checkInTime, string checkInMethod)
         {
@@ -14,16 +13,21 @@ namespace UniAttend.Core.Entities.Attendance
             StudentId = studentId;
             CheckInTime = checkInTime;
             CheckInMethod = checkInMethod ?? throw new ArgumentNullException(nameof(checkInMethod));
+            IsConfirmed = false;
         }
     
-        // Change these to { get; set; } to allow EF Core to set values
-        public int CourseId { get; set; }
-        public int StudentId { get; set; }
-        public DateTime CheckInTime { get; set; }
-        public string CheckInMethod { get; set; }
-        public bool IsConfirmed { get; set; } = false;
+        // Identity properties - immutable
+        public int CourseId { get; }
+        public int StudentId { get; }
+        public DateTime CheckInTime { get; }
+        public string CheckInMethod { get; }
+        public bool IsConfirmed { get; private set; }
     
-        public virtual Course Course { get; set; } = null!;
-        public virtual Student Student { get; set; } = null!;
+        // Navigation properties - nullable for EF Core
+        public Course? Course { get; private set; }
+        public Student? Student { get; private set; }
+    
+        // Domain methods
+        public void Confirm() => IsConfirmed = true;
     }
 }

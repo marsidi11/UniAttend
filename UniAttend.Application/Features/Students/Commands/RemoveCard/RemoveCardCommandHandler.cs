@@ -18,8 +18,8 @@ namespace UniAttend.Application.Features.Students.Commands.RemoveCard
         {
             var student = await _studentRepository.GetByIdAsync(request.StudentId)
                 ?? throw new NotFoundException(nameof(Student), request.StudentId);
-
-            student.CardId = null;
+        
+            student.RemoveCard();
             await _studentRepository.UpdateAsync(student);
         }
     }

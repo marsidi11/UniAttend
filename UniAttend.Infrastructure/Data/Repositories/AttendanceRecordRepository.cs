@@ -56,7 +56,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
             var records = await GetUnconfirmedRecordsAsync(courseId, cancellationToken);
             foreach (var record in records)
             {
-                record.IsConfirmed = true;
+                record.Confirm();
                 DbSet.Update(record);
             }
             await Context.SaveChangesAsync(cancellationToken);

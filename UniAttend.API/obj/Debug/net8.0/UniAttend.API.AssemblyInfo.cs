@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("UniAttend.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+76ffc108412ec65d0803480a171a5f5e1689ef7a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9fc48db2cc176406b4e85b69cf159a43495a5d88")]
 [assembly: System.Reflection.AssemblyProductAttribute("UniAttend.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("UniAttend.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

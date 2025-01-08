@@ -48,10 +48,11 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 await _unitOfWork.Users.AddAsync(user, cancellationToken);
 
                 // Create student record
-                var student = new Student(request.StudentId, request.DepartmentId, user)
+                var student = new Student(request.StudentId, request.DepartmentId, user);
+                if (!string.IsNullOrEmpty(request.CardId))
                 {
-                    CardId = request.CardId
-                };
+                    student.AssignCard(request.CardId);
+                }
 
                 await _unitOfWork.Students.AddAsync(student, cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);

@@ -235,30 +235,35 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((
-  to: RouteLocationNormalized, 
-  _from: RouteLocationNormalized, 
-  next: NavigationGuardNext
-) => {
+router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
   const isAuthenticated = !!authStore.token;
-  const userRole = authStore.userRole?.toLowerCase() as Role | undefined;
+  const userRole = authStore.userRole?.toLowerCase();
+  
+  console.log('Route guard:', {
+    path: to.path,
+    isAuthenticated,
+    userRole,
+    requiredRoles: to.meta.roles,
+    hasValidRole: to.meta.roles ? (to.meta.roles as string[]).includes(userRole as string) : true
+  });
 
-  // Handle authentication
+  // Check authentication
   if (to.meta.requiresAuth && !isAuthenticated) {
+    console.log('Not authenticated, redirecting to login');
     return next({ name: 'login' });
   }
 
-  // Handle role-based access
-  if (to.meta.roles && Array.isArray(to.meta.roles) && userRole) {
-    if (!to.meta.roles.includes(userRole)) {
-      return next({ name: 'dashboard' });
+  // Check role access
+  if (to.meta.roles && Array.isArray(to.meta.roles)) {
+    if (!userRole || !to.meta.roles.includes(userRole)) {
+      console.log('Unauthorized access attempt:', {
+        userRole,
+        requiredRoles: to.meta.roles
+      });
+      // Redirect to appropriate dashboard based on user's role
+      return next({ name: dashboardRedirectMap[userRole as string] || 'login' });
     }
-  }
-
-  // Handle authenticated users accessing auth pages
-  if (isAuthenticated && to.meta.requiresAuth === false) {
-    return next({ name: 'dashboard' });
   }
 
   next();

@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { User, AuthResponse, LoginRequest, RegisterRequest } from '@/types/user.types';
+import type { User } from '@/types/user.types';
+import type { AuthResponse, LoginRequest } from '@/types/auth.types';
+import { NumericRole, getRoleString } from '@/types/base.types';
 import { authApi } from '@/api/endpoints/authApi';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -19,16 +21,26 @@ export const useAuthStore = defineStore('auth', () => {
   // Actions
   async function login(credentials: LoginRequest) {
     isLoading.value = true;
+    error.value = null;
+    
     try {
       const { data } = await authApi.login(credentials);
+      console.log('Login response:', data); // Debug
       setAuthData(data);
-    } catch (err) {
-      handleError(err);
+      console.log('Auth state after login:', { 
+        user: user.value,
+        role: userRole.value,
+        token: !!token.value
+      }); // Debug
+    } catch (err: any) {
+      console.error('Login error:', err);
+      error.value = err?.response?.data?.message || 'Failed to sign in';
       throw err;
     } finally {
       isLoading.value = false;
     }
   }
+  
 
   async function register(userData: RegisterRequest) {
     isLoading.value = true;
@@ -50,9 +62,24 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function setAuthData(data: AuthResponse) {
-    user.value = data.user;
-    token.value = data.token;
-    localStorage.setItem('token', data.token);
+    if (!data.user || !data.accessToken) {
+      console.error('Invalid auth response:', data);
+      throw new Error('Invalid authentication response');
+    }
+
+    const mappedRole = getRoleString(data.user.role as NumericRole);
+    console.log('Role mapping:', {
+      numericRole: data.user.role,
+      mappedRole
+    });
+
+    user.value = {
+      ...data.user,
+      role: mappedRole
+    };
+    
+    token.value = data.accessToken;
+    localStorage.setItem('token', data.accessToken);
   }
 
   function handleError(err: unknown) {

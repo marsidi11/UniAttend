@@ -61,11 +61,11 @@ namespace UniAttend.Application.Auth.Commands.Register
                 // Handle student registration
                 if (userRole == UserRole.Student && request.StudentId != null && request.DepartmentId != null)
                 {
-                    var student = new Student(request.StudentId, request.DepartmentId.Value, user)
+                    var student = new Student(request.StudentId!, request.DepartmentId!.Value, user);
+                    if (!string.IsNullOrEmpty(request.CardId))
                     {
-                        CardId = request.CardId
-                    };
-                    await _unitOfWork.Students.AddAsync(student, cancellationToken);
+                        student.AssignCard(request.CardId);
+                    }
                 }
 
                 await _unitOfWork.CommitAsync(cancellationToken);

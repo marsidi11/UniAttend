@@ -22,7 +22,6 @@ export interface UserProfile {
 export interface UserDetails extends UserProfile {
   role: Role;
   departmentName?: string;
-  lastLoginDate?: Date;
   attendanceStats?: {
     totalClasses: number;
     attendedClasses: number;

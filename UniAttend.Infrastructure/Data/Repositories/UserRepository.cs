@@ -14,25 +14,22 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public UserRepository(ApplicationDbContext context) : base(context) { }
 
         public override async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-        {
-            return await DbSet
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
-        }
+    {
+        return await DbSet
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+    }
 
         public async Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
-        {
-            return await DbSet
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
-        }
+    {
+        return await DbSet
+            .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+    }
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
-        {
-            return await DbSet
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
-        }
+    {
+        return await DbSet
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
 
         public async Task<bool> UsernameExistsAsync(string username, CancellationToken cancellationToken = default)
         {
@@ -45,10 +42,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
         }
 
         public async Task<User?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
-        {
-            return await DbSet
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken, cancellationToken);
-        }
+    {
+        return await DbSet
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken, cancellationToken);
+    }
     }
 }
