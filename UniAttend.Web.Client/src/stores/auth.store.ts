@@ -6,11 +6,36 @@ import { NumericRole, getRoleString } from '@/types/base.types';
 import { authApi } from '@/api/endpoints/authApi';
 
 export const useAuthStore = defineStore('auth', () => {
-  // State
-  const user = ref<User | null>(null);
+  // State with hydration from localStorage
+  const user = ref<User | null>(JSON.parse(localStorage.getItem('user') || 'null'));
   const token = ref<string | null>(localStorage.getItem('token'));
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+
+  function setAuthData(data: AuthResponse) {
+    if (!data.user || !data.accessToken) {
+      console.error('Invalid auth response:', data);
+      throw new Error('Invalid authentication response');
+    }
+
+    const mappedRole = getRoleString(data.user.role as NumericRole);
+    console.log('Role mapping:', {
+      numericRole: data.user.role,
+      mappedRole
+    });
+
+    const userData = {
+      ...data.user,
+      role: mappedRole
+    };
+
+    user.value = userData;
+    token.value = data.accessToken;
+    
+    // Persist both token and user data
+    localStorage.setItem('token', data.accessToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+  }
 
   // Getters
   const isAuthenticated = computed(() => !!token.value);
@@ -41,7 +66,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   
-
   async function register(userData: RegisterRequest) {
     isLoading.value = true;
     try {
@@ -59,6 +83,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null;
     token.value = null;
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
 
   function setAuthData(data: AuthResponse) {
@@ -66,20 +91,23 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('Invalid auth response:', data);
       throw new Error('Invalid authentication response');
     }
-
-    const mappedRole = getRoleString(data.user.role as NumericRole);
-    console.log('Role mapping:', {
-      numericRole: data.user.role,
-      mappedRole
+  
+    console.log('Setting auth data:', {
+      originalRole: data.user.role,
+      originalRoleType: typeof data.user.role,
+      token: !!data.accessToken
     });
-
+  
+    const mappedRole = getRoleString(data.user.role as NumericRole);
+    
     user.value = {
       ...data.user,
       role: mappedRole
     };
-    
     token.value = data.accessToken;
+    
     localStorage.setItem('token', data.accessToken);
+    localStorage.setItem('user', JSON.stringify(user.value));
   }
 
   function handleError(err: unknown) {

@@ -1,9 +1,10 @@
+<!-- App.vue -->
 <template>
-  <router-view v-slot="{ Component }">
-    <component :is="getLayout">
+  <component :is="layout">
+    <router-view v-slot="{ Component }">
       <component :is="Component" />
-    </component>
-  </router-view>
+    </router-view>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -14,10 +15,19 @@ import AuthLayout from '@/shared/layouts/AuthLayout.vue';
 import DashboardLayout from '@/shared/layouts/DashboardLayout.vue';
 
 const route = useRoute();
-const getLayout = computed(() => {
-  if (route.path === '/') return MainLayout;
-  if (route.meta.requiresAuth === false) return AuthLayout;
-  if (route.path.includes('dashboard')) return DashboardLayout;
+
+const layout = computed(() => {
+  // If route is within dashboard
+  if (route.path.startsWith('/dashboard')) {
+    return DashboardLayout;
+  }
+
+  // If route requires auth layout
+  if (route.meta.layout === 'auth') {
+    return AuthLayout;
+  }
+
+  // Default to main layout
   return MainLayout;
 });
 </script>

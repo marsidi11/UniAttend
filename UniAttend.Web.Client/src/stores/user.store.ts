@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { 
+  User,
   UserProfile, 
   UserDetails, 
   UpdateProfileRequest, 
@@ -10,12 +11,27 @@ import { userApi } from '@/api/endpoints/userApi';
 
 export const useUserStore = defineStore('user', () => {
   // State
+  const users = ref<User[]>([]);
   const profile = ref<UserProfile | null>(null);
   const details = ref<UserDetails | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   // Actions
+  async function fetchUsers() {
+    isLoading.value = true;
+    try {
+      const { data } = await userApi.getAll();
+      users.value = data;
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function fetchProfile() {
     isLoading.value = true;
     try {
@@ -76,12 +92,14 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     // State
+    users,
     profile,
     details,
     isLoading,
     error,
 
     // Actions
+    fetchUsers,
     fetchProfile,
     fetchUserDetails,
     updateProfile,

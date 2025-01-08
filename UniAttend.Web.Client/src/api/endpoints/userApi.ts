@@ -1,5 +1,6 @@
 import apiClient  from '../apiClient';
 import type { 
+  User,
   UserProfile, 
   UserDetails,
   UpdateProfileRequest, 
@@ -8,6 +9,9 @@ import type {
 
 export const userApi = {
   // Get current user profile
+  getAll: () =>
+    apiClient.get<User[]>('/user'),
+  
   getProfile: () =>
     apiClient.get<UserProfile>('/user/profile'),
 

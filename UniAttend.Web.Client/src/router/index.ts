@@ -5,11 +5,8 @@ import {
   type NavigationGuardNext
 } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
-import type { Role } from '@/types/base.types';
 
 // Layouts
-import MainLayout from '@/shared/layouts/MainLayout.vue';
-import AuthLayout from '@/shared/layouts/AuthLayout.vue';
 import DashboardLayout from '@/shared/layouts/DashboardLayout.vue';
 
 // Public pages
@@ -73,7 +70,6 @@ const routes = [
   },
   {
     path: '/dashboard',
-    component: DashboardLayout,
     meta: { requiresAuth: true },
     children: [
       {
@@ -237,21 +233,27 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
-  const isAuthenticated = !!authStore.token;
+  const isAuthenticated = !!authStore.token && !!authStore.user;
   const userRole = authStore.userRole?.toLowerCase();
   
   console.log('Route guard:', {
     path: to.path,
     isAuthenticated,
     userRole,
-    requiredRoles: to.meta.roles,
-    hasValidRole: to.meta.roles ? (to.meta.roles as string[]).includes(userRole as string) : true
+    user: authStore.user,
+    token: !!authStore.token
   });
 
-  // Check authentication
+  // Handle auth required routes
   if (to.meta.requiresAuth && !isAuthenticated) {
     console.log('Not authenticated, redirecting to login');
     return next({ name: 'login' });
+  }
+
+  // Handle public routes when authenticated
+  if (to.name === 'login' && isAuthenticated) {
+    const redirectTarget = dashboardRedirectMap[userRole as string] || 'dashboard';
+    return next({ name: redirectTarget });
   }
 
   // Check role access
@@ -261,8 +263,10 @@ router.beforeEach((to, _from, next) => {
         userRole,
         requiredRoles: to.meta.roles
       });
-      // Redirect to appropriate dashboard based on user's role
-      return next({ name: dashboardRedirectMap[userRole as string] || 'login' });
+      if (isAuthenticated) {
+        return next({ name: dashboardRedirectMap[userRole as string] });
+      }
+      return next({ name: 'login' });
     }
   }
 

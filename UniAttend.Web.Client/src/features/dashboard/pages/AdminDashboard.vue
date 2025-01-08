@@ -159,6 +159,7 @@ import { formatDate } from '@/utils/dateUtils'
 // Types
 import type { Department } from '@/types/department.types'
 import type { AcademicYear, CreateAcademicYearRequest } from '@/types/academicYear.types'
+import type { User } from '@/types/user.types'
 
 // Components
 import StatCard from '@/shared/components/ui/StatCard.vue'
@@ -167,13 +168,13 @@ import Badge from '@/shared/components/ui/Badge.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import AcademicYearForm from '@/features/academic/components/AcademicYearForm.vue'
 
-// Store setup
+// Store setup with proper typing
 const router = useRouter()
 const departmentStore = useDepartmentStore()
 const academicYearStore = useAcademicYearStore()
 const userStore = useUserStore()
 
-// Store refs
+// Store refs with explicit typing
 const { departments } = storeToRefs(departmentStore)
 const { currentYear: currentAcademicYear } = storeToRefs(academicYearStore)
 const { users } = storeToRefs(userStore)
@@ -218,16 +219,16 @@ function updateDashboardStats() {
   if (!departments.value || !currentAcademicYear.value) return
 
   const activeDepts = departments.value.filter(d => d.isActive)
-  const staffMembers = users.value.filter(u => u.role.toLowerCase() !== 'student')
+  const staffMembers = users.value.filter((u: User) => u.role.toLowerCase() !== 'student')
   
   stats.value = {
     currentYear: currentAcademicYear.value?.name || 'Not Set',
     isAcademicYearActive: currentAcademicYear.value?.isActive ?? false,
     activeDepartments: activeDepts.length,
     totalDepartments: departments.value.length,
-    activeStaff: staffMembers.filter(s => s.isActive).length,
-    secretaryCount: staffMembers.filter(s => s.role.toLowerCase() === 'secretary').length,
-    professorCount: staffMembers.filter(s => s.role.toLowerCase() === 'professor').length
+    activeStaff: staffMembers.filter((s: User) => s.isActive).length,
+    secretaryCount: staffMembers.filter((s: User) => s.role.toLowerCase() === 'secretary').length,
+    professorCount: staffMembers.filter((s: User) => s.role.toLowerCase() === 'professor').length
   }
 }
 

@@ -2,6 +2,7 @@ import type { BaseEntity, Role } from './base.types';
 
 // Core User Interface
 export interface User extends BaseEntity {
+  id: number;
   username: string;
   email: string;
   role: Role;
