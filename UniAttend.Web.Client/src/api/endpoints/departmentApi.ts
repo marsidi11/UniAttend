@@ -1,19 +1,19 @@
 import apiClient from '../apiClient';
-import type { Department } from '@/stores/department.store';
+import type { Department } from '@/types/department.types';
 
 export const departmentApi = {
-  getDepartments: () => 
-    apiClient.get<Department[]>('/departments'),
+  getAll: () => 
+    apiClient.get<Department[]>('admin/departments'),
 
-  getDepartmentById: (id: number) => 
+  getById: (id: number) => 
     apiClient.get<Department>(`/departments/${id}`),
 
-  createDepartment: (payload: { name: string }) => 
-    apiClient.post<Department>('/departments', payload),
+  create: (payload: { name: string }) => 
+    apiClient.post<Department>('/admin/departments', payload),
 
-  updateDepartment: (id: number, payload: { name: string; isActive: boolean }) => 
-    apiClient.put<Department>(`/departments/${id}`, payload),
+  update: (id: number, payload: { name: string; isActive: boolean }) => 
+    apiClient.put<Department>(`/admin/departments/${id}`, payload),
 
   deleteDepartment: (id: number) => 
-    apiClient.delete(`/departments/${id}`)
+    apiClient.delete(`/admin/departments/${id}`)
 };

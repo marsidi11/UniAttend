@@ -5,6 +5,7 @@ using UniAttend.Application.Features.Departments.Commands.CreateDepartment;
 using UniAttend.Application.Features.Departments.Commands.UpdateDepartment;
 using UniAttend.Application.Features.AcademicYears.Commands.CreateAcademicYear;
 using UniAttend.Application.Features.Users.Commands.CreateStaff;
+using UniAttend.Application.Features.Users.Commands.UpdateStaff;
 using UniAttend.Application.Features.Subjects.Commands.CreateSubject;
 using UniAttend.Application.Features.Reports.DTOs;
 using UniAttend.Application.Features.Reports.Queries.GetAttendanceReport;
@@ -46,6 +47,14 @@ namespace UniAttend.API.Controllers
         [HttpPost("staff")]
         public async Task<ActionResult<int>> CreateStaffMember(CreateStaffCommand command)
             => Ok(await _mediator.Send(command));
+
+        [HttpPut("staff/{id}")]
+        public async Task<ActionResult> UpdateStaffMember(int id, UpdateStaffCommand command)
+        {
+            if (id != command.Id) return BadRequest();
+            await _mediator.Send(command);
+            return NoContent();
+        }
 
         [HttpGet("reports/attendance")]
         public async Task<ActionResult<AttendanceReportDto>> GetAttendanceReport([FromQuery] GetAttendanceReportQuery query)

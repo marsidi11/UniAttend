@@ -1,13 +1,8 @@
 import { 
   createRouter, 
-  createWebHistory,
-  type RouteLocationNormalized,
-  type NavigationGuardNext
+  createWebHistory
 } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
-
-// Layouts
-import DashboardLayout from '@/shared/layouts/DashboardLayout.vue';
 
 // Public pages
 import HomePage from '@/features/home/pages/HomePage.vue';
@@ -28,6 +23,7 @@ import AcademicYearList from '@/features/academic/pages/AcademicYearList.vue';
 
 // User Management
 import UserManagement from '@/features/users/pages/UserManagement.vue';
+import UserProfile from '@/features/users/pages/UserProfile.vue';
 import StudentList from '@/features/students/pages/StudentList.vue';
 import StudentDetails from '@/features/students/pages/StudentDetails.vue';
 import ProfessorList from '@/features/professors/pages/ProfessorList.vue';
@@ -217,6 +213,12 @@ const routes = [
         name: 'absence-alerts',
         component: AbsenceAlerts,
         meta: { roles: ['admin', 'secretary'] }
+      },
+      {
+        path: '/profile',
+        name: 'user-profile', 
+        component: UserProfile,
+        meta: { requiresAuth: true }
       }
     ]
   },

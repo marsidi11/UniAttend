@@ -33,7 +33,7 @@ namespace UniAttend.Application.Features.Users.Commands.CreateStaff
                 ?? throw new NotFoundException($"Department with ID {request.DepartmentId} not found");
 
             var tempPassword = GenerateTemporaryPassword();
-            
+
             var user = new User(
                 request.Username,
                 _passwordHasher.HashPassword(tempPassword),
@@ -62,7 +62,8 @@ namespace UniAttend.Application.Features.Users.Commands.CreateStaff
                     user.Email,
                     $"{user.FirstName} {user.LastName}",
                     request.Username,
-                    tempPassword
+                    tempPassword,
+                    cancellationToken 
                 );
 
                 return user.Id;
@@ -76,7 +77,10 @@ namespace UniAttend.Application.Features.Users.Commands.CreateStaff
 
         private static string GenerateTemporaryPassword()
         {
-            return Path.GetRandomFileName().Replace(".", "")[..8];
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, 12)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

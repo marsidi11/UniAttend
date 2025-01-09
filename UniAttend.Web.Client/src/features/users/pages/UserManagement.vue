@@ -2,8 +2,8 @@
   <div class="space-y-6">
     <!-- Header Section -->
     <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-900">User Management</h1>
-      <Button v-if="isAdmin" @click="openCreateModal">Add User</Button>
+      <h1 class="text-2xl font-bold text-gray-900">Staff Management</h1>
+      <Button @click="openCreateModal">Add Staff Member</Button>
     </div>
 
     <!-- Filters -->
@@ -16,9 +16,20 @@
         >
           <option value="">All Roles</option>
           <option value="admin">Admin</option>
-          <option value="professor">Professor</option>
           <option value="secretary">Secretary</option>
-          <option value="student">Student</option>
+          <option value="professor">Professor</option>
+        </select>
+      </div>
+      <div class="w-64">
+        <label class="block text-sm font-medium text-gray-700">Department</label>
+        <select
+          v-model="selectedDepartment"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        >
+          <option value="">All Departments</option>
+          <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+            {{ dept.name }}
+          </option>
         </select>
       </div>
       <div class="w-64">
@@ -34,22 +45,22 @@
       </div>
     </div>
 
-    <!-- Users Table -->
+    <!-- Staff Table -->
     <div class="bg-white shadow rounded-lg">
       <DataTable
-        :data="filteredUsers"
+        :data="filteredStaff"
         :columns="columns"
         :loading="isLoading"
         :actions="tableActions"
-        @row-click="handleRowClick"
       />
     </div>
 
-    <!-- Create/Edit User Modal -->
+    <!-- Create/Edit Staff Modal -->
     <Modal v-model="showModal" :title="modalTitle">
       <UserForm
         v-if="showModal"
-        :user="selectedUser"
+        :staff="selectedStaff"
+        :departments="departments"
         @submit="handleSubmit"
         @cancel="showModal = false"
       />
@@ -60,37 +71,44 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useUserStore } from '@/stores/user.store'
-import { useAuthStore } from '@/stores/auth.store'
+import { useAdminStore } from '@/stores/admin.store'
+import { useDepartmentStore } from '@/stores/department.store'
 import type { User } from '@/types/user.types'
+import type { CreateStaffCommand, UpdateStaffRequest } from '@/types/admin.types'
+import type { TableItem } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import UserForm from '../components/UserForm.vue'
-import type { TableItem } from '@/types/tableItem.types'
 
-const userStore = useUserStore()
-const authStore = useAuthStore()
+// Initialize stores
+const adminStore = useAdminStore()
+const departmentStore = useDepartmentStore()
 
-const { users, isLoading } = storeToRefs(userStore)
+// Get store refs
+const { staff, isLoading } = storeToRefs(adminStore)
+const { departments } = storeToRefs(departmentStore)
+
+// Component state
 const showModal = ref(false)
-const selectedUser = ref<User | null>(null)
+const selectedStaff = ref<User | null>(null)
 const selectedRole = ref('')
+const selectedDepartment = ref('')
 const selectedStatus = ref('')
 
-const isAdmin = computed(() => authStore.userRole === 'admin')
-
+// Table configuration
 const columns = [
   { key: 'username', label: 'Username' },
   { key: 'fullName', label: 'Full Name' },
   { key: 'role', label: 'Role' },
   { key: 'email', label: 'Email' },
+  { key: 'departmentName', label: 'Department' },
   { key: 'isActive', label: 'Status',
     render: (value: boolean) => value ? 'Active' : 'Inactive'
   }
 ]
 
-const tableActions = computed(() => [
+const tableActions = [
   { 
     label: 'Edit', 
     icon: 'edit', 
@@ -101,64 +119,72 @@ const tableActions = computed(() => [
     icon: 'toggle_on', 
     action: (item: TableItem) => handleToggleStatus(item as User)
   }
-])
+]
 
+// Computed properties
 const modalTitle = computed(() => 
-  selectedUser.value ? 'Edit User' : 'Add User'
+  selectedStaff.value ? 'Edit Staff Member' : 'Add Staff Member'
 )
 
-const filteredUsers = computed(() => {
-  let filtered = [...users.value]
+const filteredStaff = computed(() => {
+  let filtered = [...staff.value]
   
   if (selectedRole.value) {
-    filtered = filtered.filter(u => u.role.toLowerCase() === selectedRole.value)
+    filtered = filtered.filter(s => s.role.toLowerCase() === selectedRole.value)
+  }
+  
+  if (selectedDepartment.value) {
+    filtered = filtered.filter(s => s.departmentId === Number(selectedDepartment.value))
   }
   
   if (selectedStatus.value !== '') {
-    filtered = filtered.filter(u => u.isActive === (selectedStatus.value === 'true'))
+    filtered = filtered.filter(s => s.isActive === (selectedStatus.value === 'true'))
   }
   
   return filtered
 })
 
-onMounted(async () => {
-  await userStore.fetchUsers()
-})
-
+// Methods
 function openCreateModal() {
-  selectedUser.value = null
+  selectedStaff.value = null
   showModal.value = true
 }
 
-function handleEdit(user: User) {
-  selectedUser.value = user
+function handleEdit(staff: User) {
+  selectedStaff.value = staff
   showModal.value = true
 }
 
-async function handleToggleStatus(user: User) {
-  if (confirm(`Are you sure you want to ${user.isActive ? 'deactivate' : 'activate'} this user?`)) {
+async function handleToggleStatus(staff: User) {
+  if (confirm(`Are you sure you want to ${staff.isActive ? 'deactivate' : 'activate'} this staff member?`)) {
     try {
-      await userStore.updateUser(user.id, { isActive: !user.isActive })
+      await adminStore.updateStaff(staff.id, { isActive: !staff.isActive })
     } catch (err) {
-      console.error('Failed to update user status:', err)
+      console.error('Failed to update staff status:', err)
     }
   }
 }
 
-async function handleSubmit(userData: Partial<User>) {
+async function handleSubmit(data: CreateStaffCommand | UpdateStaffRequest) {
   try {
-    if (selectedUser.value?.id) {
-      await userStore.updateUser(selectedUser.value.id, userData)
+    if ('id' in data) {
+      // It's an update
+      await adminStore.updateStaff(data.id, data)
     } else {
-      await userStore.createUser(userData)
+      // It's a create
+      await adminStore.createStaff(data)
     }
     showModal.value = false
   } catch (err) {
-    console.error('Failed to save user:', err)
+    console.error('Failed to save staff member:', err)
   }
 }
 
-function handleRowClick(user: TableItem) {
-  console.log('User clicked:', user)
-}
+// Lifecycle hooks
+onMounted(async () => {
+  await Promise.all([
+    adminStore.getStaffList(),
+    departmentStore.fetchDepartments()
+  ])
+})
 </script>

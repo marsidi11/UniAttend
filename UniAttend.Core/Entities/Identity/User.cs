@@ -80,5 +80,10 @@ namespace UniAttend.Core.Entities.Identity
             if (string.IsNullOrWhiteSpace(name) || name.Length > 100)
                 throw new ArgumentException($"Invalid {paramName}", paramName);
         }
+
+        public void UpdateActiveStatus(bool isActive)
+        {
+            IsActive = isActive;
+        }
     }
 }

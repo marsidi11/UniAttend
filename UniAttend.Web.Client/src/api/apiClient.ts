@@ -1,17 +1,17 @@
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth.store';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5255/api', // .NET backend URL
+  baseURL: 'http://localhost:5255/api',
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// Add request interceptor for auth token
-apiClient.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+apiClient.interceptors.request.use((config) => {
+  const authStore = useAuthStore();
+  if (authStore.token) {
+    config.headers.Authorization = `Bearer ${authStore.token}`;
   }
   return config;
 });

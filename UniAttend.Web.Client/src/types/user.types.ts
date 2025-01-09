@@ -9,6 +9,7 @@ export interface User extends BaseEntity {
   firstName: string;
   lastName: string;
   isActive: boolean;
+  departmentId?: number;
 }
 
 // User Profile 

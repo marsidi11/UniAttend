@@ -10,6 +10,8 @@ using UniAttend.Infrastructure;
 using UniAttend.Infrastructure.Auth.Settings;
 using UniAttend.Infrastructure.Data;
 using UniAttend.Core.Interfaces.Services;
+using UniAttend.Infrastructure.Settings;
+using UniAttend.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +51,20 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Configure Authorization
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy =>
+        policy.RequireRole("Admin"));
+        
+    options.AddPolicy("RequireSecretaryRole", policy =>
+        policy.RequireRole("Secretary"));
+        
+    options.AddPolicy("RequireProfessorRole", policy =>
+        policy.RequireRole("Professor"));
+        
+    options.AddPolicy("RequireStudentRole", policy =>
+        policy.RequireRole("Student"));
+});
 
 // Configure Swagger
 builder.Services.AddSwaggerGen(c =>
@@ -88,6 +103,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")),
         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+
+// Add Email configuration
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Build app
 var app = builder.Build();
