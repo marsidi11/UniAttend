@@ -5,9 +5,8 @@
     </div>
 
     <div class="bg-white shadow rounded-lg p-6">
-      <UserForm
+      <ProfileForm
         :user="currentUser"
-        :is-profile-mode="true"
         @submit="handleUpdateProfile"
       />
     </div>
@@ -19,6 +18,7 @@ import { computed } from 'vue'
 import { useUserStore } from '@/stores/user.store'
 import { useAuthStore } from '@/stores/auth.store'
 import type { UpdateProfileRequest } from '@/types/user.types'
+import ProfileForm from '../components/ProfileForm.vue'
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
@@ -28,8 +28,10 @@ const currentUser = computed(() => authStore.user)
 async function handleUpdateProfile(profileData: UpdateProfileRequest) {
   try {
     await userStore.updateProfile(profileData)
+    // Show success message or handle success case
   } catch (err) {
     console.error('Failed to update profile:', err)
+    // Show error message
   }
 }
 </script>

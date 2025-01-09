@@ -215,7 +215,7 @@ const routes = [
         meta: { roles: ['admin', 'secretary'] }
       },
       {
-        path: '/profile',
+        path: 'profile',
         name: 'user-profile', 
         component: UserProfile,
         meta: { requiresAuth: true }
