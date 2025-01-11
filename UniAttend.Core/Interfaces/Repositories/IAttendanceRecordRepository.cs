@@ -24,5 +24,22 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<CourseSession> GetSessionWithDetailsAsync(
             int sessionId,
             CancellationToken cancellationToken = default);
+
+        Task<(int TotalClasses, int AttendedClasses)> GetStudentGroupAttendanceAsync(
+        int studentId,
+        int groupId,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        CancellationToken cancellationToken = default);
+
+        Task<AttendanceReportResult> GetAcademicYearAttendanceReportAsync(
+        int academicYearId,
+        CancellationToken cancellationToken = default);
+        
+    Task<AttendanceReportResult> GetGroupAttendanceReportAsync(
+        int groupId,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        CancellationToken cancellationToken = default);   
     }
 }

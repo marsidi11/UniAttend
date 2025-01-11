@@ -14,6 +14,9 @@ namespace UniAttend.Core.Interfaces.Repositories
         IReportRepository Reports { get; }
         IStudyGroupRepository StudyGroups { get; }
         IOtpCodeRepository OtpCodes { get; }
+        ICourseSessionRepository CourseSessions { get; }
+        IClassroomRepository Classrooms { get; }
+        IAbsenceAlertRepository AbsenceAlerts { get; }
         
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

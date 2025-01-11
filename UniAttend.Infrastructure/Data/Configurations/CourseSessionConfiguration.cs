@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using UniAttend.Core.Entities.Attendance;
-using UniAttend.Core.Entities;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
@@ -13,32 +12,41 @@ namespace UniAttend.Infrastructure.Data.Configurations
             
             builder.HasKey(x => x.Id);
             
-            // Use backing fields for immutable properties
-            builder.Property("CourseId").IsRequired();
-            builder.Property("GroupId").IsRequired();
-            builder.Property("ClassroomId").IsRequired();
-            builder.Property("Date").IsRequired();
-            builder.Property("StartTime").IsRequired();
-            builder.Property("EndTime").IsRequired();
-            builder.Property("Status").IsRequired().HasMaxLength(50);
+            // Properties
+            builder.Property(x => x.CourseId).IsRequired();
+            builder.Property(x => x.GroupId).IsRequired();
+            builder.Property(x => x.ClassroomId).IsRequired();
+            builder.Property(x => x.Date).IsRequired();
+            builder.Property(x => x.StartTime).IsRequired();
+            builder.Property(x => x.EndTime).IsRequired();
+            builder.Property(x => x.Status).IsRequired().HasMaxLength(50);
 
-            // Configure relationships using string names to avoid navigation property exposure
-            builder.HasOne(typeof(Course))
+            // Relationships
+            builder.HasOne(x => x.Course)
                 .WithMany()
-                .HasForeignKey("CourseId")
+                .HasForeignKey(x => x.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(typeof(StudyGroup))
+            builder.HasOne(x => x.Group)
                 .WithMany()
-                .HasForeignKey("GroupId")
+                .HasForeignKey(x => x.GroupId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(typeof(Classroom))
+            builder.HasOne(x => x.Classroom)
                 .WithMany()
-                .HasForeignKey("ClassroomId")
+                .HasForeignKey(x => x.ClassroomId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasIndex("CourseId", "Date");
+            builder.HasMany(x => x.AttendanceRecords)
+                .WithOne()
+                .HasForeignKey("CourseSessionId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes
+            builder.HasIndex(x => x.CourseId);
+            builder.HasIndex(x => x.GroupId);
+            builder.HasIndex(x => x.ClassroomId);
+            builder.HasIndex(x => x.Date);
         }
     }
 }

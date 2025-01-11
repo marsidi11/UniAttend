@@ -55,5 +55,14 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Where(ay => ay.IsActive)
                 .Include(ay => ay.StudyGroups)
                 .ToListAsync(cancellationToken);
+
+        public async Task<AcademicYear?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default)
+        => await DbSet
+            .Include(ay => ay.StudyGroups)
+                .ThenInclude(g => g.Students)
+                    .ThenInclude(gs => gs.Student)
+            .Include(ay => ay.StudyGroups)
+                .ThenInclude(g => g.Subject)
+            .FirstOrDefaultAsync(ay => ay.Id == id, cancellationToken);
     }
 }

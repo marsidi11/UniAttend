@@ -18,6 +18,16 @@ namespace UniAttend.Core.Entities.Base
 
         public bool IsActive { get; protected set; }
 
+        public void SetActive(bool isActive)
+        {
+            IsActive = isActive;
+        }
+
+        public void SetDeactive()
+        {
+            IsActive = false;
+        }
+
         protected void Deactivate() => IsActive = false;
         protected void Activate() => IsActive = true;
     }

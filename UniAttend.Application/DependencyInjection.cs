@@ -14,12 +14,12 @@ namespace UniAttend.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            // Add MediatR
-            services.AddMediatR(cfg =>
-                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
-            // Add AutoMapper
+            // Register AutoMapper with proper assembly scanning
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            
+            // Register MediatR with proper assembly scanning
+            services.AddMediatR(cfg => 
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             return services;
         }

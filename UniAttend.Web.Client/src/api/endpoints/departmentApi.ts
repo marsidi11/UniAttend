@@ -3,7 +3,7 @@ import type { Department } from '@/types/department.types';
 
 export const departmentApi = {
   getAll: () => 
-    apiClient.get<Department[]>('admin/departments'),
+    apiClient.get<Department[]>('/admin/departments'),
 
   getById: (id: number) => 
     apiClient.get<Department>(`/departments/${id}`),

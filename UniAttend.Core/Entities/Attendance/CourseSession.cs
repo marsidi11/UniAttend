@@ -1,60 +1,46 @@
 using UniAttend.Core.Entities.Base;
-using UniAttend.Core.Exceptions;
-using System;
 
 namespace UniAttend.Core.Entities.Attendance
 {
     public class CourseSession : Entity
     {
-        private CourseSession() { } // For domain events/serialization only
-    
-        public CourseSession(int courseId, int groupId, int classroomId, DateTime date, 
+        public int GroupId { get; private set; }
+        public int ClassroomId { get; private set; }
+        public int CourseId { get; private set; }
+        public DateTime Date { get; private set; }
+        public TimeSpan StartTime { get; private set; }
+        public TimeSpan EndTime { get; private set; }
+        public string Status { get; private set; }
+
+        // Navigation properties
+        public StudyGroup Group { get; private set; }
+        public Classroom Classroom { get; private set; }
+        public Course Course { get; private set; }
+        private readonly List<AttendanceRecord> _attendanceRecords = new();
+        public IReadOnlyCollection<AttendanceRecord> AttendanceRecords => _attendanceRecords.AsReadOnly();
+
+        private CourseSession() { } // For EF
+
+        public CourseSession(int groupId, int classroomId, int courseId, DateTime date, 
             TimeSpan startTime, TimeSpan endTime, string status)
         {
-            ValidateTimeRange(startTime, endTime);
-            ValidateStatus(status);
-            
-            CourseId = courseId;
             GroupId = groupId;
             ClassroomId = classroomId;
+            CourseId = courseId;
             Date = date;
             StartTime = startTime;
             EndTime = endTime;
             Status = status;
         }
-    
-        // Identity properties - immutable
-        public int CourseId { get; }
-        public int GroupId { get; }
-        public int ClassroomId { get; }
-        public DateTime Date { get; }
-        public TimeSpan StartTime { get; }
-        public TimeSpan EndTime { get; }
-        public string Status { get; private set; }
-    
-        // Domain references without EF Core annotations - nullable for EF Core
-        public Course? Course { get; private set; }
-        public StudyGroup? Group { get; private set; }
-        public Classroom? Classroom { get; private set; }
-    
-        // Domain methods
-        public void UpdateStatus(string newStatus)
+
+        public void UpdateStatus(string status)
         {
-            ValidateStatus(newStatus);
-            Status = newStatus;
+            Status = status;
         }
-    
-        // Domain validation
-        private void ValidateTimeRange(TimeSpan start, TimeSpan end)
+
+        public void AddAttendanceRecord(AttendanceRecord record)
         {
-            if (start >= end)
-                throw new DomainException("Start time must be before end time");
-        }
-    
-        private void ValidateStatus(string status)
-        {
-            if (string.IsNullOrWhiteSpace(status))
-                throw new DomainException("Status cannot be empty");
+            _attendanceRecords.Add(record);
         }
     }
 }

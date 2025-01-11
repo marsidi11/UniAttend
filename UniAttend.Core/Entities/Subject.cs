@@ -1,4 +1,5 @@
 using UniAttend.Core.Entities.Base;
+using UniAttend.Core.Exceptions;
 
 namespace UniAttend.Core.Entities
 {
@@ -7,7 +8,7 @@ namespace UniAttend.Core.Entities
     /// </summary>
     public class Subject : ActiveEntity
     {
-        private Subject() 
+        private Subject()
         {
             Name = string.Empty;
             Description = string.Empty;
@@ -34,11 +35,37 @@ namespace UniAttend.Core.Entities
             StudyGroups = new List<StudyGroup>();
         }
 
-        public string Name { get; private init; }
-        public string Description { get; private init; }
-        public int Credits { get; private init; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public int Credits { get; private set; }
         public int DepartmentId { get; private init; }
         public Department Department { get; private init; }
         public ICollection<StudyGroup> StudyGroups { get; private init; }
+
+        public void Update(string name, string description, int credits)
+        {
+            ValidateName(name);
+            ValidateCredits(credits);
+
+            Name = name;
+            Description = description ?? string.Empty;
+            Credits = credits;
+        }
+
+        private static void ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new DomainException("Subject name cannot be empty");
+            if (name.Length > 255)
+                throw new DomainException("Subject name cannot exceed 255 characters");
+        }
+
+        private static void ValidateCredits(int credits)
+        {
+            if (credits < 0)
+                throw new DomainException("Credits cannot be negative");
+            if (credits > 30)
+                throw new DomainException("Credits cannot exceed 30");
+        }
     }
 }

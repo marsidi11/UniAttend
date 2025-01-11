@@ -50,6 +50,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Configure JwtSettings
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+builder.Services.AddSingleton(jwtSettings);
+
 // Configure Authorization
 builder.Services.AddAuthorization(options =>
 {

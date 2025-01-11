@@ -1,19 +1,23 @@
+using AutoMapper;
 using MediatR;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Core.Entities;
+using UniAttend.Application.Features.AcademicYears.DTOs;
 
 namespace UniAttend.Application.Features.AcademicYears.Commands.CreateAcademicYear
 {
-    public class CreateAcademicYearCommandHandler : IRequestHandler<CreateAcademicYearCommand, int>
+    public class CreateAcademicYearCommandHandler : IRequestHandler<CreateAcademicYearCommand, AcademicYearDto>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CreateAcademicYearCommandHandler(IUnitOfWork unitOfWork)
+        public CreateAcademicYearCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<int> Handle(CreateAcademicYearCommand request, CancellationToken cancellationToken)
+        public async Task<AcademicYearDto> Handle(CreateAcademicYearCommand request, CancellationToken cancellationToken)
         {
             var academicYear = new AcademicYear(
                 request.Name,
@@ -24,7 +28,7 @@ namespace UniAttend.Application.Features.AcademicYears.Commands.CreateAcademicYe
             await _unitOfWork.AcademicYears.AddAsync(academicYear, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return academicYear.Id;
+            return _mapper.Map<AcademicYearDto>(academicYear);
         }
     }
 }

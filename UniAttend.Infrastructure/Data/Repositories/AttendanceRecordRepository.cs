@@ -83,15 +83,15 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<CourseSession> GetSessionWithDetailsAsync(
-    int sessionId,
-    CancellationToken cancellationToken = default)
+        public async Task<CourseSession> GetSessionWithDetailsAsync(int sessionId, CancellationToken cancellationToken = default)
         {
             var session = await Context.Set<CourseSession>()
+                .Include(cs => cs.Course)
                 .Include(cs => cs.Group)
                     .ThenInclude(g => g.Students)
-                        .ThenInclude(gs => gs.Student) // Add this level
-                            .ThenInclude(s => s.User) // Then access User through Student
+                        .ThenInclude(gs => gs.Student)
+                            .ThenInclude(s => s.User)
+                .Include(cs => cs.Classroom)
                 .FirstOrDefaultAsync(cs => cs.Id == sessionId, cancellationToken);
 
             if (session == null)
@@ -100,6 +100,87 @@ namespace UniAttend.Infrastructure.Data.Repositories
             }
 
             return session;
+        }
+
+        public async Task<(int TotalClasses, int AttendedClasses)> GetStudentGroupAttendanceAsync(
+        int studentId,
+        int groupId,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        CancellationToken cancellationToken = default)
+        {
+            var query = DbSet
+                .Include(ar => ar.Course)
+                .Where(ar =>
+                    ar.StudentId == studentId &&
+                    ar.Course.StudyGroupId == groupId);
+
+            if (startDate.HasValue)
+                query = query.Where(ar => ar.CheckInTime >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(ar => ar.CheckInTime <= endDate.Value);
+
+            var attendance = await query.ToListAsync(cancellationToken);
+
+            var totalClasses = await Context.Set<Course>()
+                .CountAsync(c =>
+                    c.StudyGroupId == groupId &&
+                    (!startDate.HasValue || c.StartTime >= startDate.Value) &&
+                    (!endDate.HasValue || c.EndTime <= endDate.Value),
+                    cancellationToken);
+
+            var attendedClasses = attendance.Count(a => a.IsConfirmed);
+
+            return (totalClasses, attendedClasses);
+        }
+
+        public async Task<AttendanceReportResult> GetAcademicYearAttendanceReportAsync(
+            int academicYearId,
+            CancellationToken cancellationToken = default)
+        {
+            var records = await DbSet
+                .Include(ar => ar.Course)
+                    .ThenInclude(c => c.StudyGroup)
+                .Where(ar => ar.Course.StudyGroup.AcademicYearId == academicYearId)
+                .ToListAsync(cancellationToken);
+
+            return new AttendanceReportResult
+            {
+                OverallAttendance = records.Any()
+                    ? (decimal)records.Count(r => r.IsConfirmed) / records.Count * 100
+                    : 0,
+                PendingConfirmations = records.Count(r => !r.IsConfirmed),
+                TotalRecords = records.Count
+            };
+        }
+
+        public async Task<AttendanceReportResult> GetGroupAttendanceReportAsync(
+            int groupId,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            CancellationToken cancellationToken = default)
+        {
+            var query = DbSet
+                .Include(ar => ar.Course)
+                .Where(ar => ar.Course.StudyGroupId == groupId);
+
+            if (startDate.HasValue)
+                query = query.Where(ar => ar.CheckInTime >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(ar => ar.CheckInTime <= endDate.Value);
+
+            var records = await query.ToListAsync(cancellationToken);
+
+            return new AttendanceReportResult
+            {
+                OverallAttendance = records.Any()
+                    ? (decimal)records.Count(r => r.IsConfirmed) / records.Count * 100
+                    : 0,
+                PendingConfirmations = records.Count(r => !r.IsConfirmed),
+                TotalRecords = records.Count
+            };
         }
     }
 }

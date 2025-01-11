@@ -9,7 +9,7 @@ using UniAttend.API.Extensions;
 
 namespace UniAttend.API.Controllers
 {
-        [ApiController]
+    [ApiController]
     [Route("api/[controller]")]
     [Authorize]
     public class AttendanceController : ControllerBase

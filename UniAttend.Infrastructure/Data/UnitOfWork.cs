@@ -23,6 +23,9 @@ namespace UniAttend.Infrastructure.Data
         private IReportRepository? _reports;
         private IStudyGroupRepository? _studyGroups;
         private IOtpCodeRepository? _otpCodes;
+        private ICourseSessionRepository? _courseSessions;
+        private IClassroomRepository? _classrooms;
+        private IAbsenceAlertRepository? _absenceAlerts;
         private bool _disposed;
 
         public UnitOfWork(ApplicationDbContext context)
@@ -66,6 +69,15 @@ namespace UniAttend.Infrastructure.Data
 
         public IOtpCodeRepository OtpCodes =>
             _otpCodes ??= new OtpCodeRepository(_context);
+        
+        public ICourseSessionRepository CourseSessions =>
+            _courseSessions ??= new CourseSessionRepository(_context);
+
+        public IClassroomRepository Classrooms =>
+            _classrooms ??= new ClassroomRepository(_context);
+        
+        public IAbsenceAlertRepository AbsenceAlerts =>
+            _absenceAlerts ??= new AbsenceAlertRepository(_context);
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {

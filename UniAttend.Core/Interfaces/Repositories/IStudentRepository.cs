@@ -12,5 +12,6 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<IEnumerable<Student>> GetByDepartmentIdAsync(int departmentId, CancellationToken cancellationToken = default);
         Task<bool> CardIdExistsAsync(string cardId, CancellationToken cancellationToken = default);
         Task<bool> StudentIdExistsAsync(string studentId, CancellationToken cancellationToken = default);
+        Task<Student?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default);
     }
 }

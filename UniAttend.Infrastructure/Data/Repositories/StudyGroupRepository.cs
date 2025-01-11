@@ -61,5 +61,57 @@ namespace UniAttend.Infrastructure.Data.Repositories
                     : 0m
             };
         }
+
+        public async Task<IEnumerable<StudyGroup>> GetByDepartmentIdAsync(
+        int departmentId,
+        int? academicYearId = null,
+        CancellationToken cancellationToken = default)
+        {
+            var query = DbSet
+                .Include(g => g.Subject)
+                .Include(g => g.Students)
+                .Where(g => g.Subject.DepartmentId == departmentId);
+
+            if (academicYearId.HasValue)
+                query = query.Where(g => g.AcademicYearId == academicYearId.Value);
+
+            return await query.ToListAsync(cancellationToken);
+        }
+
+        public async Task<StudyGroup?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default)
+        => await DbSet
+            .Include(g => g.Students)
+                .ThenInclude(gs => gs.Student)
+                    .ThenInclude(s => s.User)
+            .Include(g => g.Subject)
+            .Include(g => g.Professor)
+                .ThenInclude(p => p.User)
+            .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
+
+        public async Task<bool> ExistsWithNameAsync(string name, int subjectId, int academicYearId, CancellationToken cancellationToken = default)
+        {
+            return await DbSet.AnyAsync(g =>
+                g.Name == name &&
+                g.SubjectId == subjectId &&
+                g.AcademicYearId == academicYearId,
+                cancellationToken);
+        }
+
+        public async Task<IEnumerable<StudyGroup>> GetByProfessorIdAsync(int professorId, int? academicYearId = null, CancellationToken cancellationToken = default)
+        {
+            var query = DbSet
+                .Include(g => g.Subject)
+                .Include(g => g.Professor)
+                    .ThenInclude(p => p!.User)
+                .Include(g => g.AcademicYear)
+                .Where(g => g.ProfessorId == professorId);
+
+            if (academicYearId.HasValue)
+            {
+                query = query.Where(g => g.AcademicYearId == academicYearId.Value);
+            }
+
+            return await query.ToListAsync(cancellationToken);
+        }
     }
 }

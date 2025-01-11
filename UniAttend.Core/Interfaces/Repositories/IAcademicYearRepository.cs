@@ -8,5 +8,6 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<AcademicYear?> GetCurrentAsync(CancellationToken cancellationToken = default);
         Task<bool> HasOverlappingDatesAsync(DateTime startDate, DateTime endDate, int? excludeId = null, CancellationToken cancellationToken = default);
         Task<IEnumerable<AcademicYear>> GetActiveAsync(CancellationToken cancellationToken = default);
+        Task<AcademicYear?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default);
     }
 }

@@ -4,20 +4,18 @@ namespace UniAttend.Application.Features.Reports.DTOs
     {
         public DateTime StartDate { get; init; }
         public DateTime EndDate { get; init; }
-        public string Department { get; init; } = string.Empty;
         public int TotalStudents { get; init; }
         public int TotalClasses { get; init; }
-        public decimal AverageAttendance { get; init; }
-        public IEnumerable<AttendanceByGroupDto> AttendanceByGroups { get; init; } = 
-            Array.Empty<AttendanceByGroupDto>();
+        public decimal OverallAttendance { get; init; }
+        public List<DailyAttendanceDto> DailyRecords { get; init; } = new();
     }
 
-    public record AttendanceByGroupDto
+    public record DailyAttendanceDto
     {
-        public int GroupId { get; init; }
-        public string GroupName { get; init; } = string.Empty;
-        public string Subject { get; init; } = string.Empty;
-        public int EnrolledStudents { get; init; }
-        public decimal AttendancePercentage { get; init; }
+        public DateTime Date { get; init; }
+        public int TotalClasses { get; init; }
+        public int PresentStudents { get; init; }
+        public int AbsentStudents { get; init; }
+        public decimal AttendanceRate { get; init; }
     }
 }

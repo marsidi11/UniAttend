@@ -39,5 +39,13 @@ namespace UniAttend.Infrastructure.Data.Repositories
     
         public async Task<bool> StudentIdExistsAsync(string studentId, CancellationToken cancellationToken = default)
             => await DbSet.AnyAsync(s => s.StudentId == studentId, cancellationToken);
+
+        public async Task<Student?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(s => s.User)
+                .Include(s => s.Department)
+                .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+        }
     }
 }
