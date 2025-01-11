@@ -13,5 +13,7 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
         Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
+
+        IQueryable<T> GetQueryable();
     }
 }

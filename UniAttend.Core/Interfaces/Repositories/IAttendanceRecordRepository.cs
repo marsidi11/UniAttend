@@ -1,4 +1,5 @@
 using UniAttend.Core.Entities.Attendance;
+using UniAttend.Core.Entities.Stats;
 using System.Collections.Generic;
 
 namespace UniAttend.Core.Interfaces.Repositories
@@ -35,11 +36,13 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<AttendanceReportResult> GetAcademicYearAttendanceReportAsync(
         int academicYearId,
         CancellationToken cancellationToken = default);
-        
-    Task<AttendanceReportResult> GetGroupAttendanceReportAsync(
-        int groupId,
-        DateTime? startDate = null,
-        DateTime? endDate = null,
-        CancellationToken cancellationToken = default);   
+
+        Task<AttendanceReportResult> GetGroupAttendanceReportAsync(
+            int groupId,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            CancellationToken cancellationToken = default);
+
+        Task<AttendanceStats> GetStudentStatsAsync(int studentId, CancellationToken cancellationToken = default);
     }
 }

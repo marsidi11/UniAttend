@@ -1,11 +1,11 @@
 using UniAttend.Core.Enums;
 
-namespace UniAttend.Application.Auth.Common
+namespace UniAttend.Application.Features.Users.DTOs
 {
     /// <summary>
-    /// Data transfer object representing user information with essential details for authentication and identification.
+    /// Data transfer object representing detailed user profile information
     /// </summary>
-    public record UserDto(
+    public record UserProfileDto(
         int Id,
         string Username,
         string Email,

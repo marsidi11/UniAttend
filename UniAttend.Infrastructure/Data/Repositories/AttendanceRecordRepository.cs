@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Entities;
+using UniAttend.Core.Entities.Stats;
 using UniAttend.Core.Entities.Attendance;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Infrastructure.Data.Repositories.Base;
@@ -180,6 +181,31 @@ namespace UniAttend.Infrastructure.Data.Repositories
                     : 0,
                 PendingConfirmations = records.Count(r => !r.IsConfirmed),
                 TotalRecords = records.Count
+            };
+        }
+
+        public async Task<AttendanceStats> GetStudentStatsAsync(int studentId, CancellationToken cancellationToken = default)
+        {
+            var records = await DbSet
+                .Include(ar => ar.Course)
+                .Where(ar => ar.StudentId == studentId)
+                .ToListAsync(cancellationToken);
+
+            var totalClasses = await Context.Set<Course>()
+                .Include(c => c.StudyGroup)
+                .Where(c => c.StudyGroup.Students.Any(s => s.StudentId == studentId))
+                .CountAsync(cancellationToken);
+
+            var attendedClasses = records.Count(r => r.IsConfirmed);
+            var attendanceRate = totalClasses > 0
+                ? (decimal)attendedClasses / totalClasses * 100
+                : 0;
+
+            return new AttendanceStats
+            {
+                TotalClasses = totalClasses,
+                AttendedClasses = attendedClasses,
+                AttendanceRate = attendanceRate
             };
         }
     }

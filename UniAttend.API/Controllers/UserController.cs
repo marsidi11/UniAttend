@@ -1,10 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using UniAttend.Application.Features.Users.DTOs;
 using UniAttend.Application.Features.Users.Commands.CreateUser;
 using UniAttend.Application.Features.Users.Commands.ChangePassword;
 using UniAttend.Application.Features.Users.Commands.UpdateProfile;
-using UniAttend.Application.Features.Users.Queries;
+using UniAttend.Application.Features.Users.Commands.UpdateUser;
+using UniAttend.Application.Features.Users.Commands.DeactivateUser;
+using UniAttend.Application.Features.Users.Queries.GetUsers;
+using UniAttend.Application.Features.Users.Queries.GetUserDetails;
+using UniAttend.Application.Features.Users.Queries.GetUserProfile;
 using UniAttend.API.Extensions;
 using UniAttend.Core.Enums;
 
@@ -38,9 +43,14 @@ namespace UniAttend.API.Controllers
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<ActionResult<UserDto>> GetById(int id, CancellationToken cancellationToken)
         {
-            var query = new GetUserByIdQuery { Id = id };
+            var query = new GetUsersQuery { Id = id };
             var result = await _mediator.Send(query, cancellationToken);
-            return Ok(result);
+            var user = result.FirstOrDefault();
+            
+            if (user == null)
+                return NotFound();
+                
+            return Ok(user);
         }
 
         [HttpPost]
@@ -63,22 +73,6 @@ namespace UniAttend.API.Controllers
                 return Forbid();
 
             await _mediator.Send(command, cancellationToken);
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
-        {
-            await _mediator.Send(new DeleteUserCommand { Id = id }, cancellationToken);
-            return NoContent();
-        }
-
-        [HttpPost("{id}/activate")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Activate(int id, CancellationToken cancellationToken)
-        {
-            await _mediator.Send(new ActivateUserCommand { Id = id }, cancellationToken);
             return NoContent();
         }
 
@@ -106,18 +100,27 @@ namespace UniAttend.API.Controllers
             return NoContent();
         }
 
+        [HttpGet("details/{id}")]
+        [Authorize(Roles = "Admin,Secretary")]
+        public async Task<ActionResult<UserDetailsDto>> GetUserDetails(int id, CancellationToken cancellationToken)
+        {
+            var query = new GetUserDetailsQuery { UserId = id };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("details")]
+        public async Task<ActionResult<UserDetailsDto>> GetCurrentUserDetails(CancellationToken cancellationToken)
+        {
+            var query = new GetUserDetailsQuery { UserId = User.GetUserId() };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordCommand command, CancellationToken cancellationToken)
         {
             command.UserId = User.GetUserId();
-            await _mediator.Send(command, cancellationToken);
-            return NoContent();
-        }
-
-        [HttpPost("reset-password")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ResetPassword(ResetUserPasswordCommand command, CancellationToken cancellationToken)
-        {
             await _mediator.Send(command, cancellationToken);
             return NoContent();
         }

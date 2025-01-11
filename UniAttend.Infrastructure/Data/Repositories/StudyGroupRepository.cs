@@ -113,5 +113,37 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
             return await query.ToListAsync(cancellationToken);
         }
+
+        public async Task<IEnumerable<StudyGroup>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(g => g.Students)
+                .Include(g => g.Subject)
+                .Include(g => g.AcademicYear)
+                .Where(g => g.Students.Any(s => s.StudentId == studentId))
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<StudyGroup>> GetStudentGroupsAsync(
+        int studentId,
+        CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(g => g.Subject)
+                .Include(g => g.AcademicYear)
+                .Where(g => g.Students.Any(s => s.StudentId == studentId))
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<StudyGroup>> GetProfessorGroupsAsync(
+            int professorId,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(g => g.Subject)
+                .Include(g => g.AcademicYear)
+                .Where(g => g.ProfessorId == professorId)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

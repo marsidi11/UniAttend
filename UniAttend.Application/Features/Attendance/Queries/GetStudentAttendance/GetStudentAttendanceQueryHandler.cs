@@ -3,7 +3,7 @@ using UniAttend.Application.Common.Exceptions;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Application.Features.Attendance.DTOs;
 
-namespace UniAttend.Application.Features.Attendance.Queries
+namespace UniAttend.Application.Features.Attendance.Queries.GetStudentAttendance
 {
     public class GetStudentAttendanceQueryHandler : IRequestHandler<GetStudentAttendanceQuery, IEnumerable<AttendanceRecordDto>>
     {

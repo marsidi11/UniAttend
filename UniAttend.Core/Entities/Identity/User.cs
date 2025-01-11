@@ -38,6 +38,9 @@ namespace UniAttend.Core.Entities.Identity
         public string LastName { get; private set; } = string.Empty;
         public string? RefreshToken { get; private set; }
         public DateTime? RefreshTokenExpiryTime { get; private set; }
+        
+        public virtual Professor? Professor { get; private set; }
+        public virtual Student? Student { get; private set; }
 
         public void UpdateProfile(string firstName, string lastName, string email)
         {

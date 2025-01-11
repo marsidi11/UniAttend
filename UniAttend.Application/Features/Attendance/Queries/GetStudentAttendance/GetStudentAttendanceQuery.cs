@@ -1,7 +1,7 @@
 using MediatR;
 using UniAttend.Application.Features.Attendance.DTOs;
 
-namespace UniAttend.Application.Features.Attendance.Queries
+namespace UniAttend.Application.Features.Attendance.Queries.GetStudentAttendance
 {
     public class GetStudentAttendanceQuery : IRequest<IEnumerable<AttendanceRecordDto>>
     {

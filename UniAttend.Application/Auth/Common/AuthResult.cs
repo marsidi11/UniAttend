@@ -7,6 +7,6 @@ namespace UniAttend.Application.Auth.Common
         string AccessToken,
         string RefreshToken,
         DateTime ExpiresAt,
-        UserDto User
+        UserAuthDto User
     );
 }

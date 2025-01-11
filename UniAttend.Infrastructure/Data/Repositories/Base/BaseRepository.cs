@@ -46,5 +46,10 @@ namespace UniAttend.Infrastructure.Data.Repositories.Base
                 await Context.SaveChangesAsync(cancellationToken);
             }
         }
+
+        public virtual IQueryable<T> GetQueryable()
+        {
+            return DbSet.AsQueryable();
+        }
     }
 }

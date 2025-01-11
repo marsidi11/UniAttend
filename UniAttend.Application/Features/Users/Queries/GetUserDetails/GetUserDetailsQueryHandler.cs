@@ -1,33 +1,107 @@
+using AutoMapper;
 using MediatR;
-using UniAttend.Application.Auth.Common;
-using UniAttend.Shared.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Interfaces.Repositories;
+using UniAttend.Shared.Exceptions;
+using UniAttend.Core.Enums;
+using UniAttend.Application.Features.Users.DTOs;
 
 namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
 {
-    public class GetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, UserProfileDto>
+    public class GetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, UserDetailsDto>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public GetUserDetailsQueryHandler(IUserRepository userRepository)
+        public GetUserDetailsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<UserProfileDto> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
-        {
-            var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
-            
-            if (user == null)
-                throw new NotFoundException("User not found");
+                        public async Task<UserDetailsDto> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
+                {
+                    var user = await _unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken)
+                        ?? throw new NotFoundException($"User with ID {request.UserId} not found");
+                
+                    var userDetails = _mapper.Map<UserDetailsDto>(user);
+                    
+                    // Initialize result with base user details
+                    var result = userDetails;
+                
+                    // Get additional details based on role
+                    switch (user.Role)
+                    {
+                        case UserRole.Student:
+                            var student = await _unitOfWork.Students.GetByIdAsync(user.Id, cancellationToken);
+                            if (student != null)
+                            {
+                                result = userDetails with
+                                {
+                                    DepartmentId = student.DepartmentId,
+                                    DepartmentName = student.Department?.Name,
+                                    Groups = await GetStudentGroups(student.Id, cancellationToken),
+                                    AttendanceStats = await GetStudentAttendanceStats(student.Id, cancellationToken)
+                                };
+                            }
+                            break;
+                
+                        case UserRole.Professor:
+                            var professor = await _unitOfWork.Professors.GetByIdAsync(user.Id, cancellationToken);
+                            if (professor != null)
+                            {
+                                result = userDetails with
+                                {
+                                    DepartmentId = professor.DepartmentId,
+                                    DepartmentName = professor.Department?.Name,
+                                    Groups = await GetProfessorGroups(professor.Id, cancellationToken)
+                                };
+                            }
+                            break;
+                    }
+                
+                    return result;
+                }
 
-            return new UserProfileDto(
-                user.Id,
-                user.Username,
-                user.Email,
-                user.FirstName,
-                user.LastName,
-                user.Role);
+        private async Task<IEnumerable<UserGroupDto>> GetStudentGroups(int studentId, CancellationToken cancellationToken)
+        {
+            var groups = await _unitOfWork.StudyGroups
+                .GetStudentGroupsAsync(studentId, cancellationToken);
+
+            return groups.Select(g => new UserGroupDto
+            {
+                GroupId = g.Id,
+                GroupName = g.Name,
+                SubjectName = g.Subject.Name,
+                AcademicYearName = g.AcademicYear.Name
+            });
+        }
+
+        private async Task<AttendanceStatsDto> GetStudentAttendanceStats(int studentId, CancellationToken cancellationToken)
+        {
+            var stats = await _unitOfWork.AttendanceRecords
+                .GetStudentStatsAsync(studentId, cancellationToken);
+
+            return new AttendanceStatsDto
+            {
+                TotalClasses = stats.TotalClasses,
+                AttendedClasses = stats.AttendedClasses,
+                AttendanceRate = stats.AttendanceRate
+            };
+        }
+
+        private async Task<IEnumerable<UserGroupDto>> GetProfessorGroups(int professorId, CancellationToken cancellationToken)
+        {
+            var groups = await _unitOfWork.StudyGroups
+                .GetProfessorGroupsAsync(professorId, cancellationToken);
+
+            return groups.Select(g => new UserGroupDto
+            {
+                GroupId = g.Id,
+                GroupName = g.Name,
+                SubjectName = g.Subject.Name,
+                AcademicYearName = g.AcademicYear.Name
+            });
         }
     }
 }

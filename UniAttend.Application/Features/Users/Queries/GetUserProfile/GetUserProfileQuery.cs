@@ -1,5 +1,5 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Users.DTOs;
 
 namespace UniAttend.Application.Features.Users.Queries.GetUserProfile
 {

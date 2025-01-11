@@ -4,8 +4,8 @@ namespace UniAttend.Core.Interfaces.Repositories
 {
     public interface IClassroomRepository : IRepository<Classroom>
     {
-        Task<Classroom?> GetByReaderDeviceIdAsync(
-            string deviceId, 
-            CancellationToken cancellationToken = default);
+        Task<bool> ExistsWithNameAsync(string name, CancellationToken cancellationToken = default);
+        Task<Classroom?> GetByReaderDeviceIdAsync(string deviceId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Classroom>> GetAvailableAsync(DateTime startTime, DateTime endTime, CancellationToken cancellationToken = default);
     }
 }

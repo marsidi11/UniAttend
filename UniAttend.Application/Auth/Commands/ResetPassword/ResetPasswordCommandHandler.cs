@@ -53,7 +53,7 @@ namespace UniAttend.Application.Auth.Commands.ResetPassword
                 accessToken,
                 refreshToken,
                 DateTime.UtcNow.AddHours(1),
-                new UserDto(
+                new UserAuthDto(
                     user.Id,
                     user.Username,
                     user.Email,

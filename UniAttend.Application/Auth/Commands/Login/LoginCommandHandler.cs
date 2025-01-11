@@ -61,7 +61,7 @@ namespace UniAttend.Application.Auth.Commands.Login
                 accessToken,
                 refreshToken,
                 DateTime.UtcNow.AddHours(1), // Token expiry
-                new UserDto(
+                new UserAuthDto(
                     user.Id,
                     user.Username,
                     user.Email,
