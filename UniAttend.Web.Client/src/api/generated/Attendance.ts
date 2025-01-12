@@ -1,0 +1,114 @@
+/* eslint-disable */
+/* tslint:disable */
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
+ * ##                                                           ##
+ * ## AUTHOR: acacode                                           ##
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
+ * ---------------------------------------------------------------
+ */
+
+import { AttendanceRecordDto, RecordCardAttendanceCommand, RecordOtpAttendanceCommand } from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
+
+export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Attendance
+   * @name AttendanceCardCreate
+   * @request POST:/api/Attendance/card
+   * @secure
+   */
+  attendanceCardCreate = (data: RecordCardAttendanceCommand, params: RequestParams = {}) =>
+    this.request<void, any>({
+      path: `/api/Attendance/card`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Attendance
+   * @name AttendanceOtpCreate
+   * @request POST:/api/Attendance/otp
+   * @secure
+   */
+  attendanceOtpCreate = (data: RecordOtpAttendanceCommand, params: RequestParams = {}) =>
+    this.request<void, any>({
+      path: `/api/Attendance/otp`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Attendance
+   * @name AttendanceClassesConfirmCreate
+   * @request POST:/api/Attendance/classes/{classId}/confirm
+   * @secure
+   */
+  attendanceClassesConfirmCreate = (classId: number, params: RequestParams = {}) =>
+    this.request<void, any>({
+      path: `/api/Attendance/classes/${classId}/confirm`,
+      method: "POST",
+      secure: true,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Attendance
+   * @name AttendanceClassesDetail
+   * @request GET:/api/Attendance/classes/{classId}
+   * @secure
+   */
+  attendanceClassesDetail = (
+    classId: number,
+    query?: {
+      /** @format date-time */
+      date?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<AttendanceRecordDto[], any>({
+      path: `/api/Attendance/classes/${classId}`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Attendance
+   * @name AttendanceStudentList
+   * @request GET:/api/Attendance/student
+   * @secure
+   */
+  attendanceStudentList = (
+    query?: {
+      /** @format date-time */
+      startDate?: string;
+      /** @format date-time */
+      endDate?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<AttendanceRecordDto[], any>({
+      path: `/api/Attendance/student`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+}
