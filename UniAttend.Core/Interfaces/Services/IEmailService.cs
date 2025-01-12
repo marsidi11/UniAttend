@@ -18,5 +18,8 @@ namespace UniAttend.Core.Interfaces.Services
 
         Task SendWelcomeEmailAsync(string email, string fullName, string username, 
         string temporaryPassword, CancellationToken cancellationToken = default);
+
+        Task SendPasswordResetEmailAsync(string email, string fullName, string username, 
+        string newPassword, CancellationToken cancellationToken = default);
     }
 }

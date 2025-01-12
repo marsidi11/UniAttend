@@ -5,6 +5,7 @@ using UniAttend.Core.Entities;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Enums;
 using UniAttend.Shared.Exceptions;
+using UniAttend.Shared.Utils;
 
 namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
 {
@@ -39,7 +40,7 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
             try
             {
                 // Generate secure random password
-                string temporaryPassword = GenerateTemporaryPassword();
+                string temporaryPassword = PasswordGenerator.GenerateTemporaryPassword();
                 string hashedPassword = _passwordHasher.HashPassword(temporaryPassword);
 
                 // Create user account with hashed password
@@ -81,14 +82,5 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 throw;
             }
         }
-
-        private static string GenerateTemporaryPassword()
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, 12)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
     }
 }

@@ -5,6 +5,7 @@ using UniAttend.Core.Enums;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Shared.Exceptions;
+using UniAttend.Shared.Utils;
 
 namespace UniAttend.Application.Features.Users.Commands.CreateUser
 {
@@ -32,7 +33,7 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
             var department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentId, cancellationToken)
                 ?? throw new NotFoundException($"Department with ID {request.DepartmentId} not found");
 
-            var tempPassword = GenerateTemporaryPassword();
+            var tempPassword = PasswordGenerator.GenerateTemporaryPassword();
 
             var user = new User(
                 request.Username,
@@ -73,14 +74,6 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
                 await _unitOfWork.RollbackAsync(cancellationToken);
                 throw;
             }
-        }
-
-        private static string GenerateTemporaryPassword()
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, 12)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

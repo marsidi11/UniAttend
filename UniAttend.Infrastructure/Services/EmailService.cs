@@ -93,5 +93,31 @@ namespace UniAttend.Infrastructure.Services
 
             await SendEmailAsync(email, subject, body, cancellationToken);
         }
+
+        public async Task SendPasswordResetEmailAsync(
+            string email,
+            string fullName,
+            string username,
+            string newPassword,
+            CancellationToken cancellationToken = default)
+        {
+            var subject = "UniAttend - Password Reset";
+            var body = $"""
+                Dear {fullName},
+        
+                Your password has been reset successfully.
+        
+                Your login credentials:
+                Username: {username}
+                New Password: {newPassword}
+        
+                For security reasons, please change your password after logging in.
+        
+                Best regards,
+                The UniAttend Team
+                """;
+
+            await SendEmailAsync(email, subject, body, cancellationToken);
+        }
     }
 }
