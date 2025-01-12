@@ -1,9 +1,9 @@
+using MediatR;
 using UniAttend.Core.Interfaces.Repositories;
+using UniAttend.Core.Interfaces.Services;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Enums;
-using UniAttend.Core.Interfaces.Services;
-using MediatR;
 using UniAttend.Shared.Exceptions;
 
 namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
@@ -12,13 +12,16 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IEmailService _emailService;
 
         public RegisterStudentCommandHandler(
             IUnitOfWork unitOfWork,
-            IPasswordHasher passwordHasher)
+            IPasswordHasher passwordHasher,
+            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
+            _emailService = emailService;
         }
 
         public async Task<int> Handle(RegisterStudentCommand request, CancellationToken cancellationToken)
@@ -35,10 +38,14 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
 
             try
             {
-                // Create user account
+                // Generate secure random password
+                string temporaryPassword = GenerateTemporaryPassword();
+                string hashedPassword = _passwordHasher.HashPassword(temporaryPassword);
+
+                // Create user account with hashed password
                 var user = new User(
-                    username: request.StudentId, // Use student ID as username
-                    passwordHash: _passwordHasher.HashPassword(request.StudentId), // Initial password is student ID
+                    username: request.StudentId,
+                    passwordHash: hashedPassword,
                     email: request.Email,
                     role: UserRole.Student,
                     firstName: request.FirstName,
@@ -57,6 +64,15 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 await _unitOfWork.Students.AddAsync(student, cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);
 
+                // Send welcome email with temporary password
+                await _emailService.SendWelcomeEmailAsync(
+                    request.Email,
+                    $"{request.FirstName} {request.LastName}",
+                    request.StudentId,
+                    temporaryPassword, // Send original unhashed password
+                    cancellationToken
+                );
+
                 return student.Id;
             }
             catch
@@ -65,5 +81,14 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 throw;
             }
         }
+
+        private static string GenerateTemporaryPassword()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, 12)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
     }
 }

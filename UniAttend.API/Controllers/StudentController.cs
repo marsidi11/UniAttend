@@ -7,6 +7,7 @@ using UniAttend.Application.Features.Students.Queries.GetStudentAttendance;
 using UniAttend.Application.Features.Students.Queries.GetStudentGroups;
 using UniAttend.Application.Features.Students.Commands.AssignCard;
 using UniAttend.Application.Features.Students.Commands.RemoveCard;
+using UniAttend.Application.Features.Students.Commands.RegisterStudent;
 using UniAttend.Application.Features.Students.Queries.GetStudentsList;
 
 namespace UniAttend.API.Controllers
@@ -30,6 +31,14 @@ namespace UniAttend.API.Controllers
             var query = new GetStudentsListQuery();
             var result = await _mediator.Send(query);
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "RequireSecretaryRole")]
+        public async Task<ActionResult<int>> RegisterStudent([FromBody] RegisterStudentCommand command)
+        {
+            var studentId = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetAll), new { id = studentId }, studentId);
         }
 
         [HttpGet("attendance")]

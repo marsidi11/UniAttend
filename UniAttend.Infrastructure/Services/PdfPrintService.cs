@@ -21,19 +21,24 @@ namespace UniAttend.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task<byte[]> GenerateAttendanceReportPdfAsync(int groupId,
-        DateTime startDate, DateTime endDate)
+        public async Task<byte[]> GenerateAttendanceReportPdfAsync(int groupId, DateTime startDate, DateTime endDate)
         {
             try
             {
                 var records = await _attendanceRepository.GetGroupAttendanceAsync(groupId, startDate, endDate);
+
+                if (!records.Any())
+                {
+                    throw new InvalidOperationException($"No attendance records found for group {groupId}");
+                }
+
                 using var stream = new MemoryStream();
                 using var writer = new PdfWriter(stream);
                 using var pdf = new PdfDocument(writer);
                 using var document = new Document(pdf);
 
                 // Add header
-                document.Add(new Paragraph($"Attendance Report")
+                document.Add(new Paragraph("Attendance Report")
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetFontSize(20));
 
@@ -48,11 +53,12 @@ namespace UniAttend.Infrastructure.Services
                 table.AddHeaderCell("Status");
                 table.AddHeaderCell("Time");
 
-                foreach (var record in records)
+                foreach (var record in records.Where(r => r.Student?.User != null &&
+                                                        r.Course?.StudyGroup?.Subject != null))
                 {
                     table.AddCell(record.CheckInTime.ToString("d"));
-                    table.AddCell($"{record.Student.User.FirstName} {record.Student.User.LastName}");
-                    table.AddCell(record.Course.StudyGroup.Subject.Name);
+                    table.AddCell($"{record.Student!.User!.FirstName} {record.Student.User.LastName}");
+                    table.AddCell(record.Course!.StudyGroup!.Subject!.Name);
                     table.AddCell(record.IsConfirmed ? "Present" : "Pending");
                     table.AddCell(record.CheckInTime.ToString("t"));
                 }
@@ -74,17 +80,23 @@ namespace UniAttend.Infrastructure.Services
             try
             {
                 var session = await _attendanceRepository.GetSessionWithDetailsAsync(sessionId);
+
+                if (session?.Group?.Students == null)
+                {
+                    throw new InvalidOperationException($"Invalid session or missing data for session {sessionId}");
+                }
+
                 using var stream = new MemoryStream();
                 using var writer = new PdfWriter(stream);
                 using var pdf = new PdfDocument(writer);
                 using var document = new Document(pdf);
 
                 // Add header
-                document.Add(new Paragraph($"Attendance Sheet")
+                document.Add(new Paragraph("Attendance Sheet")
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetFontSize(20));
 
-                document.Add(new Paragraph($"Class: {session.Course.Name}")
+                document.Add(new Paragraph($"Class: {session.Course?.Name ?? "N/A"}")
                     .SetTextAlignment(TextAlignment.CENTER));
                 document.Add(new Paragraph($"Date: {session.Date:d}")
                     .SetTextAlignment(TextAlignment.CENTER));
@@ -96,13 +108,13 @@ namespace UniAttend.Infrastructure.Services
                 table.AddHeaderCell("Time");
                 table.AddHeaderCell("Signature");
 
-                foreach (var groupStudent in session.Group.Students)
+                foreach (var groupStudent in session.Group.Students.Where(gs => gs.Student?.User != null))
                 {
-                    table.AddCell(new Cell().Add(new Paragraph(groupStudent.Student.StudentId)));
+                    table.AddCell(new Cell().Add(new Paragraph(groupStudent.Student!.StudentId)));
                     table.AddCell(new Cell().Add(new Paragraph(
-                        $"{groupStudent.Student.User.FirstName} {groupStudent.Student.User.LastName}")));
-                    table.AddCell(new Cell().Add(new Paragraph(""))); // Empty cell for time
-                    table.AddCell(new Cell().Add(new Paragraph(""))); // Empty cell for signature
+                        $"{groupStudent.Student.User!.FirstName} {groupStudent.Student.User.LastName}")));
+                    table.AddCell(new Cell().Add(new Paragraph("")));
+                    table.AddCell(new Cell().Add(new Paragraph("")));
                 }
 
                 document.Add(table);

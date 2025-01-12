@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UniAttend.Application.Auth.Commands.Login;
-using UniAttend.Application.Auth.Commands.Register;
 using UniAttend.Application.Auth.Commands.RefreshToken;
 using UniAttend.Application.Auth.Commands.ResetPassword;
 using UniAttend.Application.Auth.Commands.Logout;
@@ -19,13 +18,6 @@ namespace UniAttend.API.Controllers.Auth
         public AuthController(IMediator mediator)
         {
             _mediator = mediator;
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterCommand command)
-        {
-            var result = await _mediator.Send(command);
-            return Ok(result);
         }
 
         [HttpPost("login")]

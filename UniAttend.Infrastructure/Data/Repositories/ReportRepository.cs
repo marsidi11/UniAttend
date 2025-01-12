@@ -2,10 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Entities.Attendance;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace UniAttend.Infrastructure.Data.Repositories
 {
@@ -19,33 +15,40 @@ namespace UniAttend.Infrastructure.Data.Repositories
         }
 
         public async Task<IEnumerable<AttendanceRecord>> GetAttendanceRecordsAsync(
-    DateTime startDate,
-    DateTime endDate,
-    int? departmentId = null,
-    int? subjectId = null,
-    int? groupId = null,
-    CancellationToken cancellationToken = default)
+            DateTime startDate,
+            DateTime endDate,
+            int? departmentId = null,
+            int? subjectId = null,
+            int? groupId = null,
+            CancellationToken cancellationToken = default)
         {
             var query = _context.Set<AttendanceRecord>()
-                .Include(ar => ar.Course)
-                    .ThenInclude(c => c.StudyGroup)
-                        .ThenInclude(sg => sg.Subject)
+                .Include(ar => ar.Course!)
+                    .ThenInclude(c => c.StudyGroup!)
+                        .ThenInclude(sg => sg.Subject!)
                             .ThenInclude(s => s.Department)
-                .Where(ar => ar.CheckInTime >= startDate && ar.CheckInTime <= endDate);
+                .Where(ar => ar.CheckInTime >= startDate && ar.CheckInTime <= endDate)
+                .AsQueryable();
 
             if (departmentId.HasValue)
             {
-                query = query.Where(ar => ar.Course.StudyGroup.Subject.DepartmentId == departmentId.Value);
+                query = query.Where(ar => ar.Course != null && 
+                                        ar.Course.StudyGroup != null && 
+                                        ar.Course.StudyGroup.Subject != null && 
+                                        ar.Course.StudyGroup.Subject.DepartmentId == departmentId.Value);
             }
 
             if (subjectId.HasValue)
             {
-                query = query.Where(ar => ar.Course.StudyGroup.SubjectId == subjectId.Value);
+                query = query.Where(ar => ar.Course != null && 
+                                        ar.Course.StudyGroup != null && 
+                                        ar.Course.StudyGroup.SubjectId == subjectId.Value);
             }
 
             if (groupId.HasValue)
             {
-                query = query.Where(ar => ar.Course.StudyGroupId == groupId.Value);
+                query = query.Where(ar => ar.Course != null && 
+                                        ar.Course.StudyGroupId == groupId.Value);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -63,13 +66,15 @@ namespace UniAttend.Infrastructure.Data.Repositories
             foreach (var group in activeGroups)
             {
                 var enrolledStudents = await _context.Set<GroupStudent>()
-                    .Include(gs => gs.Student)
+                    .Include(gs => gs.Student!)
                         .ThenInclude(s => s.User)
-                    .Where(gs => gs.GroupId == group.Id)
+                    .Where(gs => gs.GroupId == group.Id && gs.Student != null)
                     .ToListAsync(cancellationToken);
 
                 foreach (var enrollment in enrolledStudents)
                 {
+                    if (enrollment.Student == null) continue;
+                    
                     var attendancePercentage = await CalculateStudentAttendancePercentage(
                         enrollment.StudentId,
                         group.Id,
@@ -102,6 +107,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
             var attendedClasses = await _context.Set<AttendanceRecord>()
                 .CountAsync(ar =>
                     ar.StudentId == studentId &&
+                    ar.Course != null &&
                     ar.Course.StudyGroupId == groupId &&
                     ar.IsConfirmed,
                     cancellationToken);
