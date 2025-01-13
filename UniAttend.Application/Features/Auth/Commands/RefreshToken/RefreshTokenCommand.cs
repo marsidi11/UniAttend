@@ -1,7 +1,7 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 
-namespace UniAttend.Application.Auth.Commands.RefreshToken
+namespace UniAttend.Application.Features.Auth.Commands.RefreshToken
 {
     public record RefreshTokenCommand : IRequest<AuthResult>
     {

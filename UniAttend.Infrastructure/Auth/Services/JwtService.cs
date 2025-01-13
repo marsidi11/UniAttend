@@ -16,7 +16,7 @@ namespace UniAttend.Infrastructure.Auth.Services
     {
         _jwtSettings = jwtSettings ?? throw new ArgumentNullException(nameof(jwtSettings));
         
-        if (string.IsNullOrEmpty(jwtSettings.SecretKey))
+        if (string.IsNullOrEmpty(jwtSettings.Key))
             throw new InvalidOperationException("JWT:Key is not configured in appsettings.json");
         
         if (string.IsNullOrEmpty(jwtSettings.Issuer))
@@ -28,7 +28,7 @@ namespace UniAttend.Infrastructure.Auth.Services
 
     public string GenerateToken(IEnumerable<Claim> claims)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -45,7 +45,7 @@ namespace UniAttend.Infrastructure.Auth.Services
         public ClaimsPrincipal ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
 
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -72,7 +72,7 @@ namespace UniAttend.Infrastructure.Auth.Services
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
 
             var tokenValidationParameters = new TokenValidationParameters
             {

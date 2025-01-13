@@ -11,8 +11,7 @@ import type {
 } from '@/api/generated/data-contracts';
 import { User } from '@/api/generated/User';
 import { UserRole } from '@/api/generated/data-contracts';
-
-const userApi = new User();
+import { userApi } from '@/api/apiInstances';
 
 export const useUserStore = defineStore('user', () => {
   // State

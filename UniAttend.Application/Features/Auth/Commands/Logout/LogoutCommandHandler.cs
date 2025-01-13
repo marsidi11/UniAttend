@@ -4,7 +4,7 @@ using UniAttend.Core.Interfaces.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UniAttend.Application.Auth.Commands.Logout
+namespace UniAttend.Application.Features.Auth.Commands.Logout
 {
     /// <summary>
     /// Handles the logic for logging out a user.

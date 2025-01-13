@@ -20,7 +20,6 @@ namespace UniAttend.Infrastructure
             IConfiguration configuration)
         {
             // Configure Settings
-            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<CardReaderSettings>(configuration.GetSection("CardReaderSettings"));
             services.Configure<NetworkSettings>(configuration.GetSection("NetworkSettings"));

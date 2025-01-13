@@ -1,6 +1,6 @@
 using UniAttend.Core.Enums;
 
-namespace UniAttend.Application.Auth.Common
+namespace UniAttend.Application.Features.Auth.DTOs
 {
     /// <summary>
     /// Data transfer object representing user information with essential details for authentication and identification.

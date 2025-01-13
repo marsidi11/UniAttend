@@ -88,6 +88,14 @@ export interface AttendanceStatsDto {
   attendanceRate?: number;
 }
 
+export interface AuthResult {
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  /** @format date-time */
+  expiresAt?: string;
+  user?: UserAuthDto;
+}
+
 export interface ChangePasswordCommand {
   /** @format int32 */
   userId?: number;
@@ -576,6 +584,16 @@ export interface UpdateUserCommand {
   /** @format int32 */
   departmentId?: number | null;
   isActive?: boolean;
+}
+
+export interface UserAuthDto {
+  /** @format int32 */
+  id?: number;
+  username?: string | null;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  role?: UserRole;
 }
 
 export interface UserDetailsDto {

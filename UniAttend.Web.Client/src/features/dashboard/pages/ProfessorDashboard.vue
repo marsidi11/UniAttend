@@ -13,7 +13,7 @@
       <StatCard title="Active Classes" :value="stats.activeClasses" subtitle="Today's Sessions" />
       <StatCard title="Pending Confirmations" :value="stats.pendingConfirmations"
         :status="stats.pendingConfirmations > 0 ? 'warning' : 'success'" />
-      <StatCard title="Attendance Rate" :value="`${stats.averageAttendance}%`" subtitle="Overall Average" />
+      <StatCard title="Attendance Rate" :value="`${stats.averageAttendance}%`" subtitle="Today's Average" />
     </div>
 
     <!-- Content Grid -->
@@ -28,44 +28,44 @@
           <div v-else-if="!todayClasses.length" class="text-gray-500 text-center">
             No classes scheduled for today
           </div>
-          <div v-else v-for="class_ in todayClasses" :key="class_.id"
-            class="flex justify-between items-center p-4 bg-gray-50 rounded-md">
-            <div>
-              <p class="font-medium">{{ class_.groupName }}</p>
+          <template v-else>
+            <div v-for="classItem in todayClasses" :key="classItem.id">
+              <p class="font-medium">{{ classItem.groupName }}</p>
               <p class="text-sm text-gray-500">
-                {{ formatSessionTime(class_.startTime) }} - {{ class_.classroom }}
+                {{ formatDate(new Date(classItem.date || '')) }} - {{ classItem.classroomName }}
               </p>
-              <Badge :status="getStatusBadgeType(class_.status)">
-                {{ class_.status }}
+              <Badge :status="getStatusBadgeType(classItem.status || '')">
+                {{ classItem.status }}
               </Badge>
+              <div class="flex space-x-2">
+                <Button v-if="classItem.status === 'active' && classItem.id" @click="confirmAttendance(classItem.id)"
+                  variant="primary">
+                  Confirm Attendance
+                </Button>
+                <Button v-if="classItem.id" @click="viewAttendance(classItem.id)" variant="secondary">
+                  View Details
+                </Button>
+              </div>
             </div>
-            <div class="flex space-x-2">
-              <Button v-if="class_.status === 'active'" @click="confirmAttendance(class_.id)" variant="primary">
-                Confirm Attendance
-              </Button>
-              <Button @click="viewAttendance(class_.id)" variant="secondary">
-                View Details
-              </Button>
-            </div>
-          </div>
+          </template>
         </div>
       </div>
+    </div>
 
-      <!-- Recent Attendance Records -->
-      <div class="bg-white p-6 rounded-lg shadow">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-medium">Recent Attendance</h2>
-          <Button @click="router.push('/dashboard/attendance/records')" variant="secondary">
-            View All
-          </Button>
+    <!-- Recent Attendance Records -->
+    <div class="bg-white p-6 rounded-lg shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-medium">Recent Attendance</h2>
+        <Button @click="router.push('/dashboard/attendance/records')" variant="secondary">
+          View All
+        </Button>
+      </div>
+      <div class="space-y-4">
+        <div v-if="isLoadingRecords" class="flex justify-center">
+          <Spinner :size="6" />
         </div>
-        <div class="space-y-4">
-          <div v-if="isLoadingRecords" class="flex justify-center">
-            <Spinner :size="6" />
-          </div>
-          <div v-else>
-            <AttendanceList :records="recentRecords" :loading="false" compact />
-          </div>
+        <div v-else>
+          <AttendanceList :records="recentRecords" :loading="false" compact />
         </div>
       </div>
     </div>
@@ -76,7 +76,12 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAttendanceStore } from '@/stores/attendance.store'
-import type { AttendanceRecord } from '@/types/attendance.types'
+import { useReportStore } from '@/stores/report.store'
+import { useClassStore } from '@/stores/class.store'
+import type {
+  ClassDto,
+  AttendanceRecordDto
+} from '@/api/generated/data-contracts'
 import { formatDate } from '@/utils/dateUtils'
 import Button from '@/shared/components/ui/Button.vue'
 import StatCard from '@/shared/components/ui/StatCard.vue'
@@ -86,33 +91,16 @@ import AttendanceList from '@/features/attendance/components/AttendanceList.vue'
 
 type BadgeStatus = 'success' | 'warning' | 'error' | 'info'
 
-// UI-specific interface
-interface ClassSession {
-  id: number
-  groupId: number
-  classroomId: number
-  date: Date
-  startTime: string
-  endTime: string
-  groupName: string
-  classroom: string
-  status: 'active' | 'pending' | 'completed'
-}
-
 interface DashboardStats {
   activeClasses: number
   pendingConfirmations: number
   averageAttendance: number
 }
 
-// Template helper functions
-function formatSessionTime(time: string) {
-  return formatDate(new Date(time))
-}
-
-// Rest of the component code...
 const router = useRouter()
 const attendanceStore = useAttendanceStore()
+const reportStore = useReportStore()
+const classStore = useClassStore()
 
 const isLoading = ref(false)
 const isLoadingRecords = ref(false)
@@ -121,11 +109,11 @@ const stats = ref<DashboardStats>({
   pendingConfirmations: 0,
   averageAttendance: 0
 })
-const todayClasses = ref<ClassSession[]>([])
-const recentRecords = ref<AttendanceRecord[]>([])
+const todayClasses = ref<ClassDto[]>([])
+const recentRecords = ref<AttendanceRecordDto[]>([])
 
-function getStatusBadgeType(status: ClassSession['status']): BadgeStatus {
-  switch (status) {
+function getStatusBadgeType(status: string): BadgeStatus {
+  switch (status?.toLowerCase()) {
     case 'active': return 'success'
     case 'pending': return 'warning'
     default: return 'info'
@@ -135,28 +123,26 @@ function getStatusBadgeType(status: ClassSession['status']): BadgeStatus {
 async function loadDashboardData() {
   isLoading.value = true
   try {
-    const [todaySessionsData, statsData] = await Promise.all([
-      attendanceStore.fetchTodaySessions(),
-      attendanceStore.getAttendanceStats()
-    ])
-    
-    // Map API data to UI model ensuring all required fields
-    todayClasses.value = todaySessionsData.map(session => ({
-      id: session.id,
-      groupId: session.groupId,
-      classroomId: session.classroomId,
-      date: new Date(session.date),
-      startTime: session.startTime,
-      endTime: session.endTime,
-      groupName: session.groupName || '',
-      classroom: session.classroom || '',
-      status: session.status.toLowerCase() as ClassSession['status']
-    }))
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
 
-    stats.value = {
-      activeClasses: statsData.totalClasses || 0,
-      pendingConfirmations: statsData.pendingConfirmations || 0,
-      averageAttendance: statsData.attendanceRate || 0
+    const [classesData, reportData] = await Promise.all([
+      classStore.fetchClasses({ date: today }), // Pass object with date property
+      reportStore.getAttendanceReport({
+        startDate: today,
+        endDate: tomorrow
+      })
+    ])
+
+    todayClasses.value = classesData || []
+
+    if (reportData) {
+      stats.value = {
+        activeClasses: reportData.totalClasses || 0,
+        pendingConfirmations: todayClasses.value.filter(c => c.status?.toLowerCase() === 'active').length,
+        averageAttendance: reportData.overallAttendance || 0
+      }
     }
   } catch (err) {
     console.error('Failed to load dashboard data:', err)
@@ -168,7 +154,24 @@ async function loadDashboardData() {
 async function loadRecentRecords() {
   isLoadingRecords.value = true
   try {
-    recentRecords.value = await attendanceStore.fetchRecentRecords()
+    const today = new Date()
+    const lastWeek = new Date(today)
+    lastWeek.setDate(lastWeek.getDate() - 7)
+
+    const reportData = await reportStore.getAttendanceReport({
+      startDate: lastWeek,
+      endDate: today
+    })
+
+    if (reportData?.dailyRecords) {
+      // Flatten daily records into attendance records
+      recentRecords.value = reportData.dailyRecords.map(day => ({
+        checkInTime: day.date,
+        isConfirmed: true,
+        courseName: `${day.totalClasses} classes`,
+        professor: `${day.attendanceRate}% attendance`
+      }))
+    }
   } catch (err) {
     console.error('Failed to load recent records:', err)
   } finally {

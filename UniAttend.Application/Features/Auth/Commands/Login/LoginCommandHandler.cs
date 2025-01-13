@@ -1,5 +1,5 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 using UniAttend.Core.Interfaces.Services;
 using UniAttend.Shared.Exceptions;
 using UniAttend.Core.Interfaces.Repositories;
@@ -16,7 +16,7 @@ using UniAttend.Core.Interfaces.Repositories;
 /// 3. Updates the user's refresh token and login timestamp
 /// 4. Returns authentication result with user information and tokens
 /// </remarks>
-namespace UniAttend.Application.Auth.Commands.Login
+namespace UniAttend.Application.Features.Auth.Commands.Login
 {
     public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResult>
     {

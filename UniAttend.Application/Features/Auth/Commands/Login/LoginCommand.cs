@@ -1,5 +1,5 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 
 /// <summary>
 /// Represents a command to authenticate a user with their credentials.
@@ -9,7 +9,7 @@ using UniAttend.Application.Auth.Common;
 /// and generate an authentication result.
 /// </remarks>
 /// <seealso cref="IRequest{AuthResult}"/>
-namespace UniAttend.Application.Auth.Commands.Login
+namespace UniAttend.Application.Features.Auth.Commands.Login
 {
     public record LoginCommand : IRequest<AuthResult>
     {

@@ -7,13 +7,12 @@ import type {
   UserGroupDto
 } from '@/api/generated/data-contracts';
 import { Student } from '@/api/generated/Student';
+import { studentApi } from '@/api/apiInstances';
 
 // Extend StudentDto to include cardId
 interface ExtendedStudentDto extends StudentDto {
   cardId?: string;
 }
-
-const studentApi = new Student();
 
 export const useStudentStore = defineStore('student', () => {
   // State

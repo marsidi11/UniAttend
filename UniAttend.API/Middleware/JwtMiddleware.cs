@@ -43,7 +43,7 @@ namespace UniAttend.API.Middleware
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+                var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
 
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {

@@ -1,10 +1,10 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 using UniAttend.Core.Interfaces.Services;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Shared.Exceptions;
 
-namespace UniAttend.Application.Auth.Commands.RefreshToken
+namespace UniAttend.Application.Features.Auth.Commands.RefreshToken
 {
     public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, AuthResult>
     {

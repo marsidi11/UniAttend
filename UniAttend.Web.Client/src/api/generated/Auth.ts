@@ -9,7 +9,7 @@
  * ---------------------------------------------------------------
  */
 
-import { LoginCommand, RefreshTokenCommand, ResetPasswordCommand } from "./data-contracts";
+import { AuthResult, LoginCommand, ProblemDetails, RefreshTokenCommand, ResetPasswordCommand } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 export class Auth<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
@@ -22,12 +22,13 @@ export class Auth<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
    * @secure
    */
   authLoginCreate = (data: LoginCommand, params: RequestParams = {}) =>
-    this.request<void, any>({
+    this.request<AuthResult, ProblemDetails>({
       path: `/api/Auth/login`,
       method: "POST",
       body: data,
       secure: true,
       type: ContentType.Json,
+      format: "json",
       ...params,
     });
   /**

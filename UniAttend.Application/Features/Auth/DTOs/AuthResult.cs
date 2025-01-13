@@ -1,4 +1,4 @@
-namespace UniAttend.Application.Auth.Common
+namespace UniAttend.Application.Features.Auth.DTOs
 {
     /// <summary>
     /// Represents the result of an authentication operation, containing tokens and user information.

@@ -49,7 +49,7 @@
     </div>
   </template>
   
-  <script setup lang="ts">
+  <!-- <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
   import { useAbsenceAlertStore } from '@/stores/absenceAlert.store'
   import Button from '@/shared/components/ui/Button.vue'
@@ -146,4 +146,4 @@ onMounted(async () => {
     console.error('Failed to load alerts:', err)
   }
 })
-</script>
+</script> -->

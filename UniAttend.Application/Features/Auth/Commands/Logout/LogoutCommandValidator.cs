@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace UniAttend.Application.Auth.Commands.Logout
+namespace UniAttend.Application.Features.Auth.Commands.Logout
 {
     /// <summary>
     /// Validates the LogoutCommand.

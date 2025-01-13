@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace UniAttend.Application.Auth.Commands.RefreshToken
+namespace UniAttend.Application.Features.Auth.Commands.RefreshToken
 {
     public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
     {

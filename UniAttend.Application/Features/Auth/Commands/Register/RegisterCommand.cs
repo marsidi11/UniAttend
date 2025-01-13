@@ -1,7 +1,7 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 
-namespace UniAttend.Application.Auth.Commands.Register
+namespace UniAttend.Application.Features.Auth.Commands.Register
 {
     public record RegisterCommand : IRequest<AuthResult>
     {

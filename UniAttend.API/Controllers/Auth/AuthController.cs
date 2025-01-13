@@ -1,10 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniAttend.Application.Auth.Commands.Login;
-using UniAttend.Application.Auth.Commands.RefreshToken;
-using UniAttend.Application.Auth.Commands.ResetPassword;
-using UniAttend.Application.Auth.Commands.Logout;
+using UniAttend.Application.Features.Auth.DTOs;
+using UniAttend.Application.Features.Auth.Commands.Login;
+using UniAttend.Application.Features.Auth.Commands.RefreshToken;
+using UniAttend.Application.Features.Auth.Commands.ResetPassword;
+using UniAttend.Application.Features.Auth.Commands.Logout;
 using UniAttend.API.Extensions;
 
 namespace UniAttend.API.Controllers.Auth
@@ -21,7 +22,10 @@ namespace UniAttend.API.Controllers.Auth
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginCommand command)
+        [ProducesResponseType(typeof(AuthResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<AuthResult>> Login(LoginCommand command)
         {
             var result = await _mediator.Send(command);
             return Ok(result);

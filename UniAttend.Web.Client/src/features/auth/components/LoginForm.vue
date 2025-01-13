@@ -64,14 +64,14 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
-import type { LoginRequest } from '@/types/auth.types'
+import type { LoginCommand } from '@/api/generated/data-contracts'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const isLoading = ref(false)
 const error = ref('')
 
-const form = ref<LoginRequest>({
+const form = ref<LoginCommand>({
   username: '',
   password: ''
 })

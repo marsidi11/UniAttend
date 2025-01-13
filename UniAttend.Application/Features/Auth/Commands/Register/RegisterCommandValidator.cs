@@ -1,7 +1,7 @@
 using FluentValidation;
 using UniAttend.Core.Enums;
 
-namespace UniAttend.Application.Auth.Commands.Register
+namespace UniAttend.Application.Features.Auth.Commands.Register
 {
     public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
     {

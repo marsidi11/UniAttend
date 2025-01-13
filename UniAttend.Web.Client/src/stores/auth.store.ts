@@ -1,25 +1,23 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { 
-  AuthResponse, 
-  LoginRequest,
-  RegisterRequest,
-  RefreshTokenRequest,
-  ResetPasswordRequest 
+  LoginCommand,
+  ResetPasswordCommand,
+  UserDto,
+  AuthResult,
+  UserRole
 } from '@/api/generated/data-contracts';
-import { NumericRole, getRoleString } from '@/types/base.types';
+import { NumericRole, StringRole, getRoleString } from '@/types/base.types';
 import { Auth } from '@/api/generated/Auth';
-import type { 
-  LoginCommand, 
-  RefreshTokenCommand,
-  ResetPasswordCommand 
-} from '@/api/generated/data-contracts';
+import { authApi } from '@/api/apiInstances';
 
-const authApi = new Auth();
+type LoginRequest = LoginCommand;
+type ResetPasswordRequest = ResetPasswordCommand;
+type ExtendedUserDto = Omit<UserDto, 'role'> & { role: StringRole };
 
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const user = ref<User | null>(JSON.parse(localStorage.getItem('user') || 'null'));
+  const user = ref<ExtendedUserDto | null>(JSON.parse(localStorage.getItem('user') || 'null'));
   const token = ref<string | null>(localStorage.getItem('token'));
   const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'));
   const isLoading = ref(false);
@@ -27,7 +25,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const isAuthenticated = computed(() => !!token.value);
-  const userRole = computed(() => user.value?.role.toLowerCase());
+  const userRole = computed(() => user.value?.role);
   const fullName = computed(() => 
     user.value ? `${user.value.firstName} ${user.value.lastName}` : ''
   );
@@ -38,24 +36,11 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     
     try {
-      const { data } = await authApi.authLoginCreate(credentials as LoginCommand);
+      const { data } = await authApi.authLoginCreate(credentials);
       setAuthData(data);
     } catch (err: any) {
       console.error('Login error:', err);
       error.value = err?.response?.data?.message || 'Failed to sign in';
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function register(userData: RegisterRequest) {
-    isLoading.value = true;
-    try {
-      const { data } = await authApi.authRegisterCreate(userData);
-      setAuthData(data);
-    } catch (err) {
-      handleError(err);
       throw err;
     } finally {
       isLoading.value = false;
@@ -77,25 +62,31 @@ export const useAuthStore = defineStore('auth', () => {
     if (!token.value || !refreshToken.value) {
       throw new Error('No refresh token available');
     }
-
+  
     try {
       const { data } = await authApi.authRefreshTokenCreate({
         accessToken: token.value,
         refreshToken: refreshToken.value
-      } as RefreshTokenCommand);
-      
+      });
+  
+      if (!data) {
+        throw new Error('No data received from refresh token request');
+      }
+  
+      // Update tokens and user data
       setAuthData(data);
       return data;
-    } catch (err) {
+    } catch (error) {
+      console.error('Token refresh failed:', error);
       clearAuthData();
-      throw err;
+      throw error;
     }
   }
 
   async function resetPassword(request: ResetPasswordRequest) {
     isLoading.value = true;
     try {
-      await authApi.authResetPasswordCreate(request as ResetPasswordCommand);
+      await authApi.authResetPasswordCreate(request);
     } catch (err) {
       handleError(err);
       throw err;
@@ -104,15 +95,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Helper functions
-  function setAuthData(data: AuthResponse) {
+  function setAuthData(data: AuthResult) {
     if (!data.user || !data.accessToken || !data.refreshToken) {
       console.error('Invalid auth response:', data);
       throw new Error('Invalid authentication response');
     }
 
-    const mappedRole = getRoleString(data.user.role as NumericRole);
-    const userData = {
+    const mappedRole = getRoleString(data.user.role as unknown as NumericRole);
+    const userData: ExtendedUserDto = {
       ...data.user,
       role: mappedRole
     };
@@ -153,7 +143,6 @@ export const useAuthStore = defineStore('auth', () => {
     
     // Actions
     login,
-    register,
     logout,
     refreshTokens,
     resetPassword

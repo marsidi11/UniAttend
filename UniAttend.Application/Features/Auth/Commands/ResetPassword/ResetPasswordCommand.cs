@@ -1,7 +1,7 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 
-namespace UniAttend.Application.Auth.Commands.ResetPassword
+namespace UniAttend.Application.Features.Auth.Commands.ResetPassword
 {
     /// <summary>
     /// Represents a command to reset a user's password.

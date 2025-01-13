@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace UniAttend.Application.Auth.Commands.ResetPassword
+namespace UniAttend.Application.Features.Auth.Commands.ResetPassword
 {
     /// <summary>
     /// Validates the ResetPasswordCommand.

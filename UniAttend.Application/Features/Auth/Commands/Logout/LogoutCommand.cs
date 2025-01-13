@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace UniAttend.Application.Auth.Commands.Logout
+namespace UniAttend.Application.Features.Auth.Commands.Logout
 {
     /// <summary>
     /// Represents a command to log out a user.

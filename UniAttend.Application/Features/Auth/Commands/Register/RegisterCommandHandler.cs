@@ -1,6 +1,6 @@
 using MediatR;
 using UniAttend.Core.Interfaces;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Enums;
 using UniAttend.Core.Entities;
@@ -11,7 +11,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UniAttend.Application.Auth.Commands.Register
+namespace UniAttend.Application.Features.Auth.Commands.Register
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResult>
     {

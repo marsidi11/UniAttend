@@ -1,5 +1,5 @@
 using MediatR;
-using UniAttend.Application.Auth.Common;
+using UniAttend.Application.Features.Auth.DTOs;
 using UniAttend.Core.Interfaces.Services;
 using UniAttend.Shared.Exceptions;
 using UniAttend.Core.Interfaces.Repositories;
@@ -7,7 +7,7 @@ using UniAttend.Shared.Utils;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UniAttend.Application.Auth.Commands.ResetPassword
+namespace UniAttend.Application.Features.Auth.Commands.ResetPassword
 {
     /// <summary>
     /// Handles the logic for resetting a user's password.
