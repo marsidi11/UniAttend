@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="space-y-6">
     <!-- Header Section -->
     <div class="flex justify-between items-center">
@@ -150,4 +150,4 @@ async function handleRemoveCard(student: Student) {
     }
   }
 }
-</script>
+</script> -->

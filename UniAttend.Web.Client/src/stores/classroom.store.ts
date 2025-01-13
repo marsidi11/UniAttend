@@ -1,13 +1,19 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Classroom, CreateClassroomRequest, ReaderDevice } from '@/types/classroom.types';
-import { classroomApi } from '@/api/endpoints/classroomApi';
+import type { 
+  ClassroomDto,
+  CreateClassroomCommand,
+  UpdateClassroomCommand,
+  AssignReaderCommand 
+} from '@/api/generated/data-contracts';
+import { Classrooms } from '@/api/generated/Classrooms';
+
+const classroomApi = new Classrooms();
 
 export const useClassroomStore = defineStore('classroom', () => {
   // State
-  const classrooms = ref<Classroom[]>([]);
-  const currentClassroom = ref<Classroom | null>(null);
-  const readers = ref<ReaderDevice[]>([]);
+  const classrooms = ref<ClassroomDto[]>([]);
+  const currentClassroom = ref<ClassroomDto | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -24,33 +30,9 @@ export const useClassroomStore = defineStore('classroom', () => {
   async function fetchClassrooms() {
     isLoading.value = true;
     try {
-      const { data } = await classroomApi.getAll();
+      const { data } = await classroomApi.classroomsList();
       classrooms.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function fetchReaders() {
-    isLoading.value = true;
-    try {
-      const { data } = await classroomApi.getAllReaders();
-      readers.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function createClassroom(data: CreateClassroomRequest) {
-    isLoading.value = true;
-    try {
-      const response = await classroomApi.create(data);
-      classrooms.value.push(response.data);
-      return response.data;
+      return data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -59,15 +41,90 @@ export const useClassroomStore = defineStore('classroom', () => {
     }
   }
 
-  async function updateClassroom(id: number, data: Partial<CreateClassroomRequest>) {
+  async function getClassroomById(id: number) {
     isLoading.value = true;
     try {
-      const response = await classroomApi.update(id, data);
+      const { data } = await classroomApi.classroomsDetail(id);
+      currentClassroom.value = data;
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function createClassroom(classroom: CreateClassroomCommand) {
+    isLoading.value = true;
+    try {
+      const { data: id } = await classroomApi.classroomsCreate(classroom);
+      const newClassroom = await getClassroomById(id);
+      classrooms.value.push(newClassroom);
+      return newClassroom;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateClassroom(id: number, classroom: UpdateClassroomCommand) {
+    isLoading.value = true;
+    try {
+      await classroomApi.classroomsUpdate(id, { id, ...classroom });
+      const updatedClassroom = await getClassroomById(id);
       const index = classrooms.value.findIndex(c => c.id === id);
       if (index !== -1) {
-        classrooms.value[index] = response.data;
+        classrooms.value[index] = updatedClassroom;
       }
-      return response.data;
+      if (currentClassroom.value?.id === id) {
+        currentClassroom.value = updatedClassroom;
+      }
+      return updatedClassroom;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function assignReader(id: number, deviceId: string) {
+    isLoading.value = true;
+    try {
+      await classroomApi.classroomsReaderCreate(id, { deviceId });
+      await getClassroomById(id);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function removeReader(id: number) {
+    isLoading.value = true;
+    try {
+      await classroomApi.classroomsReaderDelete(id);
+      await getClassroomById(id);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function getAvailableClassrooms(startTime: Date, endTime: Date) {
+    isLoading.value = true;
+    try {
+      const { data } = await classroomApi.classroomsAvailableList({
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString()
+      });
+      return data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -81,16 +138,23 @@ export const useClassroomStore = defineStore('classroom', () => {
   }
 
   return {
+    // State
     classrooms,
     currentClassroom,
-    readers,
     isLoading,
     error,
+    
+    // Getters
     availableClassrooms,
     classroomsWithReaders,
+    
+    // Actions
     fetchClassrooms,
-    fetchReaders,
+    getClassroomById,
     createClassroom,
-    updateClassroom
+    updateClassroom,
+    assignReader,
+    removeReader,
+    getAvailableClassrooms
   };
 });

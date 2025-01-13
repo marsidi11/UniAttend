@@ -1,47 +1,36 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { User } from '@/types/user.types';
-import type { AuthResponse, LoginRequest } from '@/types/auth.types';
+import type { 
+  AuthResponse, 
+  LoginRequest,
+  RegisterRequest,
+  RefreshTokenRequest,
+  ResetPasswordRequest 
+} from '@/api/generated/data-contracts';
 import { NumericRole, getRoleString } from '@/types/base.types';
-import { authApi } from '@/api/endpoints/authApi';
+import { Auth } from '@/api/generated/Auth';
+import type { 
+  LoginCommand, 
+  RefreshTokenCommand,
+  ResetPasswordCommand 
+} from '@/api/generated/data-contracts';
+
+const authApi = new Auth();
 
 export const useAuthStore = defineStore('auth', () => {
-  // State with hydration from localStorage
+  // State
   const user = ref<User | null>(JSON.parse(localStorage.getItem('user') || 'null'));
   const token = ref<string | null>(localStorage.getItem('token'));
+  const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'));
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-
-  function setAuthData(data: AuthResponse) {
-    if (!data.user || !data.accessToken) {
-      console.error('Invalid auth response:', data);
-      throw new Error('Invalid authentication response');
-    }
-
-    const mappedRole = getRoleString(data.user.role as NumericRole);
-    console.log('Role mapping:', {
-      numericRole: data.user.role,
-      mappedRole
-    });
-
-    const userData = {
-      ...data.user,
-      role: mappedRole
-    };
-
-    user.value = userData;
-    token.value = data.accessToken;
-    
-    // Persist both token and user data
-    localStorage.setItem('token', data.accessToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-  }
 
   // Getters
   const isAuthenticated = computed(() => !!token.value);
   const userRole = computed(() => user.value?.role.toLowerCase());
   const fullName = computed(() => 
-    user.value ? `${user.value.firstName} ${user.value.lastName}` : '');
+    user.value ? `${user.value.firstName} ${user.value.lastName}` : ''
+  );
 
   // Actions
   async function login(credentials: LoginRequest) {
@@ -49,14 +38,8 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     
     try {
-      const { data } = await authApi.login(credentials);
-      console.log('Login response:', data); // Debug
+      const { data } = await authApi.authLoginCreate(credentials as LoginCommand);
       setAuthData(data);
-      console.log('Auth state after login:', { 
-        user: user.value,
-        role: userRole.value,
-        token: !!token.value
-      }); // Debug
     } catch (err: any) {
       console.error('Login error:', err);
       error.value = err?.response?.data?.message || 'Failed to sign in';
@@ -65,11 +48,11 @@ export const useAuthStore = defineStore('auth', () => {
       isLoading.value = false;
     }
   }
-  
+
   async function register(userData: RegisterRequest) {
     isLoading.value = true;
     try {
-      const { data } = await authApi.register(userData);
+      const { data } = await authApi.authRegisterCreate(userData);
       setAuthData(data);
     } catch (err) {
       handleError(err);
@@ -79,35 +62,77 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function logout() {
-    user.value = null;
-    token.value = null;
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  async function logout() {
+    if (token.value) {
+      try {
+        await authApi.authLogoutCreate();
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+    }
+    clearAuthData();
   }
 
+  async function refreshTokens() {
+    if (!token.value || !refreshToken.value) {
+      throw new Error('No refresh token available');
+    }
+
+    try {
+      const { data } = await authApi.authRefreshTokenCreate({
+        accessToken: token.value,
+        refreshToken: refreshToken.value
+      } as RefreshTokenCommand);
+      
+      setAuthData(data);
+      return data;
+    } catch (err) {
+      clearAuthData();
+      throw err;
+    }
+  }
+
+  async function resetPassword(request: ResetPasswordRequest) {
+    isLoading.value = true;
+    try {
+      await authApi.authResetPasswordCreate(request as ResetPasswordCommand);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Helper functions
   function setAuthData(data: AuthResponse) {
-    if (!data.user || !data.accessToken) {
+    if (!data.user || !data.accessToken || !data.refreshToken) {
       console.error('Invalid auth response:', data);
       throw new Error('Invalid authentication response');
     }
-  
-    console.log('Setting auth data:', {
-      originalRole: data.user.role,
-      originalRoleType: typeof data.user.role,
-      token: !!data.accessToken
-    });
-  
+
     const mappedRole = getRoleString(data.user.role as NumericRole);
-    
-    user.value = {
+    const userData = {
       ...data.user,
       role: mappedRole
     };
+
+    user.value = userData;
     token.value = data.accessToken;
+    refreshToken.value = data.refreshToken;
     
     localStorage.setItem('token', data.accessToken);
-    localStorage.setItem('user', JSON.stringify(user.value));
+    localStorage.setItem('refreshToken', data.refreshToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+  }
+
+  function clearAuthData() {
+    user.value = null;
+    token.value = null;
+    refreshToken.value = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken'); 
+    localStorage.removeItem('user');
   }
 
   function handleError(err: unknown) {
@@ -129,6 +154,8 @@ export const useAuthStore = defineStore('auth', () => {
     // Actions
     login,
     register,
-    logout
+    logout,
+    refreshTokens,
+    resetPassword
   };
 });

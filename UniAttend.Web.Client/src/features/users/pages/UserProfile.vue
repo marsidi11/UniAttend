@@ -17,7 +17,7 @@
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/user.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { UpdateProfileRequest } from '@/types/user.types'
+import type { UserProfileDto } from '@/api/generated/data-contracts'
 import ProfileForm from '../components/ProfileForm.vue'
 
 const userStore = useUserStore()
@@ -25,7 +25,7 @@ const authStore = useAuthStore()
 
 const currentUser = computed(() => authStore.user)
 
-async function handleUpdateProfile(profileData: UpdateProfileRequest) {
+async function handleUpdateProfile(profileData: UserProfileDto) {
   try {
     await userStore.updateProfile(profileData)
     // Show success message or handle success case

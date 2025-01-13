@@ -97,8 +97,11 @@ import { storeToRefs } from 'pinia'
 import { useSubjectStore } from '@/stores/subject.store'
 import { useDepartmentStore } from '@/stores/department.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { Subject } from '@/types/subject.types'
-import type { StudyGroup } from '@/types/group.types'
+import type { 
+  StudyGroupDto,
+  UpdateSubjectCommand 
+} from '@/api/generated/data-contracts'
+import type { TableItem, Column } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 import Spinner from '@/shared/components/ui/Spinner.vue'
@@ -120,12 +123,12 @@ const { departments } = storeToRefs(departmentStore)
 // Component state
 const showEditModal = ref(false)
 const isLoadingGroups = ref(false)
-const groups = ref<StudyGroup[]>([])
+const groups = ref<(StudyGroupDto & TableItem)[]>([])
 
 // Computed
 const isAdmin = computed(() => authStore.userRole === 'admin')
 
-const groupColumns = [
+const groupColumns: Column<TableItem>[] = [
   { key: 'name', label: 'Name' },
   { key: 'professorName', label: 'Professor' },
   { key: 'studentsCount', label: 'Students' },
@@ -149,7 +152,16 @@ async function loadSubjectData(subjectId: number) {
 async function loadGroups(subjectId: number) {
   isLoadingGroups.value = true
   try {
-    groups.value = await subjectStore.fetchSubjectGroups(subjectId)
+    const allSubjects = await subjectStore.fetchSubjects({ departmentId: subject.value?.departmentId })
+    groups.value = allSubjects
+      .filter(s => s.id === subjectId)
+      .map(s => ({
+        id: s.id || 0,
+        name: s.name,
+        professorName: s.departmentName,
+        studentsCount: s.studentsCount || 0,
+        averageAttendance: s.averageAttendance || 0
+      })) as (StudyGroupDto & TableItem)[]
   } catch (err) {
     console.error('Failed to load groups:', err)
   } finally {
@@ -157,7 +169,7 @@ async function loadGroups(subjectId: number) {
   }
 }
 
-async function handleUpdateSubject(updatedSubject: Partial<Subject>) {
+async function handleUpdateSubject(updatedSubject: UpdateSubjectCommand) {
   try {
     if (subject.value?.id) {
       await subjectStore.updateSubject(subject.value.id, updatedSubject)

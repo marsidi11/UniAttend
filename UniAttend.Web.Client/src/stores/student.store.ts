@@ -1,32 +1,37 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { 
-  Student,
-  StudentProfile, 
-  StudentGroupDetails,
-  StudentStats,
-  AttendanceRecord,
-  UpdateStudentRequest 
-} from '@/types/student.types';
-import { studentApi } from '@/api/endpoints/studentApi';
+  UserDto as StudentDto,
+  RegisterStudentCommand,
+  AttendanceRecordDto,
+  UserGroupDto
+} from '@/api/generated/data-contracts';
+import { Student } from '@/api/generated/Student';
+
+// Extend StudentDto to include cardId
+interface ExtendedStudentDto extends StudentDto {
+  cardId?: string;
+}
+
+const studentApi = new Student();
 
 export const useStudentStore = defineStore('student', () => {
   // State
-  const students = ref<Student[]>([]);
-  const currentStudent = ref<Student | null>(null);
-  const attendance = ref<AttendanceRecord[]>([]);
-  const groups = ref<StudentGroupDetails[]>([]);
+  const students = ref<ExtendedStudentDto[]>([]);
+  const currentStudent = ref<ExtendedStudentDto | null>(null);
+  const attendance = ref<AttendanceRecordDto[]>([]);
+  const groups = ref<UserGroupDto[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  // Getters
+  // Getters updated to use ExtendedStudentDto
   const activeStudents = computed(() => 
-    students.value.filter(s => s.isActive)
+    students.value.filter((s: ExtendedStudentDto) => s.isActive)
   );
 
   const groupedByDepartment = computed(() => {
-    const grouped = new Map<string, Student[]>();
-    students.value.forEach(student => {
+    const grouped = new Map<string, ExtendedStudentDto[]>();
+    students.value.forEach((student: ExtendedStudentDto) => {
       const dept = student.departmentName || 'Unassigned';
       if (!grouped.has(dept)) {
         grouped.set(dept, []);
@@ -40,22 +45,8 @@ export const useStudentStore = defineStore('student', () => {
   async function fetchStudentsList() {
     isLoading.value = true;
     try {
-        const { data } = await studentApi.getAll();
-        students.value = data;
-        return data;
-    } catch (err) {
-        handleError(err);
-        throw err;
-    } finally {
-        isLoading.value = false;
-    }
-}
-
-  async function createStudent(studentData: UpdateStudentRequest) {
-    isLoading.value = true;
-    try {
-      const { data } = await studentApi.getProfile();
-      students.value.push(data);
+      const { data } = await studentApi.studentList();
+      students.value = data as ExtendedStudentDto[]; // Type assertion since API returns basic UserDto
       return data;
     } catch (err) {
       handleError(err);
@@ -65,17 +56,28 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
-  async function updateStudent(id: number, studentData: UpdateStudentRequest) {
+  async function createStudent(studentData: RegisterStudentCommand) {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.updateProfile(studentData);
-      const index = students.value.findIndex(s => s.id === id);
-      if (index !== -1) {
-        students.value[index] = { ...students.value[index], ...data };
-      }
-      if (currentStudent.value?.id === id) {
-        currentStudent.value = { ...currentStudent.value, ...data };
-      }
+      const { data: studentId } = await studentApi.studentCreate(studentData);
+      await fetchStudentsList(); // Refresh list after creation
+      return studentId;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchStudentAttendance(startDate?: Date, endDate?: Date) {
+    isLoading.value = true;
+    try {
+      const { data } = await studentApi.studentAttendanceList({
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString()
+      });
+      attendance.value = data as AttendanceRecordDto[]; // Type assertion
       return data;
     } catch (err) {
       handleError(err);
@@ -85,23 +87,11 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
-  async function fetchStudentById(id: number) {
+  async function fetchStudentGroups() {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getProfile();
-      currentStudent.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function fetchStudentAttendance(studentId: number, startDate?: Date, endDate?: Date) {
-    isLoading.value = true;
-    try {
-      const { data } = await studentApi.getAttendanceHistory(startDate, endDate);
-      attendance.value = data;
+      const { data } = await studentApi.studentEnrolledGroupsList();
+      groups.value = data as UserGroupDto[]; // Type assertion
       return data;
     } catch (err) {
       handleError(err);
@@ -111,11 +101,10 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
-  async function fetchStudentGroups(studentId: number) {
+  async function getAbsenceAlerts() {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.getGroupDetails(studentId);
-      groups.value = data;
+      const { data } = await studentApi.studentAbsenceAlertsList();
       return data;
     } catch (err) {
       handleError(err);
@@ -125,37 +114,10 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
-  async function getAttendanceStats(studentId: number): Promise<StudentStats> {
-    isLoading.value = true;
-    try {
-      const { data } = await studentApi.getDashboardStats();
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function getAbsencePercentage(groupId: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await studentApi.getAbsencePercentage(groupId);
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  // New card management functions
   async function assignCard(studentId: number, cardId: string) {
     isLoading.value = true;
     try {
-      await studentApi.assignCard(studentId, cardId);
+      await studentApi.studentCardUpdate(studentId, { studentId, cardId });
       if (currentStudent.value?.id === studentId) {
         currentStudent.value = { 
           ...currentStudent.value, 
@@ -173,7 +135,7 @@ export const useStudentStore = defineStore('student', () => {
   async function removeCard(studentId: number) {
     isLoading.value = true;
     try {
-      await studentApi.removeCard(studentId);
+      await studentApi.studentCardDelete(studentId);
       if (currentStudent.value?.id === studentId) {
         currentStudent.value = { 
           ...currentStudent.value, 
@@ -208,12 +170,9 @@ export const useStudentStore = defineStore('student', () => {
     // Actions
     fetchStudentsList,
     createStudent,
-    updateStudent,
-    fetchStudentById,
     fetchStudentAttendance,
     fetchStudentGroups,
-    getAbsencePercentage,
-    getAttendanceStats,
+    getAbsenceAlerts,
     assignCard,
     removeCard
   };

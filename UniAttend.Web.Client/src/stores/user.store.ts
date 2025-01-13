@@ -1,29 +1,87 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { 
-  User,
-  UserProfile, 
-  UserDetails, 
-  UpdateProfileRequest, 
-  ChangePasswordRequest 
-} from '@/types/user.types';
-import { userApi } from '@/api/endpoints/userApi';
+  UserDto,
+  UserProfileDto, 
+  UserDetailsDto, 
+  UpdateProfileCommand, 
+  ChangePasswordCommand,
+  CreateUserCommand,
+  UpdateUserCommand
+} from '@/api/generated/data-contracts';
+import { User } from '@/api/generated/User';
+import { UserRole } from '@/api/generated/data-contracts';
+
+const userApi = new User();
 
 export const useUserStore = defineStore('user', () => {
   // State
-  const users = ref<User[]>([]);
-  const profile = ref<UserProfile | null>(null);
-  const details = ref<UserDetails | null>(null);
+  const users = ref<UserDto[]>([]);
+  const profile = ref<UserProfileDto | null>(null);
+  const details = ref<UserDetailsDto | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   // Actions
-  async function fetchUsers() {
+  async function fetchUsers(filters?: { role?: UserRole; isActive?: boolean }) {
     isLoading.value = true;
     try {
-      const { data } = await userApi.getAll();
+      const { data } = await userApi.userList(filters);
       users.value = data;
       return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchUserById(id: number) {
+    isLoading.value = true;
+    try {
+      const { data } = await userApi.userDetail(id);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function createUser(userData: CreateUserCommand) {
+    isLoading.value = true;
+    try {
+      const { data } = await userApi.userCreate(userData);
+      await fetchUsers(); // Refresh users list
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateUser(id: number, userData: UpdateUserCommand) {
+    isLoading.value = true;
+    try {
+      await userApi.userUpdate(id, userData);
+      await fetchUsers(); // Refresh users list
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function deactivateUser(id: number) {
+    isLoading.value = true;
+    try {
+      await userApi.userDeactivateCreate(id);
+      await fetchUsers(); // Refresh users list
     } catch (err) {
       handleError(err);
       throw err;
@@ -35,7 +93,7 @@ export const useUserStore = defineStore('user', () => {
   async function fetchProfile() {
     isLoading.value = true;
     try {
-      const { data } = await userApi.getProfile();
+      const { data } = await userApi.userProfileList();
       profile.value = data;
       return data;
     } catch (err) {
@@ -46,10 +104,25 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  async function fetchUserDetails() {
+  async function updateProfile(profileData: UpdateProfileCommand) {
     isLoading.value = true;
     try {
-      const { data } = await userApi.getUserDetails();
+      await userApi.userProfileUpdate(profileData);
+      await fetchProfile(); // Refresh profile data
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchUserDetails(id?: number) {
+    isLoading.value = true;
+    try {
+      const { data } = id 
+        ? await userApi.userDetailsDetail(id)
+        : await userApi.userDetailsList();
       details.value = data;
       return data;
     } catch (err) {
@@ -60,24 +133,10 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  async function updateProfile(profileData: UpdateProfileRequest) {
+  async function changePassword(passwordData: ChangePasswordCommand) {
     isLoading.value = true;
     try {
-      await userApi.updateProfile(profileData);
-      // Refresh profile data after update
-      await fetchProfile();
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function changePassword(passwordData: ChangePasswordRequest) {
-    isLoading.value = true;
-    try {
-      await userApi.changePassword(passwordData);
+      await userApi.userChangePasswordUpdate(passwordData);
     } catch (err) {
       handleError(err);
       throw err;
@@ -100,9 +159,13 @@ export const useUserStore = defineStore('user', () => {
 
     // Actions
     fetchUsers,
+    fetchUserById,
+    createUser,
+    updateUser,
+    deactivateUser,
     fetchProfile,
-    fetchUserDetails,
     updateProfile,
+    fetchUserDetails,
     changePassword
   };
 });

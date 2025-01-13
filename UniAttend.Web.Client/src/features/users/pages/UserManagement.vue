@@ -71,27 +71,51 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useAdminStore } from '@/stores/admin.store'
+import { useUserStore } from '@/stores/user.store'
 import { useDepartmentStore } from '@/stores/department.store'
-import type { User } from '@/types/user.types'
-import type { CreateStaffCommand, UpdateStaffRequest } from '@/types/admin.types'
-import type { TableItem } from '@/types/tableItem.types'
+import type { TableItem, StaffTableItem } from '@/types/tableItem.types'
+import type { StringRole } from '@/types/base.types'
+import type { 
+  UserDto, 
+  CreateUserCommand, 
+  UpdateUserCommand
+} from '@/api/generated/data-contracts'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import UserForm from '../components/UserForm.vue'
 
 // Initialize stores
-const adminStore = useAdminStore()
+const userStore = useUserStore()
 const departmentStore = useDepartmentStore()
 
 // Get store refs
-const { staff, isLoading } = storeToRefs(adminStore)
+const { users, isLoading } = storeToRefs(userStore)
 const { departments } = storeToRefs(departmentStore)
+
+// Helper function to map numeric roles to StringRole
+function mapRole(roleId: number): StringRole {
+  switch(roleId) {
+    case 1: return 'admin'
+    case 2: return 'secretary'
+    case 3: return 'professor'
+    case 4: return 'student'
+    default: return 'student'
+  }
+}
+
+// Staff computed property
+const staff = computed(() => 
+  users.value.map(user => ({
+    ...user,
+    id: user.id || 0,
+    role: mapRole(user.role || 0)
+  })) as StaffTableItem[]
+)
 
 // Component state
 const showModal = ref(false)
-const selectedStaff = ref<User | null>(null)
+const selectedStaff = ref<UserDto | null>(null)
 const selectedRole = ref('')
 const selectedDepartment = ref('')
 const selectedStatus = ref('')
@@ -112,12 +136,12 @@ const tableActions = [
   { 
     label: 'Edit', 
     icon: 'edit', 
-    action: (item: TableItem) => handleEdit(item as User)
+    action: (item: TableItem) => handleEdit(item as UserDto)
   },
   { 
     label: 'Toggle Status', 
     icon: 'toggle_on', 
-    action: (item: TableItem) => handleToggleStatus(item as User)
+    action: (item: TableItem) => handleToggleStatus(item as UserDto)
   }
 ]
 
@@ -130,18 +154,29 @@ const filteredStaff = computed(() => {
   let filtered = [...staff.value]
   
   if (selectedRole.value) {
-    filtered = filtered.filter(s => s.role.toLowerCase() === selectedRole.value)
+    filtered = filtered.filter(s => {
+      const roleNumber = {
+        'admin': 1,
+        'secretary': 2,
+        'professor': 3,
+        'student': 4
+      }[selectedRole.value]
+      
+      return s.role === mapRole(roleNumber || 0)
+    })
   }
   
   if (selectedDepartment.value) {
-    filtered = filtered.filter(s => s.departmentId === Number(selectedDepartment.value))
+    const deptId = Number(selectedDepartment.value)
+    filtered = filtered.filter(s => s.departmentId === deptId)
   }
   
   if (selectedStatus.value !== '') {
-    filtered = filtered.filter(s => s.isActive === (selectedStatus.value === 'true'))
+    const isActive = selectedStatus.value === 'true'
+    filtered = filtered.filter(s => s.isActive === isActive)
   }
   
-  return filtered
+  return filtered.filter(s => s.role !== 'student')
 })
 
 // Methods
@@ -150,29 +185,29 @@ function openCreateModal() {
   showModal.value = true
 }
 
-function handleEdit(staff: User) {
+function handleEdit(staff: UserDto) {
   selectedStaff.value = staff
   showModal.value = true
 }
 
-async function handleToggleStatus(staff: User) {
+async function handleToggleStatus(staff: UserDto) {
+  if (!staff.id) return
+  
   if (confirm(`Are you sure you want to ${staff.isActive ? 'deactivate' : 'activate'} this staff member?`)) {
     try {
-      await adminStore.updateStaff(staff.id, { isActive: !staff.isActive })
+      await userStore.updateUser(staff.id, { isActive: !staff.isActive })
     } catch (err) {
       console.error('Failed to update staff status:', err)
     }
   }
 }
 
-async function handleSubmit(data: CreateStaffCommand | UpdateStaffRequest) {
+async function handleSubmit(data: CreateUserCommand | UpdateUserCommand) {
   try {
-    if ('id' in data) {
-      // It's an update
-      await adminStore.updateStaff(data.id, data)
+    if ('id' in data && data.id) {
+      await userStore.updateUser(data.id, data)
     } else {
-      // It's a create
-      await adminStore.createStaff(data)
+      await userStore.createUser(data as CreateUserCommand)
     }
     showModal.value = false
   } catch (err) {
@@ -183,7 +218,7 @@ async function handleSubmit(data: CreateStaffCommand | UpdateStaffRequest) {
 // Lifecycle hooks
 onMounted(async () => {
   await Promise.all([
-    adminStore.getStaffList(),
+    userStore.fetchUsers(),
     departmentStore.fetchDepartments()
   ])
 })

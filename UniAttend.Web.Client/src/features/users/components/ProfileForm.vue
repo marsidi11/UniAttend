@@ -96,37 +96,41 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import Button from '@/shared/components/ui/Button.vue'
-import type { User, UpdateProfileRequest } from '@/types/user.types'
+import type { 
+  UserDto,
+  UpdateProfileCommand,
+  ChangePasswordCommand
+} from '@/api/generated/data-contracts'
 
 const props = defineProps<{
-  user: User | null
+  user: UserDto | null
 }>()
 
 const emit = defineEmits<{
-  (e: 'submit', data: UpdateProfileRequest): void
+  (e: 'submit', data: UpdateProfileCommand & Partial<ChangePasswordCommand>): void
 }>()
 
 const isLoading = ref(false)
 const error = ref('')
 
-const form = ref({
+const form = ref<Omit<UpdateProfileCommand, 'userId'>>({
   firstName: '',
   lastName: '',
-  email: '',
+  email: ''
 })
 
 const passwordForm = ref({
   currentPassword: '',
   newPassword: '',
-  confirmPassword: '',
+  confirmPassword: ''
 })
 
 watch(() => props.user, (newUser) => {
   if (newUser) {
     form.value = {
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      email: newUser.email,
+      firstName: newUser.firstName ?? '',
+      lastName: newUser.lastName ?? '',
+      email: newUser.email ?? ''
     }
   }
 }, { immediate: true })
@@ -152,7 +156,7 @@ async function handleSubmit() {
       ...form.value,
       ...(passwordForm.value.newPassword ? {
         currentPassword: passwordForm.value.currentPassword,
-        newPassword: passwordForm.value.newPassword,
+        newPassword: passwordForm.value.newPassword
       } : {})
     })
   } finally {

@@ -31,17 +31,25 @@ import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAttendanceStore } from '@/stores/attendance.store'
 import { useGroupStore } from '@/stores/group.store'
+import { useReportStore } from '@/stores/report.store'
+import type { AttendanceRecordDto } from '@/api/generated/data-contracts'
+import type { TableItem } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 
+// Store setup
 const attendanceStore = useAttendanceStore()
 const groupStore = useGroupStore()
+const reportStore = useReportStore()
 
+// Store refs
 const { records, isLoading } = storeToRefs(attendanceStore)
 const { groups } = storeToRefs(groupStore)
 
+// Component state
 const selectedGroup = ref('')
 
+// Table columns
 const columns = [
   { key: 'studentName', label: 'Student' },
   { key: 'groupName', label: 'Group' },
@@ -54,14 +62,23 @@ const columns = [
   }
 ]
 
+// Computed properties
 const filteredRecords = computed(() => {
-  let filtered = [...records.value]
+  let filtered = records.value.map((record, index) => ({
+    ...record,
+    id: index, // Add required id for TableItem
+    studentName: record.courseName, // Map courseName to studentName
+    groupId: undefined // Add groupId property
+  })) as (AttendanceRecordDto & TableItem)[]
+
   if (selectedGroup.value) {
     filtered = filtered.filter(r => r.groupId === Number(selectedGroup.value))
   }
+
   return filtered
 })
 
+// Methods
 async function loadData() {
   try {
     await Promise.all([
@@ -75,12 +92,19 @@ async function loadData() {
 
 async function exportAttendance() {
   try {
-    await attendanceStore.generateAttendanceList(Number(selectedGroup.value))
+    if (selectedGroup.value) {
+      await reportStore.exportAttendanceReport(
+        Number(selectedGroup.value),
+        new Date(), // Start date
+        new Date() // End date
+      )
+    }
   } catch (err) {
     console.error('Failed to export attendance:', err)
   }
 }
 
+// Lifecycle hooks
 onMounted(() => {
   loadData()
 })

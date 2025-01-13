@@ -1,24 +1,22 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { 
-  AttendanceRecord, 
-  AttendanceStats, 
-  ClassAttendance,
-  RecordCardAttendanceRequest,
-  RecordOtpAttendanceRequest 
-} from '@/types/attendance.types';
-import { attendanceApi } from '@/api/endpoints/attendanceApi';
+  AttendanceRecordDto,
+  RecordCardAttendanceCommand,
+  RecordOtpAttendanceCommand 
+} from '@/api/generated/data-contracts';
+import { Attendance } from '@/api/generated/Attendance';
+
+const attendanceApi = new Attendance();
 
 export const useAttendanceStore = defineStore('attendance', () => {
   // State
-  const records = ref<AttendanceRecord[]>([]);
-  const stats = ref<AttendanceStats | null>(null);
-  const currentClass = ref<ClassAttendance | null>(null);
+  const records = ref<AttendanceRecordDto[]>([]);
+  const currentClass = ref<AttendanceRecordDto[] | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   // Getters
-  const attendanceRate = computed(() => stats.value?.attendanceRate ?? 0);
   const hasUnconfirmedRecords = computed(() => 
     records.value.some(r => !r.isConfirmed)
   );
@@ -27,31 +25,12 @@ export const useAttendanceStore = defineStore('attendance', () => {
   async function fetchAttendance(startDate?: Date, endDate?: Date) {
     isLoading.value = true;
     try {
-      const { data } = await attendanceApi.getStudentAttendance(startDate, endDate);
+      const { data } = await attendanceApi.attendanceStudentList({
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString()
+      });
       records.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function fetchStats(groupId: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await attendanceApi.getAttendanceStats(groupId);
-      stats.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function recordCardAttendance(request: RecordCardAttendanceRequest) {
-    isLoading.value = true;
-    try {
-      await attendanceApi.recordCardAttendance(request);
+      return data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -60,10 +39,22 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
-  async function recordOtpAttendance(request: RecordOtpAttendanceRequest) {
+  async function recordCardAttendance(data: RecordCardAttendanceCommand) {
     isLoading.value = true;
     try {
-      await attendanceApi.recordOtpAttendance(request);
+      await attendanceApi.attendanceCardCreate(data);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function recordOtpAttendance(data: RecordOtpAttendanceCommand) {
+    isLoading.value = true;
+    try {
+      await attendanceApi.attendanceOtpCreate(data);
     } catch (err) {
       handleError(err);
       throw err;
@@ -75,9 +66,12 @@ export const useAttendanceStore = defineStore('attendance', () => {
   async function confirmAttendance(classId: number) {
     isLoading.value = true;
     try {
-      await attendanceApi.confirmClassAttendance(classId);
+      await attendanceApi.attendanceClassesConfirmCreate(classId);
       if (currentClass.value) {
-        currentClass.value.status = 'Completed';
+        currentClass.value = currentClass.value.map(record => ({
+          ...record,
+          isConfirmed: true
+        }));
       }
     } catch (err) {
       handleError(err);
@@ -87,114 +81,14 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
-  async function fetchClassAttendance(classId: number) {
+  async function fetchClassAttendance(classId: number, date?: Date) {
     isLoading.value = true;
     try {
-      const { data } = await attendanceApi.getClassAttendance(classId);
+      const { data } = await attendanceApi.attendanceClassesDetail(
+        classId,
+        date ? { date: date.toISOString() } : undefined
+      );
       currentClass.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function openClassSession(groupId: number, classroomId: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await attendanceApi.openClass({ groupId, classroomId });
-      const classAttendance: ClassAttendance = {
-        ...data,
-        records: data.records || [],
-        stats: data.stats || {
-          totalStudents: 0,
-          presentToday: 0,
-          attendanceRate: 0,
-          absentStudents: 0
-        }
-      };
-      currentClass.value = classAttendance;
-      return classAttendance;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-  
-  async function closeClassSession(classId: number) {
-    isLoading.value = true;
-    try {
-      await attendanceApi.closeClass(classId);
-      if (currentClass.value?.id === classId) {
-        currentClass.value.status = 'Completed';
-      }
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function getAttendanceStats(): Promise<AttendanceStats> {
-    isLoading.value = true;
-    try {
-      const { data } = await attendanceApi.getStudentAttendanceStats();
-      stats.value = data;
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function generateAttendanceList(groupId: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await attendanceApi.generateList(groupId);
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function fetchTodaySessions() {
-    isLoading.value = true
-    try {
-      const { data } = await attendanceApi.getTodaySessions()
-      return data
-    } catch (err) {
-      handleError(err)
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  async function fetchRecentRecords() {
-    isLoading.value = true
-    try {
-      const { data } = await attendanceApi.getRecentRecords()
-      return data
-    } catch (err) {
-      handleError(err)
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  async function getAbsenceReport(groupId: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await attendanceApi.getAbsenceReport(groupId);
       return data;
     } catch (err) {
       handleError(err);
@@ -209,25 +103,20 @@ export const useAttendanceStore = defineStore('attendance', () => {
   }
 
   return {
+    // State
     records,
-    stats,
     currentClass,
     isLoading,
     error,
-    attendanceRate,
+    
+    // Getters
     hasUnconfirmedRecords,
+    
+    // Actions
     fetchAttendance,
-    fetchStats,
     recordCardAttendance,
-    recordOtpAttendance,
+    recordOtpAttendance, 
     confirmAttendance,
-    fetchClassAttendance,
-    fetchTodaySessions,
-    fetchRecentRecords,
-    getAttendanceStats,
-    openClassSession,
-    closeClassSession,
-    generateAttendanceList,
-    getAbsenceReport
+    fetchClassAttendance
   };
 });

@@ -1,7 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { OtpCode, OtpValidationResponse } from '@/types/otp.types';
-import { otpApi } from '@/api/endpoints/otpApi';
+import type { 
+  OtpCode, 
+  OtpValidationResponse, 
+  GenerateOtpRequest,
+  ValidateOtpRequest 
+} from '@/api/generated/data-contracts';
+import { Otp } from '@/api/generated/Otp';
+
+const otpApi = new Otp();
 
 export const useOtpStore = defineStore('otp', () => {
   // State
@@ -10,10 +17,13 @@ export const useOtpStore = defineStore('otp', () => {
   const error = ref<string | null>(null);
 
   // Actions
-  async function generateOtp(classId: number) {
+  async function generateOtp(classId: number, studentId: number) {
     isLoading.value = true;
     try {
-      const { data } = await otpApi.generate(classId);
+      const { data } = await otpApi.attendanceOtpGenerateCreate({ 
+        classId,
+        studentId 
+      });
       currentOtp.value = data;
       return data;
     } catch (err) {
@@ -27,21 +37,10 @@ export const useOtpStore = defineStore('otp', () => {
   async function validateOtp(code: string, classId: number): Promise<OtpValidationResponse> {
     isLoading.value = true;
     try {
-      const { data } = await otpApi.validate(code, classId);
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function requestNewOtp(classId: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await otpApi.requestOtp(classId);
-      currentOtp.value = data;
+      const { data } = await otpApi.attendanceOtpValidateCreate({
+        code,
+        classId
+      });
       return data;
     } catch (err) {
       handleError(err);
@@ -54,7 +53,7 @@ export const useOtpStore = defineStore('otp', () => {
   async function getCurrentOtp(classId: number) {
     isLoading.value = true;
     try {
-      const { data } = await otpApi.getCurrentOtp(classId);
+      const { data } = await otpApi.attendanceOtpCurrentDetail(classId);
       currentOtp.value = data;
       return data;
     } catch (err) {
@@ -78,7 +77,6 @@ export const useOtpStore = defineStore('otp', () => {
     // Actions
     generateOtp,
     validateOtp,
-    requestNewOtp,
     getCurrentOtp
   };
 });

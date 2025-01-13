@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <form @submit.prevent="handleSubmit" class="space-y-6">
     <!-- Card ID -->
     <div>
@@ -51,9 +51,9 @@
       <Button type="submit" :loading="isLoading">Assign Card</Button>
     </div>
   </form>
-</template>
+</template> -->
 
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStudentStore } from '@/stores/student.store'
@@ -118,4 +118,4 @@ async function handleSubmit() {
     isLoading.value = false
   }
 }
-</script>
+</script> -->

@@ -62,65 +62,61 @@
         <div class="bg-white shadow rounded-lg p-6">
           <h2 class="text-lg font-medium mb-4">Attendance Overview</h2>
           <div class="grid grid-cols-3 gap-4">
-            <StatCard 
-              title="Total Classes" 
-              :value="stats.totalClasses"
-            />
-            <StatCard 
-              title="Classes Attended" 
-              :value="stats.attendedClasses"
-            />
-            <StatCard 
-              title="Absence Rate" 
-              :value="`${stats.absenceRate}%`"
-            />
+            <StatCard title="Total Classes" :value="formattedStats.totalClasses" />
+            <StatCard title="Classes Attended" :value="formattedStats.attendedClasses" />
+            <StatCard title="Absence Rate" :value="`${formattedStats.absenceRate}%`" />
           </div>
         </div>
 
         <!-- Enrolled Groups -->
         <div class="bg-white shadow rounded-lg p-6">
           <h2 class="text-lg font-medium mb-4">Enrolled Groups</h2>
-          <DataTable
-            :data="groups"
-            :columns="groupColumns"
-            :loading="isLoadingGroups"
-          />
+          <DataTable :data="groups" :columns="groupColumns" :loading="isLoadingGroups" />
         </div>
 
         <!-- Recent Attendance -->
         <div class="bg-white shadow rounded-lg p-6">
           <h2 class="text-lg font-medium mb-4">Recent Attendance</h2>
-          <AttendanceList 
-            :records="attendance"
-            :loading="isLoadingAttendance"
-          />
+          <AttendanceList :records="attendance" :loading="isLoadingAttendance" />
         </div>
       </div>
     </div>
 
     <!-- Edit Student Modal -->
     <Modal v-model="showEditModal" title="Edit Student">
-      <StudentForm
-        v-if="showEditModal"
-        :student="student"
-        :departments="departments"
-        @submit="handleUpdateStudent"
-        @cancel="showEditModal = false"
-      />
+      <StudentForm v-if="showEditModal" :student="student" :departments="departments" @submit="handleUpdateStudent"
+        @cancel="showEditModal = false" />
     </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useStudentStore } from '@/stores/student.store'
 import { useDepartmentStore } from '@/stores/department.store'
-import type { Student } from '@/types/student.types'
-import type { AttendanceRecord } from '@/types/attendance.types'
-import type { StudentGroupDetails } from '@/types/student.types'
-import type { TableItem } from '@/types/tableItem.types'
+import { useUserStore } from '@/stores/user.store'
+import { useReportStore } from '@/stores/report.store'
+import type {
+  UserDetailsDto,
+  UpdateUserCommand,
+  AttendanceRecordDto,
+  UserGroupDto,
+  AttendanceStatsDto
+} from '@/api/generated/data-contracts'
+
+interface ExtendedUserDetailsDto extends UserDetailsDto {
+  studentId?: string
+  cardId?: string | null
+}
+
+interface ExtendedUserGroupDto extends UserGroupDto {
+  id: number
+  attendanceRate: number
+}
+
+// UI Components
 import Button from '@/shared/components/ui/Button.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 import Spinner from '@/shared/components/ui/Spinner.vue'
@@ -130,98 +126,117 @@ import Modal from '@/shared/components/ui/Modal.vue'
 import StudentForm from '../components/StudentForm.vue'
 import AttendanceList from '@/features/attendance/components/AttendanceList.vue'
 
+// Column type for DataTable
+interface Column {
+  key: string
+  label: string
+  render?: (value: any) => string
+}
+
+// Store setup
 const route = useRoute()
 const studentStore = useStudentStore()
 const departmentStore = useDepartmentStore()
+const userStore = useUserStore()
+const reportStore = useReportStore()
 
 // Store refs
-const { currentStudent: student, isLoading, error } = storeToRefs(studentStore)
 const { departments } = storeToRefs(departmentStore)
+const { isLoading, error } = storeToRefs(studentStore)
 
 // Component state
 const showEditModal = ref(false)
 const isLoadingGroups = ref(false)
 const isLoadingAttendance = ref(false)
-const groups = ref<(StudentGroupDetails & TableItem)[]>([])
-const attendance = ref<AttendanceRecord[]>([])
-const stats = ref({
+const student = ref<ExtendedUserDetailsDto | null>(null)
+const groups = ref<ExtendedUserGroupDto[]>([])
+const attendance = ref<AttendanceRecordDto[]>([])
+const stats = ref<AttendanceStatsDto>({
   totalClasses: 0,
   attendedClasses: 0,
-  absenceRate: 0
+  attendanceRate: 0
 })
 
+// Computed properties
+const formattedStats = computed(() => ({
+  totalClasses: stats.value.totalClasses || 0,
+  attendedClasses: stats.value.attendedClasses || 0,
+  absenceRate: 100 - (stats.value.attendanceRate || 0)
+}))
+
 // Table columns
-const groupColumns = [
+const groupColumns: Column[] = [
   { key: 'groupName', label: 'Group' },
   { key: 'subjectName', label: 'Subject' },
-  { key: 'professorName', label: 'Professor' },
-  { key: 'attendanceRate', label: 'Attendance Rate',
+  { 
+    key: 'attendanceRate',
+    label: 'Attendance Rate',
     render: (value: number) => `${value}%`
   }
 ]
 
-// Lifecycle hooks
-onMounted(async () => {
-  const studentId = Number(route.params.id)
-  if (studentId) {
-    await loadStudentData(studentId)
-  }
-})
-
-// Methods
+// Methods remain the same but with proper type annotations
 async function loadStudentData(studentId: number) {
   try {
-    await Promise.all([
-      studentStore.fetchStudentById(studentId),
-      loadStudentGroups(studentId),
-      loadStudentStats(studentId),
-      loadStudentAttendance(studentId)
+    const [userData, reportData] = await Promise.all([
+      userStore.fetchUserDetails(studentId),
+      reportStore.getStudentReport(studentId)
     ])
+
+    if (userData) {
+      student.value = {
+        ...userData,
+        studentId: userData.username,
+        cardId: null // Initialize with null since it's not in UserDetailsDto
+      } as ExtendedUserDetailsDto
+
+      if (userData.groups) {
+        groups.value = userData.groups.map(g => ({
+          ...g,
+          id: g.groupId || 0,
+          groupId: g.groupId || 0,
+          groupName: g.groupName || '',
+          subjectName: g.subjectName || '',
+          attendanceRate: 0
+        })) as ExtendedUserGroupDto[]
+      }
+    }
+
+    if (reportData) {
+      stats.value = {
+        totalClasses: reportData.totalClasses || 0,
+        attendedClasses: reportData.totalAttendance || 0,
+        attendanceRate: reportData.attendanceRate || 0
+      }
+    }
+
+    await loadStudentAttendance(studentId)
   } catch (err) {
     console.error('Failed to load student data:', err)
-  }
-}
-
-async function loadStudentGroups(studentId: number) {
-  isLoadingGroups.value = true
-  try {
-    const data = await studentStore.fetchStudentGroups(studentId)
-    groups.value = data.map((group: StudentGroupDetails) => ({
-      ...group,
-      id: group.groupId
-    }))
-  } catch (err) {
-    console.error('Failed to load student groups:', err)
-  } finally {
-    isLoadingGroups.value = false
-  }
-}
-
-async function loadStudentStats(studentId: number) {
-  try {
-    const data = await studentStore.getAttendanceStats(studentId)
-    stats.value = data
-  } catch (err) {
-    console.error('Failed to load attendance stats:', err)
   }
 }
 
 async function loadStudentAttendance(studentId: number) {
   isLoadingAttendance.value = true
   try {
-    const data = await studentStore.fetchStudentAttendance(studentId)
-    attendance.value = data
+    const records = await studentStore.fetchStudentAttendance(studentId)
+    attendance.value = records ?? [] 
   } catch (err) {
     console.error('Failed to load attendance records:', err)
+    attendance.value = []
   } finally {
     isLoadingAttendance.value = false
   }
 }
 
-async function handleUpdateStudent(updatedStudent: Partial<Student>) {
+async function handleUpdateStudent(updatedStudent: Partial<UpdateUserCommand>) {
   try {
     if (student.value?.id) {
-      await studentStore.updateStudent(student.value.id, updatedStudent)
+      await userStore.updateUser(student.value.id, {
+        ...updatedStudent,
+        id: student.value.id
+      })
+      await loadStudentData(student.value.id)
       showEditModal.value = false
     }
   } catch (err) {
@@ -232,4 +247,12 @@ async function handleUpdateStudent(updatedStudent: Partial<Student>) {
 function openEditModal() {
   showEditModal.value = true
 }
+
+// Lifecycle hooks
+onMounted(async () => {
+  const studentId = Number(route.params.id)
+  if (studentId) {
+    await loadStudentData(studentId)
+  }
+})
 </script>

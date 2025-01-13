@@ -3,8 +3,8 @@
     <div class="flex justify-between items-center">
       <h2 class="text-xl font-semibold">Attendance History</h2>
       <div class="flex gap-4">
-        <DatePicker v-model="startDate" placeholder="Start Date" />
-        <DatePicker v-model="endDate" placeholder="End Date" />
+        <DatePicker v-model="startDateStr" placeholder="Start Date" />
+        <DatePicker v-model="endDateStr" placeholder="End Date" />
         <Button @click="loadAttendance">Filter</Button>
       </div>
     </div>
@@ -28,10 +28,10 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <tr v-for="record in records" :key="record.id">
-          <td>{{ formatDate(record.checkInTime) }}</td>
+        <tr v-for="(record, index) in records" :key="index">
+          <td>{{ record.checkInTime ? formatDate(new Date(record.checkInTime)) : '' }}</td>
           <td>{{ record.courseName }}</td>
-          <td>{{ record.professorName }}</td>
+          <td>{{ record.professor }}</td>
           <td>{{ record.checkInMethod }}</td>
           <td>
             <Badge :status="record.isConfirmed ? 'success' : 'warning'">
@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAttendanceStore } from '@/stores/attendance.store';
 import { formatDate } from '@/utils/dateUtils';
@@ -55,17 +55,31 @@ import Spinner from '@/shared/components/ui/Spinner.vue';
 import Badge from '@/shared/components/ui/Badge.vue';
 
 const attendanceStore = useAttendanceStore();
-const startDate = ref<string>();
-const endDate = ref<string>();
 
+// Date handling with proper typing
+const startDateStr = ref<string>('');
+const endDateStr = ref<string>('');
+
+// Convert string dates to Date objects
+const startDate = computed(() => startDateStr.value ? new Date(startDateStr.value) : undefined);
+const endDate = computed(() => endDateStr.value ? new Date(endDateStr.value) : undefined);
+
+// Store refs with proper typing
 const { records, isLoading } = storeToRefs(attendanceStore);
 
+// Methods
 async function loadAttendance() {
-  const start = startDate.value ? new Date(startDate.value) : undefined;
-  const end = endDate.value ? new Date(endDate.value) : undefined;
-  await attendanceStore.fetchAttendance(start, end);
+  try {
+    await attendanceStore.fetchAttendance(
+      startDate.value,
+      endDate.value
+    );
+  } catch (err) {
+    console.error('Failed to load attendance:', err);
+  }
 }
 
+// Lifecycle hooks
 onMounted(() => {
   loadAttendance();
 });

@@ -63,54 +63,78 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useStudentStore } from '@/stores/student.store'
 import { useDepartmentStore } from '@/stores/department.store'
-import type { Student } from '@/types/student.types'
+import { useUserStore } from '@/stores/user.store'
+import type { 
+  UserDetailsDto, 
+  RegisterStudentCommand,
+  UpdateUserCommand
+} from '@/api/generated/data-contracts'
+import type { TableItem, Column } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import StudentForm from '../components/StudentForm.vue'
-import type { TableItem } from '@/types/tableItem.types'
 
+// Store setup
 const router = useRouter()
 const studentStore = useStudentStore()
 const departmentStore = useDepartmentStore()
+const userStore = useUserStore()
 
 const { students, isLoading } = storeToRefs(studentStore)
 const { departments } = storeToRefs(departmentStore)
 
+// Component state
 const showModal = ref(false)
-const selectedStudent = ref<Student | null>(null)
+const selectedStudent = ref<UserDetailsDto | null>(null)
 const selectedDepartment = ref('')
 const selectedStatus = ref('')
 
-const columns = [
-  { key: 'studentId', label: 'Student ID' },
-  { key: 'fullName', label: 'Full Name' },
+const columns: Column<TableItem>[] = [
+  { key: 'username', label: 'Student ID' },
+  { 
+    key: 'fullName', 
+    label: 'Full Name', 
+    render: (value: any) => {
+      // Since we need the whole item, not just the value,
+      // use the value parameter which contains the full item for this column
+      const student = value as UserDetailsDto
+      return `${student.firstName} ${student.lastName}`
+    }
+  },
   { key: 'departmentName', label: 'Department' },
   { key: 'email', label: 'Email' },
-  { key: 'isActive', label: 'Status',
-    render: (value: boolean) => value ? 'Active' : 'Inactive'
+  { 
+    key: 'isActive', 
+    label: 'Status',
+    render: (value: any) => (value as boolean) ? 'Active' : 'Inactive'
   }
 ]
 
+// Table actions
 const tableActions = [
   { 
     label: 'View Details', 
     icon: 'visibility', 
-    action: (item: TableItem) => handleViewDetails(item as Student)
+    action: (item: TableItem) => handleViewDetails(item as UserDetailsDto)
   },
   { 
     label: 'Edit', 
     icon: 'edit', 
-    action: (item: TableItem) => handleEdit(item as Student)
+    action: (item: TableItem) => handleEdit(item as UserDetailsDto)
   }
 ]
 
+// Computed properties
 const modalTitle = computed(() => 
   selectedStudent.value ? 'Edit Student' : 'Add Student'
 )
 
 const filteredStudents = computed(() => {
-  let filtered = [...students.value]
+  let filtered = [...students.value].map(student => ({
+    ...student,
+    id: student.id || 0
+  })) as (UserDetailsDto & TableItem)[]
   
   if (selectedDepartment.value) {
     filtered = filtered.filter(s => s.departmentId === Number(selectedDepartment.value))
@@ -123,41 +147,57 @@ const filteredStudents = computed(() => {
   return filtered
 })
 
-onMounted(async () => {
-  await Promise.all([
-    studentStore.fetchStudents(),
-    departmentStore.fetchDepartments()
-  ])
-})
-
+// Methods
 function openCreateModal() {
   selectedStudent.value = null
   showModal.value = true
 }
 
-function handleViewDetails(student: Student) {
-  router.push(`/dashboard/students/${student.id}`)
+function handleViewDetails(student: UserDetailsDto) {
+  if (student.id) {
+    router.push(`/dashboard/students/${student.id}`)
+  }
 }
 
-function handleEdit(student: Student) {
+function handleEdit(student: UserDetailsDto) {
   selectedStudent.value = student
   showModal.value = true
 }
 
-async function handleSubmit(studentData: Partial<Student>) {
+async function handleSubmit(data: RegisterStudentCommand) {
   try {
     if (selectedStudent.value?.id) {
-      await studentStore.updateStudent(selectedStudent.value.id, studentData)
+      // For updates, use userStore.updateUser
+      const updateData: UpdateUserCommand = {
+        id: selectedStudent.value.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        departmentId: data.departmentId,
+        isActive: selectedStudent.value.isActive
+      }
+      await userStore.updateUser(selectedStudent.value.id, updateData)
     } else {
-      await studentStore.createStudent(studentData)
+      // For creation, use studentStore.createStudent
+      await studentStore.createStudent(data)
     }
     showModal.value = false
+    // Refresh the students list after update/create
+    await studentStore.fetchStudentsList()
   } catch (err) {
     console.error('Failed to save student:', err)
   }
 }
 
 function handleRowClick(student: TableItem) {
-  handleViewDetails(student as Student)
+  handleViewDetails(student as UserDetailsDto)
 }
+
+// Lifecycle hooks
+onMounted(async () => {
+  await Promise.all([
+    studentStore.fetchStudentsList(),
+    departmentStore.fetchDepartments()
+  ])
+})
 </script>

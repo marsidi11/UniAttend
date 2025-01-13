@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Subject } from '@/types/subject.types';
-import { subjectApi } from '@/api/endpoints/subjectApi';
+import type { SubjectDto, CreateSubjectCommand, UpdateSubjectCommand } from '@/api/generated/data-contracts';
+import { Subjects } from '@/api/generated/Subjects';
+
+const subjectApi = new Subjects();
 
 export const useSubjectStore = defineStore('subject', () => {
   // State
-  const subjects = ref<Subject[]>([]);
-  const currentSubject = ref<Subject | null>(null);
+  const subjects = ref<SubjectDto[]>([]);
+  const currentSubject = ref<SubjectDto | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -16,34 +18,23 @@ export const useSubjectStore = defineStore('subject', () => {
   );
 
   const subjectsByDepartment = computed(() => {
-    const grouped = new Map();
+    const grouped = new Map<string, SubjectDto[]>();
     subjects.value.forEach(subject => {
       const dept = subject.departmentName;
       if (!grouped.has(dept)) {
         grouped.set(dept, []);
       }
-      grouped.get(dept).push(subject);
+      grouped.get(dept)?.push(subject);
     });
     return grouped;
   });
 
   // Actions
-  async function fetchSubjects(departmentId?: number) {
+  async function fetchSubjects(filters?: { departmentId?: number; isActive?: boolean }) {
     isLoading.value = true;
     try {
-      const { data } = await subjectApi.getAll(departmentId);
+      const { data } = await subjectApi.subjectsList(filters);
       subjects.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function fetchSubjectGroups(subjectId: number): Promise<StudyGroup[]> {
-    isLoading.value = true;
-    try {
-      const { data } = await subjectApi.getGroups(subjectId);
       return data;
     } catch (err) {
       handleError(err);
@@ -56,20 +47,9 @@ export const useSubjectStore = defineStore('subject', () => {
   async function fetchSubjectById(id: number) {
     isLoading.value = true;
     try {
-      const { data } = await subjectApi.getById(id);
+      const { data } = await subjectApi.subjectsDetail(id);
       currentSubject.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function createSubject(subject: Partial<Subject>) {
-    isLoading.value = true;
-    try {
-      const { data } = await subjectApi.create(subject);
-      subjects.value.push(data);
+      return data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -78,16 +58,48 @@ export const useSubjectStore = defineStore('subject', () => {
     }
   }
 
-  async function updateSubject(id: number, subject: Partial<Subject>) {
+  async function createSubject(subject: CreateSubjectCommand) {
     isLoading.value = true;
     try {
-      const { data } = await subjectApi.update(id, subject);
+      const { data } = await subjectApi.subjectsCreate(subject);
+      subjects.value.push(data);
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateSubject(id: number, subject: UpdateSubjectCommand) {
+    isLoading.value = true;
+    try {
+      await subjectApi.subjectsUpdate(id, { id, ...subject });
+      const updatedSubject = await subjectApi.subjectsDetail(id);
       const index = subjects.value.findIndex(s => s.id === id);
       if (index !== -1) {
-        subjects.value[index] = data;
+        subjects.value[index] = updatedSubject.data;
       }
       if (currentSubject.value?.id === id) {
-        currentSubject.value = data;
+        currentSubject.value = updatedSubject.data;
+      }
+      return updatedSubject.data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function deleteSubject(id: number) {
+    isLoading.value = true;
+    try {
+      await subjectApi.subjectsDelete(id);
+      subjects.value = subjects.value.filter(s => s.id !== id);
+      if (currentSubject.value?.id === id) {
+        currentSubject.value = null;
       }
     } catch (err) {
       handleError(err);
@@ -115,8 +127,8 @@ export const useSubjectStore = defineStore('subject', () => {
     // Actions
     fetchSubjects,
     fetchSubjectById,
-    fetchSubjectGroups,
     createSubject,
-    updateSubject
+    updateSubject,
+    deleteSubject
   };
 });

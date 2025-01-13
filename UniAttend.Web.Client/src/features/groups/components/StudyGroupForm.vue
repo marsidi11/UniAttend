@@ -82,27 +82,31 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useProfessorStore } from '@/stores/professor.store'
+import { useUserStore } from '@/stores/user.store'
 import { useAcademicYearStore } from '@/stores/academicYear.store'
 import Button from '@/shared/components/ui/Button.vue'
-import type { StudyGroup } from '@/types/group.types'
-import type { Subject } from '@/types/subject.types'
+import type { 
+  StudyGroupDto,
+  CreateGroupCommand,
+  UpdateGroupCommand,
+  SubjectDto
+} from '@/api/generated/data-contracts'
 
 interface Props {
-  group?: StudyGroup | null
-  subjects: Subject[]
+  group?: StudyGroupDto | null
+  subjects: Array<SubjectDto>
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'submit', data: Partial<StudyGroup>): void
+  (e: 'submit', data: Partial<CreateGroupCommand | UpdateGroupCommand>): void
   (e: 'cancel'): void
 }>()
 
-const professorStore = useProfessorStore()
+const userStore = useUserStore()
 const academicYearStore = useAcademicYearStore()
 
-const { professors } = storeToRefs(professorStore)
+const { users } = storeToRefs(userStore)
 const { academicYears } = storeToRefs(academicYearStore)
 
 const isLoading = ref(false)
@@ -114,25 +118,24 @@ const form = ref({
   isActive: true
 })
 
-// Get professors who can teach the selected subject
-const availableProfessors = computed(() => {
-  if (!form.value.subjectId) return professors.value
-  return professors.value.filter(p => 
-    p.isActive && (p.subjects?.includes(form.value.subjectId) ?? false)
-  )
-})
+// Filter professors from users - using role 2 for Professor
+const professors = computed(() => 
+  users.value.filter(user => user.role === 2 && user.isActive)
+)
+
+// Since professors aren't pre-assigned to subjects in DB, show all professors
+const availableProfessors = computed(() => professors.value)
 
 watch(() => props.group, (newGroup) => {
   if (newGroup) {
     form.value = {
-      name: newGroup.name,
-      subjectId: newGroup.subjectId,
-      professorId: newGroup.professorId,
-      academicYearId: newGroup.academicYearId,
-      isActive: newGroup.isActive
+      name: newGroup.name ?? '',
+      subjectId: newGroup.subjectId ?? 0,
+      professorId: newGroup.professorId ?? 0,
+      academicYearId: newGroup.academicYearId ?? 0,
+      isActive: newGroup.isActive ?? true
     }
   } else {
-    // Reset form for new group
     form.value = {
       name: '',
       subjectId: 0,
@@ -144,9 +147,8 @@ watch(() => props.group, (newGroup) => {
 }, { immediate: true })
 
 onMounted(async () => {
-  // Load required data if not already loaded
-  if (!professors.value.length) {
-    await professorStore.fetchProfessors()
+  if (!users.value.length) {
+    await userStore.fetchUsers({ role: 2, isActive: true })
   }
   if (!academicYears.value.length) {
     await academicYearStore.fetchAcademicYears()

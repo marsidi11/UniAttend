@@ -46,10 +46,10 @@ namespace UniAttend.API.Controllers
             var query = new GetUsersQuery { Id = id };
             var result = await _mediator.Send(query, cancellationToken);
             var user = result.FirstOrDefault();
-            
+
             if (user == null)
                 return NotFound();
-                
+
             return Ok(user);
         }
 

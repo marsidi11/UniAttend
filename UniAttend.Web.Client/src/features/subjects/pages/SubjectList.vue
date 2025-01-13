@@ -63,25 +63,33 @@ import { storeToRefs } from 'pinia'
 import { useSubjectStore } from '@/stores/subject.store'
 import { useDepartmentStore } from '@/stores/department.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { Subject } from '@/types/subject.types'
+import type { 
+  SubjectDto,
+  CreateSubjectCommand,
+  UpdateSubjectCommand 
+} from '@/api/generated/data-contracts'
+import type { TableItem } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import SubjectForm from '../components/SubjectForm.vue'
-import type { TableItem } from '@/types/tableItem.types'
 
+// Store initialization
 const subjectStore = useSubjectStore()
 const departmentStore = useDepartmentStore()
 const authStore = useAuthStore()
 
+// Store refs
 const { subjects, isLoading } = storeToRefs(subjectStore)
 const { departments } = storeToRefs(departmentStore)
 
+// Component state
 const showModal = ref(false)
-const selectedSubject = ref<Subject | null>(null)
+const selectedSubject = ref<SubjectDto | null>(null)
 const selectedDepartment = ref('')
 const selectedStatus = ref('')
 
+// Computed properties
 const isAdmin = computed(() => authStore.userRole === 'admin')
 
 const columns = [
@@ -96,12 +104,12 @@ const tableActions = computed(() => isAdmin.value ? [
   { 
     label: 'Edit', 
     icon: 'edit', 
-    action: (item: TableItem) => handleEdit(item as Subject)
+    action: (item: TableItem) => handleEdit(item as SubjectDto)
   },
   { 
     label: 'Delete', 
     icon: 'delete', 
-    action: (item: TableItem) => handleDelete(item as Subject)
+    action: (item: TableItem) => handleDelete(item as SubjectDto)
   }
 ] : undefined)
 
@@ -110,7 +118,10 @@ const modalTitle = computed(() =>
 )
 
 const filteredSubjects = computed(() => {
-  let filtered = [...subjects.value]
+  let filtered = [...subjects.value].map(subject => ({
+    ...subject,
+    id: subject.id || 0
+  })) as (SubjectDto & TableItem)[]
   
   if (selectedDepartment.value) {
     filtered = filtered.filter(s => s.departmentId === Number(selectedDepartment.value))
@@ -123,28 +134,25 @@ const filteredSubjects = computed(() => {
   return filtered
 })
 
-onMounted(async () => {
-  await Promise.all([
-    subjectStore.fetchSubjects(),
-    departmentStore.fetchDepartments()
-  ])
-})
-
+// Methods
 function openCreateModal() {
   selectedSubject.value = null
   showModal.value = true
 }
 
-function handleEdit(subject: Subject) {
+function handleEdit(subject: SubjectDto) {
   selectedSubject.value = subject
   showModal.value = true
 }
 
-async function handleDelete(subject: Subject) {
+async function handleDelete(subject: SubjectDto) {
   if (confirm('Are you sure you want to delete this subject?')) {
     try {
       if (subject.id) {
-        await subjectStore.updateSubject(subject.id, { isActive: false })
+        await subjectStore.updateSubject(subject.id, { 
+          id: subject.id,
+          isActive: false 
+        } as UpdateSubjectCommand)
       }
     } catch (err) {
       console.error('Failed to delete subject:', err)
@@ -152,12 +160,12 @@ async function handleDelete(subject: Subject) {
   }
 }
 
-async function handleSubmit(subject: Partial<Subject>) {
+async function handleSubmit(data: CreateSubjectCommand | UpdateSubjectCommand) {
   try {
     if (selectedSubject.value?.id) {
-      await subjectStore.updateSubject(selectedSubject.value.id, subject)
+      await subjectStore.updateSubject(selectedSubject.value.id, data as UpdateSubjectCommand)
     } else {
-      await subjectStore.createSubject(subject)
+      await subjectStore.createSubject(data as CreateSubjectCommand)
     }
     showModal.value = false
   } catch (err) {
@@ -168,4 +176,12 @@ async function handleSubmit(subject: Partial<Subject>) {
 function handleRowClick(subject: TableItem) {
   console.log('Subject clicked:', subject)
 }
+
+// Lifecycle hooks
+onMounted(async () => {
+  await Promise.all([
+    subjectStore.fetchSubjects(),
+    departmentStore.fetchDepartments()
+  ])
+})
 </script>

@@ -1,16 +1,18 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { 
-  AcademicYear, 
-  CreateAcademicYearRequest,
-  UpdateAcademicYearRequest 
-} from '@/types/academicYear.types';
-import { academicYearApi } from '@/api/endpoints/academicYearApi';
+  AcademicYearDto,
+  CreateAcademicYearCommand,
+  UpdateAcademicYearCommand 
+} from '@/api/generated/data-contracts';
+import { AcademicYear } from '@/api/generated/AcademicYear';
+
+const academicYearApi = new AcademicYear();
 
 export const useAcademicYearStore = defineStore('academicYear', () => {
   // State
-  const academicYears = ref<AcademicYear[]>([]);
-  const currentYear = ref<AcademicYear | null>(null);
+  const academicYears = ref<AcademicYearDto[]>([]);
+  const currentYear = ref<AcademicYearDto | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -21,7 +23,7 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
 
   const sortedYears = computed(() => 
     [...academicYears.value].sort((a, b) => 
-      new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      new Date(b.startDate!).getTime() - new Date(a.startDate!).getTime()
     )
   );
 
@@ -33,31 +35,35 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
   async function fetchAcademicYears() {
     isLoading.value = true;
     try {
-      const { data } = await academicYearApi.getAll();
+      const { data } = await academicYearApi.academicYearList();
       academicYears.value = data;
+      return data;
     } catch (err) {
       handleError(err);
+      throw err;
     } finally {
       isLoading.value = false;
     }
   }
 
-  async function fetchCurrentAcademicYear() {
+  async function fetchActiveAcademicYear() {
     isLoading.value = true;
     try {
-      const { data } = await academicYearApi.getCurrent();
+      const { data } = await academicYearApi.academicYearActiveList();
       currentYear.value = data;
+      return data;
     } catch (err) {
       handleError(err);
+      throw err;
     } finally {
       isLoading.value = false;
     }
   }
 
-  async function createAcademicYear(year: CreateAcademicYearRequest) {
+  async function createAcademicYear(year: CreateAcademicYearCommand) {
     isLoading.value = true;
     try {
-      const { data } = await academicYearApi.create(year);
+      const { data } = await academicYearApi.academicYearCreate(year);
       academicYears.value.push(data);
       return data;
     } catch (err) {
@@ -68,18 +74,14 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
     }
   }
 
-  async function updateAcademicYear(id: number, year: UpdateAcademicYearRequest) {
+  async function updateAcademicYear(id: number, year: UpdateAcademicYearCommand) {
     isLoading.value = true;
     try {
-      const { data } = await academicYearApi.update(id, year);
-      const index = academicYears.value.findIndex(y => y.id === id);
-      if (index !== -1) {
-        academicYears.value[index] = data;
-      }
+      await academicYearApi.academicYearUpdate(id, year);
+      await fetchAcademicYears(); // Refresh list
       if (currentYear.value?.id === id) {
-        currentYear.value = data;
+        await fetchActiveAcademicYear(); // Refresh current if updated
       }
-      return data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -88,11 +90,11 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
     }
   }
 
-  async function deleteAcademicYear(id: number) {
+  async function closeAcademicYear(id: number) {
     isLoading.value = true;
     try {
-      await academicYearApi.delete(id);
-      academicYears.value = academicYears.value.filter(y => y.id !== id);
+      await academicYearApi.academicYearCloseCreate(id);
+      await fetchAcademicYears(); // Refresh list
       if (currentYear.value?.id === id) {
         currentYear.value = null;
       }
@@ -101,16 +103,6 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
       throw err;
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  async function checkDateOverlap(startDate: Date, endDate: Date, excludeId?: number) {
-    try {
-      const { data } = await academicYearApi.checkOverlap(startDate, endDate, excludeId);
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
     }
   }
 
@@ -132,10 +124,9 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
 
     // Actions
     fetchAcademicYears,
-    fetchCurrentAcademicYear,
+    fetchActiveAcademicYear,
     createAcademicYear,
     updateAcademicYear,
-    deleteAcademicYear,
-    checkDateOverlap
+    closeAcademicYear
   };
 });

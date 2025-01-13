@@ -54,16 +54,16 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import Button from '@/shared/components/ui/Button.vue'
-import type { AcademicYear } from '@/types/academicYear.types'
+import type { AcademicYearDto, CreateAcademicYearCommand } from '@/api/generated/data-contracts'
 
 interface Props {
-  academicYear?: AcademicYear | null
+  academicYear?: AcademicYearDto | null
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'submit', data: Partial<AcademicYear>): void
-  (e: 'cancel'): void
+  (e: 'submit', data: CreateAcademicYearCommand): void;
+  (e: 'cancel'): void;
 }>()
 
 const isLoading = ref(false)
@@ -77,15 +77,15 @@ const form = ref({
 watch(() => props.academicYear, (newYear) => {
   if (newYear) {
     form.value = {
-      name: newYear.name,
-      startDate: formatDateForInput(newYear.startDate),
-      endDate: formatDateForInput(newYear.endDate),
-      isActive: newYear.isActive,
+      name: newYear.name ?? '',
+      startDate: formatDateForInput(newYear.startDate ?? ''),
+      endDate: formatDateForInput(newYear.endDate ?? ''),
+      isActive: newYear.isActive ?? true,
     }
   }
 }, { immediate: true })
 
-function formatDateForInput(date: Date | string): string {
+function formatDateForInput(date: string): string {
   return new Date(date).toISOString().split('T')[0]
 }
 
@@ -94,9 +94,8 @@ async function handleSubmit() {
     isLoading.value = true
     emit('submit', {
       name: form.value.name,
-      startDate: form.value.startDate ? new Date(form.value.startDate) : undefined,
-      endDate: form.value.endDate ? new Date(form.value.endDate) : undefined,
-      isActive: form.value.isActive
+      startDate: form.value.startDate ? new Date(form.value.startDate).toISOString() : undefined,
+      endDate: form.value.endDate ? new Date(form.value.endDate).toISOString() : undefined
     })
   } finally {
     isLoading.value = false

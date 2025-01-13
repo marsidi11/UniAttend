@@ -1,13 +1,22 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { StudyGroup, GroupStudent } from '@/types/group.types';
-import { groupApi } from '@/api/endpoints/groupApi';
+import type { 
+  StudyGroupDto,
+  GroupStudentDto,
+  CreateGroupCommand,
+  UpdateGroupCommand,
+  EnrollStudentsCommand,
+  TransferStudentCommand 
+} from '@/api/generated/data-contracts';
+import { Groups } from '@/api/generated/Groups';
+
+const groupApi = new Groups();
 
 export const useGroupStore = defineStore('group', () => {
   // State
-  const groups = ref<StudyGroup[]>([]);
-  const currentGroup = ref<StudyGroup | null>(null);
-  const groupStudents = ref<GroupStudent[]>([]);
+  const groups = ref<StudyGroupDto[]>([]);
+  const currentGroup = ref<StudyGroupDto | null>(null);
+  const groupStudents = ref<GroupStudentDto[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -17,50 +26,26 @@ export const useGroupStore = defineStore('group', () => {
   );
 
   const groupsBySubject = computed(() => {
-    const grouped = new Map();
+    const grouped = new Map<string, StudyGroupDto[]>();
     groups.value.forEach(group => {
-      const subject = group.subjectName;
+      const subject = group.subjectName || 'Unassigned';
       if (!grouped.has(subject)) {
         grouped.set(subject, []);
       }
-      grouped.get(subject).push(group);
+      grouped.get(subject)?.push(group);
     });
     return grouped;
   });
 
   // Actions
-  async function fetchGroups(academicYearId?: number) {
+  async function fetchGroups(professorId?: number, academicYearId?: number) {
     isLoading.value = true;
     try {
-      const { data } = await groupApi.getAll(academicYearId);
+      const { data } = professorId 
+        ? await groupApi.groupsProfessorDetail(professorId, { academicYearId })
+        : await groupApi.groupsList();
       groups.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function fetchGroupById(id: number) {
-    isLoading.value = true;
-    try {
-      const { data } = await groupApi.getById(id);
-      currentGroup.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function updateGroup(id: number, data: Partial<StudyGroup>) {
-    isLoading.value = true;
-    try {
-      const response = await groupApi.update(id, data);
-      if (currentGroup.value?.id === id) {
-        currentGroup.value = { ...currentGroup.value, ...response.data };
-      }
-      return response.data;
+      return data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -69,10 +54,24 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function createGroup(groupData: Partial<StudyGroup>) {
+  async function fetchGroupById(id: number) {
     isLoading.value = true;
     try {
-      const { data } = await groupApi.create(groupData);
+      const { data } = await groupApi.groupsDetail(id);
+      currentGroup.value = data;
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function createGroup(group: CreateGroupCommand) {
+    isLoading.value = true;
+    try {
+      const { data } = await groupApi.groupsCreate(group);
       groups.value.push(data);
       return data;
     } catch (err) {
@@ -83,23 +82,16 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function fetchGroupStudents(groupId: number) {
+  async function updateGroup(id: number, group: UpdateGroupCommand) {
     isLoading.value = true;
     try {
-      const { data } = await groupApi.getStudents(groupId);
-      groupStudents.value = data;
-    } catch (err) {
-      handleError(err);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function addStudentToGroup(groupId: number, studentId: number) {
-    isLoading.value = true;
-    try {
-      await groupApi.addStudent(groupId, studentId);
-      await fetchGroupStudents(groupId);
+      await groupApi.groupsUpdate(id, { id, ...group });
+      const updatedGroup = await fetchGroupById(id);
+      const index = groups.value.findIndex(g => g.id === id);
+      if (index !== -1) {
+        groups.value[index] = updatedGroup;
+      }
+      return updatedGroup;
     } catch (err) {
       handleError(err);
       throw err;
@@ -108,10 +100,37 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function removeStudentFromGroup(groupId: number, studentId: number) {
+  async function fetchGroupStudents(id: number) {
     isLoading.value = true;
     try {
-      await groupApi.removeStudent(groupId, studentId);
+      const { data } = await groupApi.groupsStudentsDetail(id);
+      groupStudents.value = data;
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function enrollStudents(id: number, studentIds: number[]) {
+    isLoading.value = true;
+    try {
+      await groupApi.groupsStudentsEnrollCreate(id, { groupId: id, studentIds });
+      await fetchGroupStudents(id);
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function removeStudent(groupId: number, studentId: number) {
+    isLoading.value = true;
+    try {
+      await groupApi.groupsStudentsDelete(groupId, studentId);
       groupStudents.value = groupStudents.value.filter(
         gs => gs.studentId !== studentId
       );
@@ -123,45 +142,13 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function enrollStudents(groupId: number, studentIds: number[]) {
+  async function transferStudent(data: TransferStudentCommand) {
     isLoading.value = true;
     try {
-      await groupApi.enrollStudents(groupId, studentIds);
-      await fetchGroupStudents(groupId);
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-  
-  async function unenrollStudent(groupId: number, studentId: number) {
-    isLoading.value = true;
-    try {
-      await groupApi.unenrollStudent(groupId, studentId);
-      groupStudents.value = groupStudents.value
-        .filter(gs => gs.studentId !== studentId);
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-  
-  async function transferStudent(
-    studentId: number, 
-    fromGroupId: number, 
-    toGroupId: number
-  ) {
-    isLoading.value = true;
-    try {
-      await groupApi.transferStudent(studentId, fromGroupId, toGroupId);
-      await Promise.all([
-        fetchGroupStudents(fromGroupId),
-        fetchGroupStudents(toGroupId)
-      ]);
+      await groupApi.groupsTransferStudentCreate(data);
+      if (currentGroup.value?.id) {
+        await fetchGroupStudents(currentGroup.value.id);
+      }
     } catch (err) {
       handleError(err);
       throw err;
@@ -189,13 +176,11 @@ export const useGroupStore = defineStore('group', () => {
     // Actions
     fetchGroups,
     fetchGroupById,
-    fetchGroupStudents,
-    updateGroup,
     createGroup,
-    addStudentToGroup,
-    removeStudentFromGroup,
+    updateGroup,
+    fetchGroupStudents,
     enrollStudents,
-    unenrollStudent,
+    removeStudent,
     transferStudent
   };
 });

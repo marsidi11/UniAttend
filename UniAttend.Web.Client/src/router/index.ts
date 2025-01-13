@@ -27,7 +27,7 @@ import UserProfile from '@/features/users/pages/UserProfile.vue';
 import StudentList from '@/features/students/pages/StudentList.vue';
 import StudentDetails from '@/features/students/pages/StudentDetails.vue';
 import ProfessorList from '@/features/professors/pages/ProfessorList.vue';
-import CardManagement from '@/features/cards/pages/CardManagement.vue';
+// import CardManagement from '@/features/cards/pages/CardManagement.vue';
 
 // Schedule & Groups
 import ScheduleManager from '@/features/schedule/pages/ScheduleManager.vue';
@@ -133,12 +133,12 @@ const routes = [
         component: StudentDetails,
         meta: { roles: ['secretary'] }
       },
-      {
-        path: 'cards',
-        name: 'card-management',
-        component: CardManagement,
-        meta: { roles: ['secretary'] }
-      },
+      // {
+      //   path: 'cards',
+      //   name: 'card-management',
+      //   component: CardManagement,
+      //   meta: { roles: ['secretary'] }
+      // },
       {
         path: 'schedule',
         name: 'schedule',

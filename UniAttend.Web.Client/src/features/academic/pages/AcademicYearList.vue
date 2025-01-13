@@ -46,8 +46,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import Button from '@/shared/components/ui/Button.vue'
-import type { Subject } from '@/types/subject.types'
-import type { Department } from '@/types/department.types'
+import type { DepartmentDto, SubjectDto } from '@/api/generated/data-contracts'
 
 interface FormData {
   name: string;
@@ -56,8 +55,8 @@ interface FormData {
 }
 
 interface Props {
-  subject?: Subject | null;
-  departments: Department[];
+  subject?: SubjectDto | null;
+  departments: DepartmentDto[];
 }
 
 const props = defineProps<Props>()
@@ -76,9 +75,9 @@ const form = ref<FormData>({
 watch(() => props.subject, (newSubject) => {
   if (newSubject) {
     form.value = {
-      name: newSubject.name,
-      departmentId: newSubject.departmentId,
-      isActive: newSubject.isActive,
+      name: newSubject.name ?? '',
+      departmentId: newSubject.departmentId ?? 0,
+      isActive: newSubject.isActive ?? true,
     }
   }
 }, { immediate: true })

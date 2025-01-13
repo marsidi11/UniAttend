@@ -76,18 +76,6 @@
       />
     </div>
 
-    <!-- Active Status -->
-    <div>
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          v-model="form.isActive"
-          class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-        />
-        <span class="ml-2 text-sm text-gray-600">Active</span>
-      </label>
-    </div>
-
     <div class="flex justify-end space-x-3">
       <Button type="button" variant="secondary" @click="$emit('cancel')">Cancel</Button>
       <Button type="submit" :loading="isLoading">Save</Button>
@@ -98,41 +86,42 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import Button from '@/shared/components/ui/Button.vue'
-import type { Department } from '@/types/department.types'
-import type { StudentProfile } from '@/types/student.types'
+import type { 
+  RegisterStudentCommand, 
+  DepartmentDto,
+  UserDetailsDto 
+} from '@/api/generated/data-contracts'
 
 interface Props {
-  student?: StudentProfile | null
-  departments: Department[]
+  student?: UserDetailsDto | null
+  departments: DepartmentDto[]
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'submit', data: Partial<StudentProfile>): void
+  (e: 'submit', data: RegisterStudentCommand): void
   (e: 'cancel'): void
 }>()
 
 const isLoading = ref(false)
-const form = ref({
+const form = ref<RegisterStudentCommand>({
   firstName: '',
   lastName: '',
   studentId: '',
   email: '',
   departmentId: 0,
-  cardId: '',
-  isActive: true
+  cardId: ''
 })
 
 watch(() => props.student, (newStudent) => {
   if (newStudent) {
     form.value = {
-      firstName: newStudent.firstName,
-      lastName: newStudent.lastName,
-      studentId: newStudent.studentId,
-      email: newStudent.email,
-      departmentId: newStudent.departmentId,
-      cardId: newStudent.cardId || '',
-      isActive: newStudent.isActive
+      firstName: newStudent.firstName ?? '',
+      lastName: newStudent.lastName ?? '',
+      studentId: newStudent.username ?? '',
+      email: newStudent.email ?? '',
+      departmentId: newStudent.departmentId ?? 0,
+      cardId: ''
     }
   }
 }, { immediate: true })

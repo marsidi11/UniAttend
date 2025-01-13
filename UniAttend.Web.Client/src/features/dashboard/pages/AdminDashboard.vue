@@ -7,23 +7,13 @@
 
     <!-- Key System Stats -->
     <div class="grid grid-cols-3 gap-4">
-      <StatCard
-        title="Academic Year Status"
-        :value="stats.currentYear"
+      <StatCard title="Academic Year Status" :value="stats.currentYear"
         :status="stats.isAcademicYearActive ? 'success' : 'warning'"
-        :subtitle="stats.isAcademicYearActive ? 'Active' : 'Not Set'"
-      />
-      <StatCard
-        title="Departments"
-        :value="stats.activeDepartments"
-        :total="stats.totalDepartments"
-        subtitle="Active/Total"
-      />
-      <StatCard
-        title="Staff Members"
-        :value="stats.activeStaff"
-        :subtitle="`${stats.secretaryCount} Secretaries, ${stats.professorCount} Professors`"
-      />
+        :subtitle="stats.isAcademicYearActive ? 'Active' : 'Not Set'" />
+      <StatCard title="Departments" :value="stats.activeDepartments" :total="stats.totalDepartments"
+        subtitle="Active/Total" />
+      <StatCard title="Staff Members" :value="stats.activeStaff"
+        :subtitle="`${stats.secretaryCount} Secretaries, ${stats.professorCount} Professors`" />
     </div>
 
     <!-- Main Management Sections -->
@@ -37,11 +27,8 @@
           </Button>
         </div>
         <div class="space-y-2">
-          <div 
-            v-for="dept in departments" 
-            :key="dept.id" 
-            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-          >
+          <div v-for="dept in departments" :key="dept.id"
+            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div>
               <span class="font-medium">{{ dept.name }}</span>
             </div>
@@ -49,11 +36,7 @@
               <Badge :status="dept.isActive ? 'success' : 'error'">
                 {{ dept.isActive ? 'Active' : 'Inactive' }}
               </Badge>
-              <Button 
-                @click="handleToggleDepartment(dept)"
-                variant="secondary"
-                size="sm"
-              >
+              <Button @click="handleToggleDepartment(dept)" variant="secondary" size="sm">
                 {{ dept.isActive ? 'Deactivate' : 'Activate' }}
               </Button>
             </div>
@@ -65,11 +48,7 @@
       <div class="bg-white p-6 rounded-lg shadow">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium">Academic Year</h2>
-          <Button 
-            @click="handleOpenAcademicYear" 
-            variant="primary"
-            :disabled="stats.isAcademicYearActive"
-          >
+          <Button @click="handleOpenAcademicYear" variant="primary" :disabled="stats.isAcademicYearActive">
             Set Academic Year
           </Button>
         </div>
@@ -78,16 +57,11 @@
             <div>
               <h3 class="font-medium">{{ currentAcademicYear.name }}</h3>
               <p class="text-sm text-gray-600">
-                {{ formatDate(currentAcademicYear.startDate) }} - 
-                {{ formatDate(currentAcademicYear.endDate) }}
+                {{ formatDate(new Date(currentAcademicYear.startDate || '')) }} -
+                {{ formatDate(new Date(currentAcademicYear.endDate || '')) }}
               </p>
             </div>
-            <Button 
-              v-if="currentAcademicYear.isActive"
-              @click="handleCloseAcademicYear" 
-              variant="danger"
-              size="sm"
-            >
+            <Button v-if="currentAcademicYear.isActive" @click="handleCloseAcademicYear" variant="danger" size="sm">
               Close Year
             </Button>
           </div>
@@ -123,12 +97,8 @@
           <h2 class="text-lg font-medium">System Reports</h2>
         </div>
         <div class="grid grid-cols-2 gap-4">
-          <div 
-            v-for="report in systemReports" 
-            :key="report.id"
-            @click="handleGenerateReport(report)"
-            class="p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-          >
+          <div v-for="report in systemReports" :key="report.id" @click="handleGenerateReport(report)"
+            class="p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
             <h3 class="font-medium">{{ report.name }}</h3>
             <p class="text-sm text-gray-600">{{ report.description }}</p>
           </div>
@@ -138,11 +108,8 @@
 
     <!-- Academic Year Modal -->
     <Modal v-model="showAcademicYearModal" title="Set Academic Year">
-      <AcademicYearForm
-        v-if="showAcademicYearModal"
-        @submit="handleAcademicYearSubmit"
-        @cancel="showAcademicYearModal = false"
-      />
+      <AcademicYearForm v-if="showAcademicYearModal" @submit="handleAcademicYearSubmit"
+        @cancel="showAcademicYearModal = false" />
     </Modal>
   </div>
 </template>
@@ -156,10 +123,13 @@ import { useAcademicYearStore } from '@/stores/academicYear.store'
 import { useUserStore } from '@/stores/user.store'
 import { formatDate } from '@/utils/dateUtils'
 
-// Types
-import type { Department } from '@/types/department.types'
-import type { AcademicYear, CreateAcademicYearRequest } from '@/types/academicYear.types'
-import type { User } from '@/types/user.types'
+// Import types from data-contracts
+import type {
+  UserDto,
+  DepartmentDto,
+  CreateAcademicYearCommand
+} from '@/api/generated/data-contracts'
+import { UserRole } from '@/api/generated/data-contracts'
 
 // Components
 import StatCard from '@/shared/components/ui/StatCard.vue'
@@ -206,7 +176,7 @@ async function loadDashboardData() {
   try {
     await Promise.all([
       departmentStore.fetchDepartments(),
-      academicYearStore.fetchCurrentAcademicYear(), // Changed from getCurrentYear
+      academicYearStore.fetchActiveAcademicYear(),
       userStore.fetchUsers()
     ])
     updateDashboardStats()
@@ -219,26 +189,28 @@ function updateDashboardStats() {
   if (!departments.value || !currentAcademicYear.value) return
 
   const activeDepts = departments.value.filter(d => d.isActive)
-  const staffMembers = users.value.filter((u: User) => u.role.toLowerCase() !== 'student')
+  const staffMembers = users.value.filter((u: UserDto) => u.role !== UserRole.Value4) // Value4 = Student
   
   stats.value = {
     currentYear: currentAcademicYear.value?.name || 'Not Set',
     isAcademicYearActive: currentAcademicYear.value?.isActive ?? false,
     activeDepartments: activeDepts.length,
     totalDepartments: departments.value.length,
-    activeStaff: staffMembers.filter((s: User) => s.isActive).length,
-    secretaryCount: staffMembers.filter((s: User) => s.role.toLowerCase() === 'secretary').length,
-    professorCount: staffMembers.filter((s: User) => s.role.toLowerCase() === 'professor').length
+    activeStaff: staffMembers.filter((s: UserDto) => s.isActive).length,
+    secretaryCount: staffMembers.filter((s: UserDto) => s.role === UserRole.Value2).length,
+    professorCount: staffMembers.filter((s: UserDto) => s.role === UserRole.Value3).length
   }
 }
 
-async function handleToggleDepartment(department: Department) {
+async function handleToggleDepartment(department: DepartmentDto) {
   try {
-    await departmentStore.updateDepartment(department.id, {
-      ...department,
-      isActive: !department.isActive
-    })
-    await loadDashboardData()
+    if (department.id) {
+      await departmentStore.updateDepartment(department.id, {
+        ...department,
+        isActive: !department.isActive
+      })
+      await loadDashboardData()
+    }
   } catch (error) {
     console.error('Failed to toggle department status:', error)
   }
@@ -248,13 +220,12 @@ function handleOpenAcademicYear() {
   showAcademicYearModal.value = true
 }
 
-async function handleAcademicYearSubmit(data: Partial<AcademicYear>) {
+async function handleAcademicYearSubmit(data: Partial<CreateAcademicYearCommand>) {
   try {
-    const createRequest: CreateAcademicYearRequest = {
+    const createRequest: CreateAcademicYearCommand = {
       name: data.name || '',
-      startDate: data.startDate || new Date(),
-      endDate: data.endDate || new Date(),
-      isActive: data.isActive
+      startDate: data.startDate || new Date().toISOString(),
+      endDate: data.endDate || new Date().toISOString()
     }
     await academicYearStore.createAcademicYear(createRequest)
     showAcademicYearModal.value = false
@@ -265,13 +236,10 @@ async function handleAcademicYearSubmit(data: Partial<AcademicYear>) {
 }
 
 async function handleCloseAcademicYear() {
-  if (!currentAcademicYear.value) return
+  if (!currentAcademicYear.value?.id) return
   
   try {
-    await academicYearStore.updateAcademicYear(currentAcademicYear.value.id, {
-      ...currentAcademicYear.value,
-      isActive: false
-    })
+    await academicYearStore.closeAcademicYear(currentAcademicYear.value.id)
     await loadDashboardData()
   } catch (error) {
     console.error('Failed to close academic year:', error)

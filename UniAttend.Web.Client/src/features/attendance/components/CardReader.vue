@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-medium">Card Reader</h3>
@@ -52,4 +52,4 @@ onMounted(() => {
   const cardInput = document.querySelector('input')
   if (cardInput) cardInput.focus()
 })
-</script>
+</script> -->

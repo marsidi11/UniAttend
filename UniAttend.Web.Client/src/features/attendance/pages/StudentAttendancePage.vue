@@ -7,15 +7,15 @@
     <div class="grid grid-cols-3 gap-4">
       <StatCard
         title="Total Classes"
-        :value="stats.totalClasses"
+        :value="stats.totalClasses || 0"
       />
       <StatCard
         title="Classes Attended"
-        :value="stats.attendedClasses"
+        :value="stats.attendedClasses || 0"
       />
       <StatCard
         title="Attendance Rate"
-        :value="`${stats.attendanceRate}%`"
+        :value="`${stats.attendanceRate || 0}%`"
       />
     </div>
 
@@ -30,15 +30,24 @@
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAttendanceStore } from '@/stores/attendance.store'
+import { useReportStore } from '@/stores/report.store'
 import StatCard from '@/shared/components/ui/StatCard.vue'
 import AttendanceList from '../components/AttendanceList.vue'
-import type { AttendanceRecord } from '@/types/attendance.types'
+import type { 
+  AttendanceRecordDto,
+  AttendanceStatsDto 
+} from '@/api/generated/data-contracts'
 
+// Store setup
 const attendanceStore = useAttendanceStore()
+const reportStore = useReportStore()
+
+// Store refs
 const { isLoading } = storeToRefs(attendanceStore)
 
-const attendanceRecords = ref<AttendanceRecord[]>([])
-const stats = ref({
+// Component state
+const attendanceRecords = ref<AttendanceRecordDto[]>([])
+const stats = ref<AttendanceStatsDto>({
   totalClasses: 0,
   attendedClasses: 0,
   attendanceRate: 0
@@ -46,10 +55,19 @@ const stats = ref({
 
 async function loadAttendance() {
   try {
-    await attendanceStore.fetchAttendance()
-    const data = await attendanceStore.getAttendanceStats()
-    stats.value = data
-    attendanceRecords.value = attendanceStore.records
+    // Fetch attendance records
+    const attendanceData = await attendanceStore.fetchAttendance()
+    attendanceRecords.value = attendanceData
+
+    // Get stats from student report
+    const reportData = await reportStore.getStudentReport(1) // TODO: Get actual student ID
+    if (reportData) {
+      stats.value = {
+        totalClasses: reportData.totalClasses || 0,
+        attendedClasses: reportData.totalAttendance || 0,
+        attendanceRate: reportData.attendanceRate || 0
+      }
+    }
   } catch (err) {
     console.error('Failed to load attendance:', err)
   }

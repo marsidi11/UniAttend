@@ -1,87 +1,85 @@
 <template>
   <div class="space-y-6">
     <header class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold">Class Attendance</h1>
-      <Button 
-        variant="primary" 
-        @click="confirmAttendance"
-        :disabled="!hasUnconfirmedRecords"
-      >
-        Confirm Attendance
-      </Button>
+      <h1 class="text-2xl font-bold">My Attendance</h1>
     </header>
 
+    <!-- Stats Cards -->
     <div class="grid grid-cols-3 gap-4">
       <StatCard
-        title="Total Students"
-        :value="stats.totalStudents"
+        title="Total Classes"
+        :value="stats.totalClasses || 0"
       />
       <StatCard
-        title="Present Today"
-        :value="stats.presentToday"
+        title="Classes Attended"
+        :value="stats.attendedClasses || 0"
       />
       <StatCard
         title="Attendance Rate"
-        :value="`${stats.attendanceRate}%`"
+        :value="`${stats.attendanceRate || 0}%`"
       />
     </div>
 
-    <AttendanceList 
-      v-model:selected="selectedRecords"
-      :records="currentClassRecords" 
-      selectable
+    <!-- Attendance List -->
+    <AttendanceList
+      :records="attendanceRecords"
+      :loading="isLoading"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useAttendanceStore } from '@/stores/attendance.store'
-import { useRoute } from 'vue-router'
-import Button from '@/shared/components/ui/Button.vue'
+import { useReportStore } from '@/stores/report.store'
+import { useAuthStore } from '@/stores/auth.store'
 import StatCard from '@/shared/components/ui/StatCard.vue'
 import AttendanceList from '../components/AttendanceList.vue'
-import type { AttendanceRecord, ClassAttendance, AttendanceStats } from '@/types/attendance.types'
+import type { 
+  AttendanceRecordDto,
+  AttendanceStatsDto
+} from '@/api/generated/data-contracts'
 
-type ClassStats = AttendanceStats
-
-const route = useRoute()
+// Store setup
 const attendanceStore = useAttendanceStore()
-const selectedRecords = ref<number[]>([])
-const currentClassRecords = ref<AttendanceRecord[]>([])
-const stats = ref<ClassStats>({
-  totalStudents: 0,
-  presentToday: 0,
+const reportStore = useReportStore()
+const authStore = useAuthStore()
+
+// Store refs
+const { isLoading } = storeToRefs(attendanceStore)
+
+// Component state
+const attendanceRecords = ref<AttendanceRecordDto[]>([])
+const stats = ref<AttendanceStatsDto>({
+  totalClasses: 0,
+  attendedClasses: 0,
   attendanceRate: 0
 })
 
-const classId = computed(() => Number(route.params.id))
-const hasUnconfirmedRecords = computed(() => 
-  currentClassRecords.value.some(record => !record.isConfirmed)
-)
-
-async function loadClassAttendance() {
+async function loadAttendance() {
   try {
-    const response = await attendanceStore.fetchClassAttendance(classId.value)
-    if (response) {
-      currentClassRecords.value = response.records
-      stats.value = response.stats
+    // Fetch attendance records
+    const records = await attendanceStore.fetchAttendance()
+    attendanceRecords.value = records || []
+
+    // Get stats from student report
+    if (authStore.user?.id) {
+      const reportData = await reportStore.getStudentReport(authStore.user.id)
+      if (reportData) {
+        stats.value = {
+          totalClasses: reportData.totalClasses || 0,
+          attendedClasses: reportData.totalAttendance || 0,
+          attendanceRate: reportData.attendanceRate || 0
+        }
+      }
     }
-  } catch (error) {
-    console.error('Failed to load class attendance:', error)
-  }
-}
-
-async function confirmAttendance() {
-  try {
-    await attendanceStore.confirmAttendance(classId.value)
-    await loadClassAttendance()
-  } catch (error) {
-    console.error('Failed to confirm attendance:', error)
+  } catch (err) {
+    console.error('Failed to load attendance:', err)
   }
 }
 
 onMounted(() => {
-  loadClassAttendance()
+  loadAttendance()
 })
 </script>
