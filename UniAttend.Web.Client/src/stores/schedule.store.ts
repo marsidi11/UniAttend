@@ -5,9 +5,7 @@ import type {
   CreateScheduleCommand,
   UpdateScheduleCommand 
 } from '@/api/generated/data-contracts';
-import { Schedule } from '@/api/generated/Schedule';
-
-const scheduleApi = new Schedule();
+import { scheduleApi } from '@/api/apiInstances';
 
 export const useScheduleStore = defineStore('schedule', () => {
   // State

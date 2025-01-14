@@ -4,9 +4,7 @@ import type {
   ClassDto,
   OpenClassCommand
 } from '@/api/generated/data-contracts';
-import { Classes } from '@/api/generated/Classes';
-
-const classApi = new Classes();
+import { classApi } from '@/api/apiInstances';
 
 export const useClassStore = defineStore('class', () => {
   // State

@@ -9,7 +9,6 @@ import type {
   CreateUserCommand,
   UpdateUserCommand
 } from '@/api/generated/data-contracts';
-import { User } from '@/api/generated/User';
 import { UserRole } from '@/api/generated/data-contracts';
 import { userApi } from '@/api/apiInstances';
 

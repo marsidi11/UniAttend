@@ -6,9 +6,7 @@ import type {
   GenerateOtpRequest,
   ValidateOtpRequest 
 } from '@/api/generated/data-contracts';
-import { Otp } from '@/api/generated/Otp';
-
-const otpApi = new Otp();
+import { otpApi } from '@/api/apiInstances';
 
 export const useOtpStore = defineStore('otp', () => {
   // State

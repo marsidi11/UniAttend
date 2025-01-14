@@ -23,7 +23,7 @@ export const useStudentStore = defineStore('student', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  // Getters updated to use ExtendedStudentDto
+  // Getters remain the same
   const activeStudents = computed(() => 
     students.value.filter((s: ExtendedStudentDto) => s.isActive)
   );
@@ -44,9 +44,13 @@ export const useStudentStore = defineStore('student', () => {
   async function fetchStudentsList() {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.studentList();
-      students.value = data as ExtendedStudentDto[]; // Type assertion since API returns basic UserDto
-      return data;
+      const response = await studentApi.studentList();
+      if (response?.data) {
+        const studentData = response.data as ExtendedStudentDto[];
+        students.value = studentData;
+        return studentData;
+      }
+      return [];
     } catch (err) {
       handleError(err);
       throw err;
@@ -58,9 +62,9 @@ export const useStudentStore = defineStore('student', () => {
   async function createStudent(studentData: RegisterStudentCommand) {
     isLoading.value = true;
     try {
-      const { data: studentId } = await studentApi.studentCreate(studentData);
+      const response = await studentApi.studentCreate(studentData);
       await fetchStudentsList(); // Refresh list after creation
-      return studentId;
+      return response?.data;
     } catch (err) {
       handleError(err);
       throw err;
@@ -72,12 +76,16 @@ export const useStudentStore = defineStore('student', () => {
   async function fetchStudentAttendance(startDate?: Date, endDate?: Date) {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.studentAttendanceList({
+      const response = await studentApi.studentAttendanceList({
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString()
       });
-      attendance.value = data as AttendanceRecordDto[]; // Type assertion
-      return data;
+      if (response?.data) {
+        const attendanceData = response.data as AttendanceRecordDto[];
+        attendance.value = attendanceData;
+        return attendanceData;
+      }
+      return [];
     } catch (err) {
       handleError(err);
       throw err;
@@ -89,9 +97,13 @@ export const useStudentStore = defineStore('student', () => {
   async function fetchStudentGroups() {
     isLoading.value = true;
     try {
-      const { data } = await studentApi.studentEnrolledGroupsList();
-      groups.value = data as UserGroupDto[]; // Type assertion
-      return data;
+      const response = await studentApi.studentEnrolledGroupsList();
+      if (response?.data) {
+        const groupData = response.data as UserGroupDto[];
+        groups.value = groupData;
+        return groupData;
+      }
+      return [];
     } catch (err) {
       handleError(err);
       throw err;

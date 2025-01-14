@@ -5,9 +5,7 @@ import type {
   CreateDepartmentCommand,
   UpdateDepartmentCommand 
 } from '@/api/generated/data-contracts';
-import { Departments } from '@/api/generated/Departments';
-
-const departmentApi = new Departments();
+import { departmentApi } from '@/api/apiInstances';
 
 export const useDepartmentStore = defineStore('department', () => {
   // State

@@ -5,9 +5,7 @@ import type {
   CreateAcademicYearCommand,
   UpdateAcademicYearCommand 
 } from '@/api/generated/data-contracts';
-import { AcademicYear } from '@/api/generated/AcademicYear';
-
-const academicYearApi = new AcademicYear();
+import { academicYearApi } from '@/api/apiInstances';
 
 export const useAcademicYearStore = defineStore('academicYear', () => {
   // State

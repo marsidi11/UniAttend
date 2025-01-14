@@ -5,9 +5,7 @@ import type {
   RecordCardAttendanceCommand,
   RecordOtpAttendanceCommand 
 } from '@/api/generated/data-contracts';
-import { Attendance } from '@/api/generated/Attendance';
-
-const attendanceApi = new Attendance();
+import { attendanceApi } from '@/api/apiInstances';
 
 export const useAttendanceStore = defineStore('attendance', () => {
   // State

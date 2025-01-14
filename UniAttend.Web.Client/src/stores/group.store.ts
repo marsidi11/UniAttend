@@ -8,9 +8,7 @@ import type {
   EnrollStudentsCommand,
   TransferStudentCommand 
 } from '@/api/generated/data-contracts';
-import { Groups } from '@/api/generated/Groups';
-
-const groupApi = new Groups();
+import { groupApi } from '@/api/apiInstances';
 
 export const useGroupStore = defineStore('group', () => {
   // State

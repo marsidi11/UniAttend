@@ -7,9 +7,7 @@ import type {
   AttendanceReportDto,
   AcademicYearReportDto
 } from '@/api/generated/data-contracts';
-import { Reports } from '@/api/generated/Reports';
-
-const reportApi = new Reports();
+import { reportApi } from '@/api/apiInstances';
 
 export const useReportStore = defineStore('report', () => {
   // State

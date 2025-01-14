@@ -6,9 +6,7 @@ import type {
   UpdateClassroomCommand,
   AssignReaderCommand 
 } from '@/api/generated/data-contracts';
-import { Classrooms } from '@/api/generated/Classrooms';
-
-const classroomApi = new Classrooms();
+import { classroomApi } from '@/api/apiInstances';
 
 export const useClassroomStore = defineStore('classroom', () => {
   // State

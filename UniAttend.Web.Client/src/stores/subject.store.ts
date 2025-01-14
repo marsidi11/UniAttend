@@ -1,9 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { SubjectDto, CreateSubjectCommand, UpdateSubjectCommand } from '@/api/generated/data-contracts';
-import { Subjects } from '@/api/generated/Subjects';
-
-const subjectApi = new Subjects();
+import { subjectApi } from '@/api/apiInstances';
 
 export const useSubjectStore = defineStore('subject', () => {
   // State
