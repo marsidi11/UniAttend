@@ -6,6 +6,7 @@ import type {
   RecordOtpAttendanceCommand 
 } from '@/api/generated/data-contracts';
 import { attendanceApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useAttendanceStore = defineStore('attendance', () => {
   // State
@@ -94,10 +95,6 @@ export const useAttendanceStore = defineStore('attendance', () => {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

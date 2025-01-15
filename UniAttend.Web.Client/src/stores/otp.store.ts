@@ -7,6 +7,7 @@ import type {
   ValidateOtpRequest 
 } from '@/api/generated/data-contracts';
 import { otpApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useOtpStore = defineStore('otp', () => {
   // State
@@ -25,7 +26,7 @@ export const useOtpStore = defineStore('otp', () => {
       currentOtp.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -41,7 +42,7 @@ export const useOtpStore = defineStore('otp', () => {
       });
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -55,15 +56,11 @@ export const useOtpStore = defineStore('otp', () => {
       currentOtp.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

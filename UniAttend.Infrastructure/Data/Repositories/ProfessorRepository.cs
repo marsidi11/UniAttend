@@ -19,10 +19,10 @@ using UniAttend.Infrastructure.Data.Repositories.Base;
 /// </remarks>
 namespace UniAttend.Infrastructure.Data.Repositories
 {
-        public class ProfessorRepository : BaseRepository<Professor>, IProfessorRepository
+    public class ProfessorRepository : BaseRepository<Professor>, IProfessorRepository
     {
         public ProfessorRepository(ApplicationDbContext context) : base(context) { }
-    
+
         public override async Task<Professor?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(p => p.User)
@@ -34,15 +34,15 @@ namespace UniAttend.Infrastructure.Data.Repositories
             return await DbSet
                 .Include(p => p.User)
                 .Include(p => p.Department)
-                .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);
         }
 
         public async Task<Professor?> GetByUserId(int userId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(p => p.User)
                 .Include(p => p.Department)
-                .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
-    
+                .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);
+
         public async Task<IEnumerable<Professor>> GetByDepartmentId(int departmentId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(p => p.User)

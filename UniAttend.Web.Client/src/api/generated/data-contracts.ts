@@ -212,6 +212,8 @@ export interface DepartmentDto {
   studentsCount?: number;
   /** @format int32 */
   professorsCount?: number;
+  /** @format date-time */
+  createdAt?: string;
 }
 
 export interface DepartmentReportDto {

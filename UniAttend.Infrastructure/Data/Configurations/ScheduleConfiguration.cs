@@ -4,14 +4,14 @@ using UniAttend.Core.Entities;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
+    internal class ScheduleConfiguration : EntityConfiguration<Schedule>
     {
-        public void Configure(EntityTypeBuilder<Schedule> builder)
+        public override void Configure(EntityTypeBuilder<Schedule> builder)
         {
+            base.Configure(builder);
+            
             builder.ToTable("Schedules");
-            
-            builder.HasKey(x => x.Id);
-            
+                        
             // Use backing fields for immutable properties
             builder.Property("GroupId")
                 .IsRequired();

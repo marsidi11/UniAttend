@@ -8,6 +8,7 @@ import type {
   AcademicYearReportDto
 } from '@/api/generated/data-contracts';
 import { reportApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useReportStore = defineStore('report', () => {
   // State
@@ -30,7 +31,7 @@ export const useReportStore = defineStore('report', () => {
       studentReport.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -47,7 +48,7 @@ export const useReportStore = defineStore('report', () => {
       groupReport.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -61,7 +62,7 @@ export const useReportStore = defineStore('report', () => {
       departmentReport.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -87,7 +88,7 @@ export const useReportStore = defineStore('report', () => {
       attendanceReport.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -101,7 +102,7 @@ export const useReportStore = defineStore('report', () => {
       academicYearReport.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -117,15 +118,11 @@ export const useReportStore = defineStore('report', () => {
         endDate: endDate.toISOString()
       });
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

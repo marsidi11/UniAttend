@@ -21,10 +21,11 @@ namespace UniAttend.Core.Entities
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Department name cannot be empty", nameof(name));
-            if (name.Length > 100) 
+            if (name.Length > 100)
                 throw new ArgumentException("Department name cannot exceed 100 characters", nameof(name));
-            
+
             Name = name;
+            CreatedAt = DateTime.UtcNow; // Set creation time
         }
 
         /// <summary>

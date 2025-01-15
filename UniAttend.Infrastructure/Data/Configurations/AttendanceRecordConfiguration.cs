@@ -4,14 +4,14 @@ using UniAttend.Core.Entities.Attendance;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class AttendanceRecordConfiguration : IEntityTypeConfiguration<AttendanceRecord>
+    internal class AttendanceRecordConfiguration : EntityConfiguration<AttendanceRecord>
     {
-        public void Configure(EntityTypeBuilder<AttendanceRecord> builder)
+        public override void Configure(EntityTypeBuilder<AttendanceRecord> builder)
         {
+            base.Configure(builder);
+            
             builder.ToTable("AttendanceRecords");
-            
-            builder.HasKey(x => x.Id);
-            
+                        
             // Use backing fields for immutable properties
             builder.Property("CourseId").IsRequired();
             builder.Property("StudentId").IsRequired();

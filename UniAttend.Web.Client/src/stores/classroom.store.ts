@@ -7,6 +7,7 @@ import type {
   AssignReaderCommand 
 } from '@/api/generated/data-contracts';
 import { classroomApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useClassroomStore = defineStore('classroom', () => {
   // State
@@ -32,7 +33,7 @@ export const useClassroomStore = defineStore('classroom', () => {
       classrooms.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -46,7 +47,7 @@ export const useClassroomStore = defineStore('classroom', () => {
       currentClassroom.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -61,7 +62,7 @@ export const useClassroomStore = defineStore('classroom', () => {
       classrooms.value.push(newClassroom);
       return newClassroom;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -82,7 +83,7 @@ export const useClassroomStore = defineStore('classroom', () => {
       }
       return updatedClassroom;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -95,7 +96,7 @@ export const useClassroomStore = defineStore('classroom', () => {
       await classroomApi.classroomsReaderCreate(id, { deviceId });
       await getClassroomById(id);
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -108,7 +109,7 @@ export const useClassroomStore = defineStore('classroom', () => {
       await classroomApi.classroomsReaderDelete(id);
       await getClassroomById(id);
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -124,15 +125,11 @@ export const useClassroomStore = defineStore('classroom', () => {
       });
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

@@ -51,6 +51,8 @@ namespace UniAttend.Core.Entities.Identity
             FirstName = firstName.Trim();
             LastName = lastName.Trim();
             Email = email.Trim().ToLower();
+
+            CreatedAt = DateTime.UtcNow; // Set creation time
         }
 
         public void UpdatePassword(string newPasswordHash)

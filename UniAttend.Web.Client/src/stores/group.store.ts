@@ -5,10 +5,10 @@ import type {
   GroupStudentDto,
   CreateGroupCommand,
   UpdateGroupCommand,
-  EnrollStudentsCommand,
   TransferStudentCommand 
 } from '@/api/generated/data-contracts';
 import { groupApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useGroupStore = defineStore('group', () => {
   // State
@@ -45,7 +45,7 @@ export const useGroupStore = defineStore('group', () => {
       groups.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -59,7 +59,7 @@ export const useGroupStore = defineStore('group', () => {
       currentGroup.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -73,7 +73,7 @@ export const useGroupStore = defineStore('group', () => {
       groups.value.push(data);
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -91,7 +91,7 @@ export const useGroupStore = defineStore('group', () => {
       }
       return updatedGroup;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -105,7 +105,7 @@ export const useGroupStore = defineStore('group', () => {
       groupStudents.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -118,7 +118,7 @@ export const useGroupStore = defineStore('group', () => {
       await groupApi.groupsStudentsEnrollCreate(id, { groupId: id, studentIds });
       await fetchGroupStudents(id);
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -133,7 +133,7 @@ export const useGroupStore = defineStore('group', () => {
         gs => gs.studentId !== studentId
       );
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -148,15 +148,11 @@ export const useGroupStore = defineStore('group', () => {
         await fetchGroupStudents(currentGroup.value.id);
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

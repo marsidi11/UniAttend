@@ -8,6 +8,7 @@ import type {
 } from '@/api/generated/data-contracts';
 import { Student } from '@/api/generated/Student';
 import { studentApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 // Extend StudentDto to include cardId
 interface ExtendedStudentDto extends StudentDto {
@@ -45,14 +46,15 @@ export const useStudentStore = defineStore('student', () => {
     isLoading.value = true;
     try {
       const response = await studentApi.studentList();
-      if (response?.data) {
-        const studentData = response.data as ExtendedStudentDto[];
-        students.value = studentData;
-        return studentData;
+      // Type assertion to handle the response
+      const studentData = response as unknown as { data: ExtendedStudentDto[] };
+      if (studentData && Array.isArray(studentData.data)) {
+        students.value = studentData.data;
+        return studentData.data;
       }
       return [];
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -66,7 +68,7 @@ export const useStudentStore = defineStore('student', () => {
       await fetchStudentsList(); // Refresh list after creation
       return response?.data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -80,14 +82,15 @@ export const useStudentStore = defineStore('student', () => {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString()
       });
-      if (response?.data) {
-        const attendanceData = response.data as AttendanceRecordDto[];
-        attendance.value = attendanceData;
-        return attendanceData;
+      // Type assertion for the response
+      const attendanceData = response as unknown as { data: AttendanceRecordDto[] };
+      if (attendanceData && Array.isArray(attendanceData.data)) {
+        attendance.value = attendanceData.data;
+        return attendanceData.data;
       }
       return [];
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -98,14 +101,15 @@ export const useStudentStore = defineStore('student', () => {
     isLoading.value = true;
     try {
       const response = await studentApi.studentEnrolledGroupsList();
-      if (response?.data) {
-        const groupData = response.data as UserGroupDto[];
-        groups.value = groupData;
-        return groupData;
+      // Type assertion for the response
+      const groupData = response as unknown as { data: UserGroupDto[] };
+      if (groupData && Array.isArray(groupData.data)) {
+        groups.value = groupData.data;
+        return groupData.data;
       }
       return [];
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -118,7 +122,7 @@ export const useStudentStore = defineStore('student', () => {
       const { data } = await studentApi.studentAbsenceAlertsList();
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -136,7 +140,7 @@ export const useStudentStore = defineStore('student', () => {
         };
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -154,15 +158,11 @@ export const useStudentStore = defineStore('student', () => {
         };
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

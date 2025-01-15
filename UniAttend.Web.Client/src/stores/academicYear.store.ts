@@ -6,6 +6,7 @@ import type {
   UpdateAcademicYearCommand 
 } from '@/api/generated/data-contracts';
 import { academicYearApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useAcademicYearStore = defineStore('academicYear', () => {
   // State
@@ -37,7 +38,7 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
       academicYears.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -51,7 +52,7 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
       currentYear.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -65,7 +66,7 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
       academicYears.value.push(data);
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -81,7 +82,7 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
         await fetchActiveAcademicYear(); // Refresh current if updated
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -97,17 +98,13 @@ export const useAcademicYearStore = defineStore('academicYear', () => {
         currentYear.value = null;
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
   }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
-  }
-
+  
   return {
     // State
     academicYears,

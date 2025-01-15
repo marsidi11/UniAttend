@@ -5,6 +5,7 @@ import type {
   OpenClassCommand
 } from '@/api/generated/data-contracts';
 import { classApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useClassStore = defineStore('class', () => {
   // State
@@ -45,7 +46,7 @@ export const useClassStore = defineStore('class', () => {
       classes.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -59,7 +60,7 @@ export const useClassStore = defineStore('class', () => {
       currentClass.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -73,7 +74,7 @@ export const useClassStore = defineStore('class', () => {
       classes.value.push(data);
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -92,7 +93,7 @@ export const useClassStore = defineStore('class', () => {
         currentClass.value = { ...currentClass.value, status: 'closed' };
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -105,7 +106,7 @@ export const useClassStore = defineStore('class', () => {
       const { data } = await classApi.classesGroupDetail(groupId);
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -118,15 +119,11 @@ export const useClassStore = defineStore('class', () => {
       const { data } = await classApi.classesClassroomDetail(classroomId);
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

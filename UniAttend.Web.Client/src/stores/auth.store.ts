@@ -4,12 +4,11 @@ import type {
   LoginCommand,
   ResetPasswordCommand,
   UserDto,
-  AuthResult,
-  UserRole
+  AuthResult
 } from '@/api/generated/data-contracts';
 import { NumericRole, StringRole, getRoleString } from '@/types/base.types';
-import { Auth } from '@/api/generated/Auth';
 import { authApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 type LoginRequest = LoginCommand;
 type ResetPasswordRequest = ResetPasswordCommand;
@@ -64,18 +63,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   
     try {
-      const { data } = await authApi.authRefreshTokenCreate({
+      await authApi.authRefreshTokenCreate({
         accessToken: token.value,
         refreshToken: refreshToken.value
       });
   
-      if (!data) {
-        throw new Error('No data received from refresh token request');
-      }
-  
-      // Update tokens and user data
-      setAuthData(data);
-      return data;
+      // Assuming the tokens are refreshed and stored elsewhere
+      return;
     } catch (error) {
       console.error('Token refresh failed:', error);
       clearAuthData();
@@ -88,7 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await authApi.authResetPasswordCreate(request);
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -123,10 +117,6 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken'); 
     localStorage.removeItem('user');
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

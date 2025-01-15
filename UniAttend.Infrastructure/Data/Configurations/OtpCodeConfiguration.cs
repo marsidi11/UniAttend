@@ -4,15 +4,14 @@ using UniAttend.Core.Entities.Attendance;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class OtpCodeConfiguration : IEntityTypeConfiguration<OtpCode>
+        internal class OtpCodeConfiguration : EntityConfiguration<OtpCode>
     {
-        public void Configure(EntityTypeBuilder<OtpCode> builder)
+        public override void Configure(EntityTypeBuilder<OtpCode> builder)
         {
+            base.Configure(builder);
+            
             builder.ToTable("OtpCodes");
             
-            builder.HasKey(x => x.Id);
-            
-            // Use backing fields for immutable properties
             builder.Property("StudentId").IsRequired();
             builder.Property("ClassId").IsRequired();
             builder.Property("Code")
@@ -22,14 +21,15 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.Property("IsUsed")
                 .IsRequired()
                 .HasDefaultValue(false);
-
+    
             // Indexes for fast lookups
             builder.HasIndex("Code", "ClassId", "StudentId")
                 .IsUnique();
             builder.HasIndex("ClassId", "ExpiryTime");
-
-            // Enforce code format
-            builder.HasCheckConstraint("CK_OtpCode_Format", "LEN([Code]) = 6 AND [Code] NOT LIKE '%[^0-9]%'");
+    
+            // MySQL compatible check constraint
+            builder.HasCheckConstraint("CK_OtpCode_Format", 
+                "LENGTH(Code) = 6 AND Code REGEXP '^[0-9]+$'");
         }
     }
 }

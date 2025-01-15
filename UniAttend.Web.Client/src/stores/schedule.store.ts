@@ -6,6 +6,7 @@ import type {
   UpdateScheduleCommand 
 } from '@/api/generated/data-contracts';
 import { scheduleApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useScheduleStore = defineStore('schedule', () => {
   // State
@@ -18,6 +19,7 @@ export const useScheduleStore = defineStore('schedule', () => {
   const schedulesByDay = computed(() => {
     const grouped = new Map<number, ScheduleDto[]>();
     schedules.value.forEach(schedule => {
+      if (schedule.dayOfWeek === undefined) return;
       if (!grouped.has(schedule.dayOfWeek)) {
         grouped.set(schedule.dayOfWeek, []);
       }
@@ -36,7 +38,7 @@ export const useScheduleStore = defineStore('schedule', () => {
       schedules.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -50,7 +52,7 @@ export const useScheduleStore = defineStore('schedule', () => {
       await fetchSchedules(schedule.groupId);
       return scheduleId;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -63,7 +65,7 @@ export const useScheduleStore = defineStore('schedule', () => {
       await scheduleApi.scheduleUpdate(id, { id, ...schedule });
       await fetchSchedules(schedule.groupId);
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -76,15 +78,11 @@ export const useScheduleStore = defineStore('schedule', () => {
       await scheduleApi.scheduleDelete(id);
       await fetchSchedules(groupId);
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

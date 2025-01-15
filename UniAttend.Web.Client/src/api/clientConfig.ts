@@ -1,6 +1,17 @@
 import type { ApiConfig } from './generated/http-client';
 import { useAuthStore } from '@/stores/auth.store';
 
+class ApiError extends Error {
+  constructor(
+    message: string,
+    public status?: number,
+    public data?: any
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType> {
   return {
     baseUrl: 'http://localhost:5255',
@@ -13,21 +24,15 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
     },
     securityWorker: async () => {
       const token = localStorage.getItem('token');
-      
-      if (!token) {
-        return;
-      }
-
-      return {
+      return token ? {
         headers: {
           Authorization: `Bearer ${token}`
         },
         credentials: 'include'
-      };
+      } : undefined;
     },
     customFetch: async (input: RequestInfo | URL, init?: RequestInit) => {
       try {
-        // Add credentials to all requests
         const requestInit = {
           ...init,
           credentials: 'include' as RequestCredentials
@@ -35,30 +40,57 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
 
         const response = await fetch(input, requestInit);
 
-        if (response.status === 401) {
-          try {
-            const authStore = useAuthStore();
-            await authStore.refreshTokens();
-            
-            const newInit = {
-              ...requestInit,
-              headers: {
-                ...requestInit?.headers,
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-              }
-            };
-            
-            return fetch(input, newInit);
-          } catch (refreshError) {
-            localStorage.clear();
-            window.location.href = '/login';
-            throw new Error('Authentication required');
+        // Handle specific status codes
+        switch (response.status) {
+          case 401: {
+            try {
+              const authStore = useAuthStore();
+              await authStore.refreshTokens();
+              return fetch(input, {
+                ...requestInit,
+                headers: {
+                  ...requestInit?.headers,
+                  Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+              });
+            } catch (refreshError) {
+              localStorage.clear();
+              window.location.href = '/login';
+              throw new ApiError('Authentication required', 401);
+            }
+          }
+          case 403:
+            throw new ApiError('Access forbidden', 403);
+          case 404:
+            throw new ApiError('Resource not found', 404);
+          case 422: {
+            const validationData = await response.json();
+            throw new ApiError('Validation failed', 422, validationData);
+          }
+          case 500: {
+            const serverError = await response.json();
+            throw new ApiError('Internal server error', 500, serverError);
           }
         }
-        
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new ApiError(`HTTP error! status: ${response.status}`, response.status, errorData);
+        }
+
         return response;
-      } catch (error) {
-        console.error('Request failed:', error);
+
+      } catch (error: unknown) {
+        const requestUrl = input instanceof Request ? input.url : 
+                         input instanceof URL ? input.toString() : input;
+                         
+        console.error('Request failed:', {
+          url: requestUrl,
+          method: init?.method || 'GET',
+          status: error instanceof ApiError ? error.status : undefined,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          data: error instanceof ApiError ? error.data : undefined
+        });
         throw error;
       }
     }

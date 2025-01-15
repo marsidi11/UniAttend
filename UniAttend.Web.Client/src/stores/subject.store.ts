@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { SubjectDto, CreateSubjectCommand, UpdateSubjectCommand } from '@/api/generated/data-contracts';
 import { subjectApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useSubjectStore = defineStore('subject', () => {
   // State
@@ -35,7 +36,7 @@ export const useSubjectStore = defineStore('subject', () => {
       subjects.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -49,7 +50,7 @@ export const useSubjectStore = defineStore('subject', () => {
       currentSubject.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -63,7 +64,7 @@ export const useSubjectStore = defineStore('subject', () => {
       subjects.value.push(data);
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -84,7 +85,7 @@ export const useSubjectStore = defineStore('subject', () => {
       }
       return updatedSubject.data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -100,15 +101,11 @@ export const useSubjectStore = defineStore('subject', () => {
         currentSubject.value = null;
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

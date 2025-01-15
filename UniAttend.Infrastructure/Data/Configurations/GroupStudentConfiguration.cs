@@ -8,13 +8,12 @@ namespace UniAttend.Infrastructure.Data.Configurations
     /// Configuration class for GroupStudent entity defining the database schema and relationships.
     /// This class maps the GroupStudent entity to the database using Entity Framework Core configurations.
     /// </summary>
-    public class GroupStudentConfiguration : IEntityTypeConfiguration<GroupStudent>
+    public class GroupStudentConfiguration : EntityConfiguration<GroupStudent>
     {
-        public void Configure(EntityTypeBuilder<GroupStudent> builder)
+        public override void Configure(EntityTypeBuilder<GroupStudent> builder)
         {
-            // Key configuration
-            builder.HasKey(x => x.Id);
-
+            base.Configure(builder);
+            
             // Required properties
             builder.Property(x => x.GroupId)
                 .IsRequired();

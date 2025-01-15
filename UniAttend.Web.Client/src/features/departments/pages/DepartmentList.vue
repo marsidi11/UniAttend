@@ -50,7 +50,7 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useDepartmentStore } from '@/stores/department.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { Department, CreateDepartmentRequest, UpdateDepartmentRequest } from '@/types/department.types'
+import type { DepartmentDto, CreateDepartmentCommand, UpdateDepartmentCommand } from '@/api/generated/data-contracts'
 import type { TableItem } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
@@ -64,7 +64,7 @@ const authStore = useAuthStore()
 const { departments, isLoading } = storeToRefs(departmentStore)
 
 const showModal = ref(false)
-const selectedDepartment = ref<Department | null>(null)
+const selectedDepartment = ref<DepartmentDto | null>(null)
 const selectedStatus = ref('')
 
 const isAdmin = computed(() => authStore.userRole === 'admin')
@@ -83,12 +83,12 @@ const tableActions = computed(() => isAdmin.value ? [
   { 
     label: 'View Details', 
     icon: 'visibility',
-    action: (item: TableItem) => handleViewDetails(item as Department)
+    action: (item: TableItem) => handleViewDetails(item as DepartmentDto)
   },
   { 
     label: 'Edit', 
     icon: 'edit',
-    action: (item: TableItem) => handleEdit(item as Department)
+    action: (item: TableItem) => handleEdit(item as DepartmentDto)
   }
 ] : [])
 
@@ -97,7 +97,10 @@ const modalTitle = computed(() =>
 )
 
 const filteredDepartments = computed(() => {
-  let filtered = [...departments.value]
+  let filtered = [...departments.value].map(dept => ({
+    ...dept,
+    id: dept.id || 0
+  })) as (DepartmentDto & TableItem)[]
   
   if (selectedStatus.value !== '') {
     filtered = filtered.filter(d => d.isActive === (selectedStatus.value === 'true'))
@@ -115,24 +118,26 @@ function openCreateModal() {
   showModal.value = true
 }
 
-function handleViewDetails(department: Department) {
+function handleViewDetails(department: DepartmentDto) {
   router.push(`/dashboard/departments/${department.id}`)
 }
 
-function handleEdit(department: Department) {
+function handleEdit(department: DepartmentDto) {
   selectedDepartment.value = department
   showModal.value = true
 }
 
 function handleRowClick(department: TableItem) {
-  handleViewDetails(department as Department)
+  handleViewDetails(department as DepartmentDto)
 }
 
-async function handleSubmit(departmentData: Partial<Department>) {
+async function handleSubmit(departmentData: Partial<DepartmentDto>) {
   try {
     if (selectedDepartment.value?.id) {
-      const updateRequest: UpdateDepartmentRequest = {
+      const updateRequest: UpdateDepartmentCommand = {
+        id: selectedDepartment.value.id,
         name: departmentData.name || '',
+        description: '',
         isActive: departmentData.isActive ?? true
       }
       await departmentStore.updateDepartment(
@@ -140,13 +145,12 @@ async function handleSubmit(departmentData: Partial<Department>) {
         updateRequest
       )
     } else {
-      const createRequest: CreateDepartmentRequest = {
+      const createRequest: CreateDepartmentCommand = {
         name: departmentData.name || ''
       }
       await departmentStore.createDepartment(createRequest)
     }
     showModal.value = false
-    // Refresh the departments list
     await departmentStore.fetchDepartments()
   } catch (err) {
     console.error('Failed to save department:', err)

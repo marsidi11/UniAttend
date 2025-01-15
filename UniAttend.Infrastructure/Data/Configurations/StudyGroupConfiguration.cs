@@ -4,57 +4,41 @@ using UniAttend.Core.Entities;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class StudyGroupConfiguration : IEntityTypeConfiguration<StudyGroup>
+    internal class StudyGroupConfiguration : EntityConfiguration<StudyGroup>
     {
-        public void Configure(EntityTypeBuilder<StudyGroup> builder)
+        public override void Configure(EntityTypeBuilder<StudyGroup> builder)
         {
+            base.Configure(builder);
+            
             builder.ToTable("StudyGroups");
             
-            builder.HasKey(x => x.Id);
-            
-            // Use backing fields for immutable properties
-            builder.Property("Name")
+            builder.Property(x => x.Name)
                 .IsRequired()
                 .HasMaxLength(100);
-
-            builder.Property("SubjectId")
+        
+            builder.Property(x => x.SubjectId)
                 .IsRequired();
-
-            builder.Property("AcademicYearId")
+        
+            builder.Property(x => x.AcademicYearId)
                 .IsRequired();
-
-            builder.Property("ProfessorId")
+        
+            builder.Property(x => x.ProfessorId)
                 .IsRequired();
-
-            builder.Property("IsActive")
-                .IsRequired()
-                .HasDefaultValue(true);
-
-            // Configure relationships
-            builder.HasOne(typeof(Subject))
+        
+            builder.HasOne(x => x.Subject)
                 .WithMany()
-                .HasForeignKey("SubjectId")
+                .HasForeignKey(x => x.SubjectId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(typeof(AcademicYear))
+        
+            builder.HasOne(x => x.AcademicYear)
+                .WithMany(x => x.StudyGroups)
+                .HasForeignKey(x => x.AcademicYearId)
+                .OnDelete(DeleteBehavior.Restrict);
+        
+            builder.HasOne(x => x.Professor)
                 .WithMany()
-                .HasForeignKey("AcademicYearId")
+                .HasForeignKey(x => x.ProfessorId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(typeof(Professor))
-                .WithMany()
-                .HasForeignKey("ProfessorId")
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Collections
-            builder.HasMany(x => x.Students)
-                .WithOne(x => x.Group)
-                .HasForeignKey("GroupId")
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Indexes
-            builder.HasIndex("Name", "SubjectId", "AcademicYearId")
-                .IsUnique();
         }
     }
 }

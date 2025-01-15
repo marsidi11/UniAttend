@@ -4,11 +4,11 @@ using UniAttend.Core.Entities;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
+    public class DepartmentConfiguration : EntityConfiguration<Department>
     {
-        public void Configure(EntityTypeBuilder<Department> builder)
+        public override void Configure(EntityTypeBuilder<Department> builder)
         {
-            builder.HasKey(d => d.Id);
+            base.Configure(builder);
 
             builder.Property(d => d.Name)
                 .IsRequired()
@@ -17,6 +17,10 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.Property(d => d.IsActive)
                 .IsRequired()
                 .HasDefaultValue(true);
+
+            builder.Property(d => d.CreatedAt)
+                .HasColumnName("CreatedAt")
+                .IsRequired();
 
             // Configure relationships
             builder.HasMany(d => d.Subjects)

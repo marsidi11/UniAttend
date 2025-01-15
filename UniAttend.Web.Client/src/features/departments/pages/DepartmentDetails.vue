@@ -10,68 +10,60 @@
         </Button>
       </div>
     </div>
+  </div>
 
-    <div v-if="isLoading">
-      <Spinner :size="6" />
-    </div>
+  <div v-if="isLoading">
+    <Spinner :size="6" />
+  </div>
 
-    <div v-else-if="error" class="text-red-600">
-      {{ error }}
-    </div>
+  <div v-else-if="error" class="text-red-600">
+    {{ error }}
+  </div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Department Info Card -->
-      <div class="col-span-1 bg-white shadow rounded-lg p-6">
-        <h2 class="text-lg font-medium mb-4">Department Information</h2>
-        <dl class="space-y-4">
-          <div>
-            <dt class="text-sm font-medium text-gray-500">Name</dt>
-            <dd class="mt-1 text-sm text-gray-900">{{ department?.name }}</dd>
-          </div>
-          <div>
-            <dt class="text-sm font-medium text-gray-500">Status</dt>
-            <dd class="mt-1">
-              <Badge :status="department?.isActive ? 'success' : 'error'">
-                {{ department?.isActive ? 'Active' : 'Inactive' }}
-              </Badge>
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- Stats Cards -->
-      <div class="col-span-2 grid grid-cols-3 gap-4">
-        <StatCard title="Total Subjects" :value="department?.subjectsCount || 0" />
-        <StatCard title="Total Students" :value="department?.studentsCount || 0" />
-        <StatCard title="Total Professors" :value="department?.professorsCount || 0" />
-      </div>
-
-      <!-- Subjects Table -->
-      <div class="col-span-3">
-        <div class="bg-white shadow rounded-lg p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-medium">Subjects</h2>
-            <Button v-if="isAdmin" variant="secondary" @click="openAddSubjectModal">
-              Add Subject
-            </Button>
-          </div>
-          <DataTable 
-            :data="department?.subjects || []"
-            :columns="subjectColumns"
-            :loading="isLoading"
-          />
+  <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Department Info Card -->
+    <div class="col-span-1 bg-white shadow rounded-lg p-6">
+      <h2 class="text-lg font-medium mb-4">Department Information</h2>
+      <dl class="space-y-4">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Name</dt>
+          <dd class="mt-1 text-sm text-gray-900">{{ department?.name }}</dd>
         </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1">
+            <Badge :status="department?.isActive ? 'success' : 'error'">
+              {{ department?.isActive ? 'Active' : 'Inactive' }}
+            </Badge>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="col-span-2 grid grid-cols-3 gap-4">
+      <StatCard title="Total Subjects" :value="department?.subjectsCount || 0" />
+      <StatCard title="Total Students" :value="department?.studentsCount || 0" />
+      <StatCard title="Total Professors" :value="department?.professorsCount || 0" />
+    </div>
+
+    <!-- Subjects Table -->
+    <div class="col-span-3">
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-medium">Subjects</h2>
+          <Button v-if="isAdmin" variant="secondary" @click="openAddSubjectModal">
+            Add Subject
+          </Button>
+        </div>
+        <DataTable :data="subjects" :columns="subjectColumns" :loading="isLoadingSubjects" />
       </div>
     </div>
 
     <!-- Edit Department Modal -->
     <Modal v-model="showEditModal" title="Edit Department">
-      <DepartmentForm 
-        v-if="showEditModal"
-        :department="department"
-        @submit="handleUpdateDepartment"
-        @cancel="showEditModal = false"
-      />
+      <DepartmentForm v-if="showEditModal" :department="department" @submit="handleUpdateDepartment"
+        @cancel="showEditModal = false" />
     </Modal>
   </div>
 </template>
@@ -82,7 +74,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useDepartmentStore } from '@/stores/department.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { Department, UpdateDepartmentRequest } from '@/types/department.types'
+import { useSubjectStore } from '@/stores/subject.store'
+import type { DepartmentDto, UpdateDepartmentCommand, SubjectDto } from '@/api/generated/data-contracts'
+import { TableItem } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 import Spinner from '@/shared/components/ui/Spinner.vue'
@@ -95,35 +89,60 @@ const route = useRoute()
 const router = useRouter()
 const departmentStore = useDepartmentStore()
 const authStore = useAuthStore()
+const subjectStore = useSubjectStore()
 
 const { currentDepartment: department, isLoading, error } = storeToRefs(departmentStore)
 const showEditModal = ref(false)
+const subjects = ref<(SubjectDto & TableItem)[]>([])
+const isLoadingSubjects = ref(false)
 
 const isAdmin = computed(() => authStore.userRole === 'admin')
 
 const subjectColumns = [
   { key: 'name', label: 'Name' },
   { key: 'credits', label: 'Credits' },
-  { key: 'isActive', label: 'Status', 
-    render: (value: boolean) => value ? 'Active' : 'Inactive' 
+  {
+    key: 'isActive', label: 'Status',
+    render: (value: boolean) => value ? 'Active' : 'Inactive'
   }
 ]
+
+async function loadSubjects(departmentId: number) {
+  isLoadingSubjects.value = true
+  try {
+    const data = await subjectStore.fetchSubjects({ departmentId })
+    subjects.value = data.map(subject => ({
+      ...subject,
+      id: subject.id || 0
+    })) as (SubjectDto & TableItem)[]
+  } catch (err) {
+    console.error('Failed to load subjects:', err)
+  } finally {
+    isLoadingSubjects.value = false
+  }
+}
 
 onMounted(async () => {
   const departmentId = Number(route.params.id)
   if (departmentId) {
-    await departmentStore.fetchDepartmentById(departmentId)
+    await Promise.all([
+      departmentStore.fetchDepartmentById(departmentId),
+      loadSubjects(departmentId)
+    ])
   }
 })
 
-async function handleUpdateDepartment(updatedDepartment: Partial<Department>) {
+async function handleUpdateDepartment(updatedDepartment: Partial<DepartmentDto>) {
   try {
-    // Create a properly typed update request
-    const updateRequest: UpdateDepartmentRequest = {
+    if (!department.value?.id) return
+
+    const updateRequest: UpdateDepartmentCommand = {
+      id: department.value.id,
       name: updatedDepartment.name || '',
+      description: '',
       isActive: updatedDepartment.isActive ?? true
     }
-    await departmentStore.updateDepartment(Number(route.params.id), updateRequest)
+    await departmentStore.updateDepartment(department.value.id, updateRequest)
     showEditModal.value = false
   } catch (err) {
     console.error('Failed to update department:', err)

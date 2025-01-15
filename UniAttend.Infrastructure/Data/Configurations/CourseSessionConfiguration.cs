@@ -4,14 +4,14 @@ using UniAttend.Core.Entities.Attendance;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class CourseSessionConfiguration : IEntityTypeConfiguration<CourseSession>
+    internal class CourseSessionConfiguration : EntityConfiguration<CourseSession>
     {
-        public void Configure(EntityTypeBuilder<CourseSession> builder)
+        public override void Configure(EntityTypeBuilder<CourseSession> builder)
         {
+            base.Configure(builder);
+            
             builder.ToTable("CourseSessions");
-            
-            builder.HasKey(x => x.Id);
-            
+                        
             // Properties
             builder.Property(x => x.CourseId).IsRequired();
             builder.Property(x => x.GroupId).IsRequired();

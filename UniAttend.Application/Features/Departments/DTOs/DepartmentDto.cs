@@ -10,5 +10,6 @@ namespace UniAttend.Application.Features.Departments.DTOs
         public int SubjectsCount { get; init; }
         public int StudentsCount { get; init; }
         public int ProfessorsCount { get; init; }
+        public DateTime CreatedAt { get; init; }
     }
 }

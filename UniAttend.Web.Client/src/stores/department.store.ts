@@ -6,6 +6,7 @@ import type {
   UpdateDepartmentCommand 
 } from '@/api/generated/data-contracts';
 import { departmentApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useDepartmentStore = defineStore('department', () => {
   // State
@@ -26,7 +27,7 @@ export const useDepartmentStore = defineStore('department', () => {
       const { data } = await departmentApi.departmentsList();
       departments.value = data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error); // Using handleError with errorRef
     } finally {
       isLoading.value = false;
     }
@@ -38,7 +39,7 @@ export const useDepartmentStore = defineStore('department', () => {
       const { data } = await departmentApi.departmentsDetail(id);
       currentDepartment.value = data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error); // Using handleError with errorRef
     } finally {
       isLoading.value = false;
     }
@@ -47,12 +48,16 @@ export const useDepartmentStore = defineStore('department', () => {
   async function createDepartment(request: CreateDepartmentCommand) {
     isLoading.value = true;
     try {
+      if (!request.name?.trim()) {
+        throw new Error('Department name is required');
+      }
+
       const { data: departmentId } = await departmentApi.departmentsCreate(request);
       const newDepartment = await departmentApi.departmentsDetail(departmentId);
       departments.value.push(newDepartment.data);
       return departmentId;
     } catch (err) {
-      handleError(err);
+      handleError(err, error); // Using handleError with errorRef
       throw err;
     } finally {
       isLoading.value = false;
@@ -75,7 +80,7 @@ export const useDepartmentStore = defineStore('department', () => {
         currentDepartment.value = updatedDepartment.data;
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error); // Using handleError with errorRef
       throw err;
     } finally {
       isLoading.value = false;
@@ -92,15 +97,11 @@ export const useDepartmentStore = defineStore('department', () => {
         departments.value[index] = currentDepartment.value;
       }
     } catch (err) {
-      handleError(err);
+      handleError(err, error); // Using handleError with errorRef
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {

@@ -5,15 +5,14 @@ using UniAttend.Core.Entities.Identity;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class StudentConfiguration : IEntityTypeConfiguration<Student>
+    internal class StudentConfiguration : EntityConfiguration<Student>
     {
-        public void Configure(EntityTypeBuilder<Student> builder)
+        public override void Configure(EntityTypeBuilder<Student> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("Students");
-            
-            builder.HasKey(x => x.Id);
-            
-            // Use backing fields for immutable properties
+
             builder.Property("StudentId")
                 .IsRequired()
                 .HasMaxLength(20);

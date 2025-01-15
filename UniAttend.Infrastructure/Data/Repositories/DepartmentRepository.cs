@@ -10,28 +10,40 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public DepartmentRepository(ApplicationDbContext context) : base(context) { }
 
         public override async Task<Department?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-            => await DbSet
-                .Include(d => d.Subjects)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(d => d.Subjects.Where(s => s.IsActive))
                 .Include(d => d.Students)
                 .Include(d => d.Professors)
                 .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+        }
 
         public async Task<Department?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
-            => await DbSet
-                .Include(d => d.Subjects)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(d => d.Subjects
+                    .Where(s => s.IsActive))
                 .Include(d => d.Students)
                 .Include(d => d.Professors)
                 .FirstOrDefaultAsync(d => d.Name == name, cancellationToken);
-
+        }
+    
         public async Task<IEnumerable<Department>> GetActiveAsync(CancellationToken cancellationToken = default)
-            => await DbSet
+        {
+            return await DbSet
                 .Where(d => d.IsActive)
-                .Include(d => d.Subjects)
+                .Include(d => d.Subjects
+                    .Where(s => s.IsActive))
                 .Include(d => d.Students)
                 .Include(d => d.Professors)
                 .ToListAsync(cancellationToken);
-
+        }
+    
         public async Task<bool> NameExistsAsync(string name, CancellationToken cancellationToken = default)
-            => await DbSet.AnyAsync(d => d.Name == name, cancellationToken);
+        {
+            return await DbSet.AnyAsync(d => d.Name == name, cancellationToken);
+        }
     }
 }

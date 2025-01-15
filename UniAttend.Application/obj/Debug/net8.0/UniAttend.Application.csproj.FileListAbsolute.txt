@@ -1,9 +1,3 @@
-C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.csproj.AssemblyReference.cache
-C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.AssemblyInfoInputs.cache
-C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.AssemblyInfo.cs
-C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.csproj.CoreCompileInputs.cache
-C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.sourcelink.json
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\bin\Debug\net8.0\UniAttend.Application.deps.json
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\bin\Debug\net8.0\UniAttend.Application.dll
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\bin\Debug\net8.0\UniAttend.Application.pdb
@@ -11,6 +5,12 @@ C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\bin\Debu
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\bin\Debug\net8.0\UniAttend.Shared.dll
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\bin\Debug\net8.0\UniAttend.Core.pdb
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\bin\Debug\net8.0\UniAttend.Shared.pdb
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.csproj.AssemblyReference.cache
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.AssemblyInfoInputs.cache
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.AssemblyInfo.cs
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.sourcelink.json
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAtten.A5543226.Up2Date
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\UniAttend.Application.dll
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\obj\Debug\net8.0\refint\UniAttend.Application.dll

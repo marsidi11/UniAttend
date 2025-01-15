@@ -12,14 +12,15 @@ namespace UniAttend.Core.Entities
         {
             ValidateUser(user);
             
+            Id = user.Id;
             DepartmentId = departmentId;
-            UserId = user.Id;
             User = user;
+
+            CreatedAt = DateTime.UtcNow; // Set creation time
         }
     
         // Identity properties - immutable
         public int DepartmentId { get; }
-        public int UserId { get; }
         
         // Domain references without EF Core annotations - nullable for EF Core
         public User? User { get; private set; }

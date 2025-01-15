@@ -4,14 +4,14 @@ using UniAttend.Core.Entities;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class AbsenceAlertConfiguration : IEntityTypeConfiguration<AbsenceAlert>
+    internal class AbsenceAlertConfiguration : EntityConfiguration<AbsenceAlert>
     {
-        public void Configure(EntityTypeBuilder<AbsenceAlert> builder)
+        public override void Configure(EntityTypeBuilder<AbsenceAlert> builder)
         {
+            base.Configure(builder);
+            
             builder.ToTable("AbsenceAlerts");
-            
-            builder.HasKey(x => x.Id);
-            
+                        
             // Use backing fields for immutable properties
             builder.Property("StudentId")
                 .IsRequired();
