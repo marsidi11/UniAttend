@@ -20,3 +20,4 @@ C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\obj\D
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\obj\Debug\net8.0\UniAttend.Infrastructure.pdb
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\obj\Debug\net8.0\UniAttend.Infrastructure.genruntimeconfig.cache
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\obj\Debug\net8.0\ref\UniAttend.Infrastructure.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\bin\Debug\net8.0\appsettings.json

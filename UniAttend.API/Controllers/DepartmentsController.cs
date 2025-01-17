@@ -9,9 +9,9 @@ using UniAttend.Application.Features.Departments.Queries.GetDepartments;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class DepartmentsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -72,7 +72,7 @@ namespace UniAttend.API.Controllers
         /// Toggles department active status. Admin only.
         /// </summary>
         [HttpPatch("{id}/toggle-status")]
-[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> ToggleDepartmentStatus(int id)
         {
             // First get the current department to check its status

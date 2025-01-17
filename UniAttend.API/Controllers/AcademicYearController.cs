@@ -11,6 +11,7 @@ using UniAttend.Application.Features.AcademicYears.DTOs;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AcademicYearController : ControllerBase

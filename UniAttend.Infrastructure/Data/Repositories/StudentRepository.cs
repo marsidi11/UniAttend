@@ -9,6 +9,17 @@ namespace UniAttend.Infrastructure.Data.Repositories
     {
         public StudentRepository(ApplicationDbContext context) : base(context) { }
 
+        public async Task<IEnumerable<Student>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(s => s.User)
+                .Include(s => s.Department)
+                .OrderBy(s => s.User.LastName)
+                .ThenBy(s => s.User.FirstName)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
+
         public override async Task<Student?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(s => s.User)

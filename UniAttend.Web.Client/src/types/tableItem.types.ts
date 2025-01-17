@@ -8,6 +8,8 @@ export interface TableItem {
 export interface Column<T extends TableItem> {
   key: keyof T;
   label: string;
+  sortable?: boolean;
+  cellClass?: (value: any) => string;
   render?: (value: T[keyof T]) => string | number;
 }
 

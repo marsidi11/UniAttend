@@ -12,9 +12,9 @@ using UniAttend.Application.Features.Classrooms.DTOs;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ClassroomsController : ControllerBase
     {
         private readonly IMediator _mediator;

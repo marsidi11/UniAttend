@@ -8,9 +8,9 @@ using UniAttend.Application.Features.Classes.DTOs;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ClassesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -49,7 +49,7 @@ namespace UniAttend.API.Controllers
         /// Opens a new class session
         /// </summary>
         [HttpPost]
-        [Authorize(Policy = "RequireProfessorRole")]
+        [Authorize(Roles = "Professor")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -69,7 +69,7 @@ namespace UniAttend.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the class to close</param>
         [HttpPost("{id}/close")]
-        [Authorize(Policy = "RequireProfessorRole")]
+        [Authorize(Roles = "Professor")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

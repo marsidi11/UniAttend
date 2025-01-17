@@ -19,11 +19,14 @@ export const useSubjectStore = defineStore('subject', () => {
   const subjectsByDepartment = computed(() => {
     const grouped = new Map<string, SubjectDto[]>();
     subjects.value.forEach(subject => {
-      const dept = subject.departmentName;
+      const dept = subject.departmentName ?? 'Unassigned';
       if (!grouped.has(dept)) {
         grouped.set(dept, []);
       }
-      grouped.get(dept)?.push(subject);
+      const group = grouped.get(dept);
+      if (group) {
+        group.push(subject);
+      }
     });
     return grouped;
   });

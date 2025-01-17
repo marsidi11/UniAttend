@@ -11,9 +11,9 @@ using UniAttend.Application.Features.Reports.Queries.ExportAttendanceReport;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ReportsController : ControllerBase
     {
         private readonly IMediator _mediator;

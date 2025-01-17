@@ -7,6 +7,8 @@ namespace UniAttend.Core.Interfaces.Repositories
     /// </summary>
     public interface IStudentRepository : IRepository<Student>
     {
+        Task<IEnumerable<Student>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
+        
         Task<Student?> GetByCardIdAsync(string cardId, CancellationToken cancellationToken = default);
         Task<Student?> GetByStudentIdAsync(string studentId, CancellationToken cancellationToken = default);
         Task<IEnumerable<Student>> GetByDepartmentIdAsync(int departmentId, CancellationToken cancellationToken = default);

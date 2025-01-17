@@ -7,7 +7,19 @@
     </div>
 
     <!-- Filters -->
-    <div class="flex gap-4 bg-white p-4 rounded-lg shadow">
+    <div class="flex flex-wrap gap-4 bg-white p-4 rounded-lg shadow">
+      <!-- Search -->
+      <div class="w-64">
+        <label class="block text-sm font-medium text-gray-700">Search</label>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by name, ID, or username"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <!-- Department Filter -->
       <div class="w-64">
         <label class="block text-sm font-medium text-gray-700">Department</label>
         <select
@@ -20,6 +32,8 @@
           </option>
         </select>
       </div>
+
+      <!-- Status Filter -->
       <div class="w-64">
         <label class="block text-sm font-medium text-gray-700">Status</label>
         <select
@@ -34,7 +48,7 @@
     </div>
 
     <!-- Students Table -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg overflow-hidden">
       <DataTable
         :data="filteredStudents"
         :columns="columns"
@@ -89,25 +103,49 @@ const showModal = ref(false)
 const selectedStudent = ref<UserDetailsDto | null>(null)
 const selectedDepartment = ref('')
 const selectedStatus = ref('')
+const searchQuery = ref('')
 
+// Table columns configuration
 const columns: Column<TableItem>[] = [
-  { key: 'username', label: 'Student ID' },
+  { 
+    key: 'studentId',
+    label: 'Student ID',
+    sortable: true
+  },
+  { 
+    key: 'username',
+    label: 'Username',
+    sortable: true
+  },
   { 
     key: 'fullName', 
     label: 'Full Name', 
+    sortable: true,
     render: (value: any) => {
-      // Since we need the whole item, not just the value,
-      // use the value parameter which contains the full item for this column
       const student = value as UserDetailsDto
       return `${student.firstName} ${student.lastName}`
     }
   },
-  { key: 'departmentName', label: 'Department' },
-  { key: 'email', label: 'Email' },
+  {
+    key: 'email',
+    label: 'Email',
+    sortable: true
+  },
+  {
+    key: 'cardId',
+    label: 'Card ID',
+    render: (value: any) => value || 'Not Assigned'
+  },
+  { 
+    key: 'departmentName',
+    label: 'Department',
+    sortable: true
+  },
   { 
     key: 'isActive', 
     label: 'Status',
-    render: (value: any) => (value as boolean) ? 'Active' : 'Inactive'
+    render: (value: boolean) => value ? 'Active' : 'Inactive',
+    cellClass: (value: boolean) => value ? 'text-green-600' : 'text-red-600'
   }
 ]
 
@@ -133,13 +171,28 @@ const modalTitle = computed(() =>
 const filteredStudents = computed(() => {
   let filtered = [...students.value].map(student => ({
     ...student,
-    id: student.id || 0
+    id: student.id || 0,
+    fullName: `${student.firstName} ${student.lastName}`
   })) as (UserDetailsDto & TableItem)[]
   
+  // Apply search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(s => 
+      s.firstName?.toLowerCase().includes(query) ||
+      s.lastName?.toLowerCase().includes(query) ||
+      s.username?.toLowerCase().includes(query) ||
+      s.studentId?.toLowerCase().includes(query) ||
+      s.email?.toLowerCase().includes(query)
+    )
+  }
+  
+  // Apply department filter
   if (selectedDepartment.value) {
     filtered = filtered.filter(s => s.departmentId === Number(selectedDepartment.value))
   }
   
+  // Apply status filter
   if (selectedStatus.value !== '') {
     filtered = filtered.filter(s => s.isActive === (selectedStatus.value === 'true'))
   }
@@ -201,3 +254,13 @@ onMounted(async () => {
   ])
 })
 </script>
+
+<style scoped>
+.table-cell-active {
+  @apply text-green-600 font-medium;
+}
+
+.table-cell-inactive {
+  @apply text-red-600 font-medium;
+}
+</style>

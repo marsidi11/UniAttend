@@ -27,7 +27,7 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
 
         public async Task<int> Handle(RegisterStudentCommand request, CancellationToken cancellationToken)
         {
-            // Validate unique constraints
+            // Validate unique constraints first
             if (await _unitOfWork.Students.StudentIdExistsAsync(request.StudentId, cancellationToken))
                 throw new ValidationException("Student ID already exists");
 
@@ -35,17 +35,18 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 await _unitOfWork.Students.CardIdExistsAsync(request.CardId, cancellationToken))
                 throw new ValidationException("Card ID already exists");
 
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
             try
             {
-                // Generate secure random password
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+                // Generate username and password
+                string username = await GenerateUniqueUsernameAsync(request.FirstName, request.LastName, cancellationToken);
                 string temporaryPassword = PasswordGenerator.GenerateTemporaryPassword();
                 string hashedPassword = _passwordHasher.HashPassword(temporaryPassword);
 
-                // Create user account with hashed password
+                // Create user first
                 var user = new User(
-                    username: request.StudentId,
+                    username: username,
                     passwordHash: hashedPassword,
                     email: request.Email,
                     role: UserRole.Student,
@@ -54,8 +55,9 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 );
 
                 await _unitOfWork.Users.AddAsync(user, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                // Create student record
+                // Then create student
                 var student = new Student(request.StudentId, request.DepartmentId, user);
                 if (!string.IsNullOrEmpty(request.CardId))
                 {
@@ -63,14 +65,15 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 }
 
                 await _unitOfWork.Students.AddAsync(student, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);
 
-                // Send welcome email with temporary password
+                // Send welcome email after successful commit
                 await _emailService.SendWelcomeEmailAsync(
                     request.Email,
                     $"{request.FirstName} {request.LastName}",
-                    request.StudentId,
-                    temporaryPassword, // Send original unhashed password
+                    username,
+                    temporaryPassword,
                     cancellationToken
                 );
 
@@ -81,6 +84,31 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 await _unitOfWork.RollbackAsync(cancellationToken);
                 throw;
             }
+        }
+
+        private async Task<string> GenerateUniqueUsernameAsync(string firstName, string lastName, CancellationToken cancellationToken)
+        {
+            // Convert to lowercase and remove spaces/special characters
+            firstName = firstName.ToLower().Trim();
+            lastName = lastName.ToLower().Trim();
+
+            // Take first letter of first name + full lastname
+            string baseUsername = $"{firstName[0]}.{lastName}";
+
+            // Remove any special characters and spaces
+            baseUsername = string.Join("", baseUsername.Where(c => c == '.' || char.IsLetterOrDigit(c)));
+
+            string username = baseUsername;
+            int counter = 1;
+
+            // Check if username exists and append number if it does
+            while (await _unitOfWork.Users.UsernameExistsAsync(username, cancellationToken))
+            {
+                username = $"{baseUsername}{counter}";
+                counter++;
+            }
+
+            return username;
         }
     }
 }

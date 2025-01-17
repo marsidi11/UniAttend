@@ -5,32 +5,31 @@ using UniAttend.Core.Entities.Identity;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-        internal class ProfessorConfiguration : EntityConfiguration<Professor>
+    internal class ProfessorConfiguration : EntityConfiguration<Professor>
+    {
+        public override void Configure(EntityTypeBuilder<Professor> builder)
         {
-            public override void Configure(EntityTypeBuilder<Professor> builder)
-            {
-                base.Configure(builder);
-        
-                builder.ToTable("Professors");
-                    
-                // Configure primary key to match Users table
-                builder.HasKey(p => p.Id);
-                builder.Property(p => p.Id)
-                    .ValueGeneratedNever();
-        
-                builder.Property(p => p.DepartmentId)
-                    .IsRequired();
-        
-                // Configure relationships
-                builder.HasOne(p => p.Department)
-                    .WithMany(d => d.Professors)
-                    .HasForeignKey(p => p.DepartmentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-        
-                builder.HasOne(p => p.User)
-                    .WithOne(u => u.Professor)
-                    .HasForeignKey<Professor>(p => p.Id)
-                    .OnDelete(DeleteBehavior.Restrict);
-            }
+            base.Configure(builder);
+
+            builder.ToTable("Professors");
+
+            builder.Property(x => x.DepartmentId)
+                .IsRequired();
+
+            // Professor shares the same Id with User (one-to-one)
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).ValueGeneratedNever();
+
+            // Configure relationships
+            builder.HasOne(x => x.Department)
+                .WithMany(x => x.Professors)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.User)
+                .WithOne()
+                .HasForeignKey<Professor>(x => x.Id)
+                .OnDelete(DeleteBehavior.Restrict);
         }
+    }
 }

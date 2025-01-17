@@ -8,5 +8,10 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     }
-  }
+  },
+  server: {
+    host: false, // Allow host
+    port: 5173,
+    open: false // Optional: Opens the browser on start
+  },
 })

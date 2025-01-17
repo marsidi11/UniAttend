@@ -19,8 +19,20 @@ namespace UniAttend.Application.Features.Students.Queries.GetStudentsList
 
         public async Task<List<StudentListDto>> Handle(GetStudentsListQuery request, CancellationToken cancellationToken)
         {
-            var students = await _studentRepository.GetAllAsync(cancellationToken);
-            return _mapper.Map<List<StudentListDto>>(students.ToList());
+            var students = await _studentRepository.GetAllWithDetailsAsync(cancellationToken);
+
+            if (request.ActiveOnly)
+            {
+                students = students.Where(s => s.User?.IsActive == true);
+            }
+
+            if (request.DepartmentId.HasValue)
+            {
+                students = students.Where(s => s.DepartmentId == request.DepartmentId.Value);
+            }
+
+            var studentDtos = _mapper.Map<List<StudentListDto>>(students);
+            return studentDtos;
         }
     }
 }

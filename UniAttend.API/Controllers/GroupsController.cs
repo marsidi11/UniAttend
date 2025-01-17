@@ -12,9 +12,9 @@ using UniAttend.Application.Features.Groups.DTOs;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class GroupsController : ControllerBase
     {
         private readonly IMediator _mediator;

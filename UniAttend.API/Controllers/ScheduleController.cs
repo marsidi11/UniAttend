@@ -10,9 +10,9 @@ using UniAttend.Application.Features.Schedule.DTOs;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ScheduleController : ControllerBase
     {
         private readonly IMediator _mediator;

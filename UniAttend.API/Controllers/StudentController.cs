@@ -12,9 +12,9 @@ using UniAttend.Application.Features.Students.Queries.GetStudentsList;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "RequireStudentRole")]
     public class StudentController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -25,7 +25,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "RequireSecretaryRole")]
+        [Authorize(Roles = "Secretary")]
         public async Task<IActionResult> GetAll()
         {
             var query = new GetStudentsListQuery();
@@ -34,7 +34,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "RequireSecretaryRole")]
+        [Authorize(Roles = "Secretary")]
         public async Task<ActionResult<int>> RegisterStudent([FromBody] RegisterStudentCommand command)
         {
             var studentId = await _mediator.Send(command);

@@ -4,7 +4,7 @@ using UniAttend.Core.Entities;
 
 namespace UniAttend.Infrastructure.Data.Configurations
 {
-    internal class StudyGroupConfiguration : EntityConfiguration<StudyGroup>
+        internal class StudyGroupConfiguration : EntityConfiguration<StudyGroup>
     {
         public override void Configure(EntityTypeBuilder<StudyGroup> builder)
         {
@@ -26,7 +26,7 @@ namespace UniAttend.Infrastructure.Data.Configurations
                 .IsRequired();
         
             builder.HasOne(x => x.Subject)
-                .WithMany()
+                .WithMany(x => x.StudyGroups)
                 .HasForeignKey(x => x.SubjectId)
                 .OnDelete(DeleteBehavior.Restrict);
         

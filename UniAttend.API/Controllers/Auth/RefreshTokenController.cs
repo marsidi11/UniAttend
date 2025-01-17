@@ -5,6 +5,7 @@ using UniAttend.Application.Features.Auth.Commands.RefreshToken;
 
 namespace UniAttend.API.Controllers.Auth
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RefreshTokenController : ControllerBase

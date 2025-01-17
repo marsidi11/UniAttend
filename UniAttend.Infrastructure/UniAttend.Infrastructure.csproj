@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+  <None Update="appsettings.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  
     <PackageReference Include="itext7" Version="9.0.0" />
     <PackageReference Include="itext7.pdfhtml" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />

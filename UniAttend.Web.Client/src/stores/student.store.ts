@@ -46,6 +46,7 @@ export const useStudentStore = defineStore('student', () => {
     isLoading.value = true;
     try {
       const response = await studentApi.studentList();
+      console.log('API Response:', response.data)
       // Type assertion to handle the response
       const studentData = response as unknown as { data: ExtendedStudentDto[] };
       if (studentData && Array.isArray(studentData.data)) {

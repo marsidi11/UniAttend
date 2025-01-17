@@ -12,8 +12,8 @@ using UniAttend.Infrastructure.Data;
 namespace UniAttend.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250115010137_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250115181709_UpdateSubjectConfiguration")]
+    partial class UpdateSubjectConfiguration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -457,20 +457,21 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("ProfessorId")
+                        .HasColumnType("int");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("longtext");
@@ -480,8 +481,8 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime")
@@ -496,6 +497,8 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("ProfessorId");
 
                     b.HasIndex("Username")
                         .IsUnique();
@@ -521,15 +524,9 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnType("datetime")
                         .HasColumnName("UpdatedAt");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Professors", (string)null);
                 });
@@ -584,10 +581,7 @@ namespace UniAttend.Infrastructure.Migrations
             modelBuilder.Entity("UniAttend.Core.Entities.Student", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CardId")
                         .HasMaxLength(50)
@@ -602,9 +596,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DepartmentId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("StudentId")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -614,9 +605,6 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnType("datetime")
                         .HasColumnName("UpdatedAt");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CardId")
@@ -625,12 +613,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.HasIndex("DepartmentId1");
-
                     b.HasIndex("StudentId")
-                        .IsUnique();
-
-                    b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("Students", (string)null);
@@ -667,9 +650,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SubjectId1")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime")
                         .HasColumnName("UpdatedAt");
@@ -681,8 +661,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.HasIndex("ProfessorId");
 
                     b.HasIndex("SubjectId");
-
-                    b.HasIndex("SubjectId1");
 
                     b.ToTable("StudyGroups", (string)null);
                 });
@@ -696,7 +674,10 @@ namespace UniAttend.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasColumnName("CreatedAt")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("Credits")
                         .HasColumnType("int");
@@ -706,23 +687,29 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime")
+                        .HasColumnName("UpdatedAt");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Subjects");
+                    b.HasIndex("Name", "DepartmentId")
+                        .IsUnique();
+
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("UniAttend.Core.Entities.AbsenceAlert", b =>
@@ -833,6 +820,15 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("UniAttend.Core.Entities.Identity.User", b =>
+                {
+                    b.HasOne("UniAttend.Core.Entities.Professor", "Professor")
+                        .WithMany()
+                        .HasForeignKey("ProfessorId");
+
+                    b.Navigation("Professor");
+                });
+
             modelBuilder.Entity("UniAttend.Core.Entities.Professor", b =>
                 {
                     b.HasOne("UniAttend.Core.Entities.Department", "Department")
@@ -842,8 +838,8 @@ namespace UniAttend.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("UniAttend.Core.Entities.Identity.User", "User")
-                        .WithOne("Professor")
-                        .HasForeignKey("UniAttend.Core.Entities.Professor", "UserId")
+                        .WithOne()
+                        .HasForeignKey("UniAttend.Core.Entities.Professor", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -873,20 +869,17 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.Student", b =>
                 {
-                    b.HasOne("UniAttend.Core.Entities.Department", null)
+                    b.HasOne("UniAttend.Core.Entities.Department", "Department")
                         .WithMany("Students")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("UniAttend.Core.Entities.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId1");
-
                     b.HasOne("UniAttend.Core.Entities.Identity.User", "User")
                         .WithOne("Student")
-                        .HasForeignKey("UniAttend.Core.Entities.Student", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("UniAttend.Core.Entities.Student", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Department");
 
@@ -908,14 +901,10 @@ namespace UniAttend.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("UniAttend.Core.Entities.Subject", "Subject")
-                        .WithMany()
+                        .WithMany("StudyGroups")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("UniAttend.Core.Entities.Subject", null)
-                        .WithMany("StudyGroups")
-                        .HasForeignKey("SubjectId1");
 
                     b.Navigation("AcademicYear");
 
@@ -961,8 +950,6 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.Identity.User", b =>
                 {
-                    b.Navigation("Professor");
-
                     b.Navigation("Student");
                 });
 

@@ -29,12 +29,20 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
         {
             if (request.Role != UserRole.Secretary && request.Role != UserRole.Professor)
                 throw new ValidationException("Invalid role for User member");
-
-            var department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentId, cancellationToken)
-                ?? throw new NotFoundException($"Department with ID {request.DepartmentId} not found");
-
+        
+            // Skip department validation for Secretary role
+            Department? department = null;
+            if (request.Role == UserRole.Professor)
+            {
+                if (!request.DepartmentId.HasValue)
+                    throw new ValidationException("Department is required for professors");
+                    
+                department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentId.Value, cancellationToken)
+                    ?? throw new NotFoundException($"Department with ID {request.DepartmentId.Value} not found");
+            }
+        
             var tempPassword = PasswordGenerator.GenerateTemporaryPassword();
-
+        
             var user = new User(
                 request.Username,
                 _passwordHasher.HashPassword(tempPassword),
@@ -43,30 +51,31 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
                 request.FirstName,
                 request.LastName
             );
-
+        
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
+        
             try
             {
                 await _unitOfWork.Users.AddAsync(user, cancellationToken);
-
-                if (request.Role == UserRole.Professor)
+        
+                // Only create Professor entity if role is Professor
+                if (request.Role == UserRole.Professor && department != null)
                 {
-                    var professor = new Professor(request.DepartmentId, user);
+                    var professor = new Professor(department.Id, user);
                     await _unitOfWork.Professors.AddAsync(professor, cancellationToken);
                 }
-
+        
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);
-
+        
                 await _emailService.SendWelcomeEmailAsync(
                     user.Email,
                     $"{user.FirstName} {user.LastName}",
                     request.Username,
                     tempPassword,
-                    cancellationToken 
+                    cancellationToken
                 );
-
+        
                 return user.Id;
             }
             catch

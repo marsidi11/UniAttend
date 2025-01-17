@@ -56,27 +56,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("VueApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "http://192.168.0.101:5173" // Local netword IP
+            )
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
     });
-});
-
-// Configure Authorization
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdminRole", policy =>
-        policy.RequireRole("Admin"));
-        
-    options.AddPolicy("RequireSecretaryRole", policy =>
-        policy.RequireRole("Secretary"));
-        
-    options.AddPolicy("RequireProfessorRole", policy =>
-        policy.RequireRole("Professor"));
-        
-    options.AddPolicy("RequireStudentRole", policy =>
-        policy.RequireRole("Student"));
 });
 
 // Configure Swagger

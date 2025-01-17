@@ -8,12 +8,13 @@ namespace UniAttend.Core.Entities
     /// </summary>
     public class Subject : ActiveEntity
     {
+        private readonly List<StudyGroup> _studyGroups = new();
+
         private Subject()
         {
             Name = string.Empty;
             Description = string.Empty;
             Department = null!;
-            StudyGroups = new List<StudyGroup>();
         }
 
         public Subject(string name, string description, int credits, Department department)
@@ -32,7 +33,6 @@ namespace UniAttend.Core.Entities
             Credits = credits;
             Department = department ?? throw new ArgumentNullException(nameof(department));
             DepartmentId = department.Id;
-            StudyGroups = new List<StudyGroup>();
         }
 
         public string Name { get; private set; }
@@ -40,7 +40,7 @@ namespace UniAttend.Core.Entities
         public int Credits { get; private set; }
         public int DepartmentId { get; private init; }
         public Department Department { get; private init; }
-        public ICollection<StudyGroup> StudyGroups { get; private init; }
+        public IReadOnlyCollection<StudyGroup> StudyGroups => _studyGroups.AsReadOnly();
 
         public void Update(string name, string description, int credits)
         {

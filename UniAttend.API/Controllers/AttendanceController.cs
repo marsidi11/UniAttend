@@ -11,9 +11,9 @@ using UniAttend.API.Extensions;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class AttendanceController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -38,7 +38,7 @@ namespace UniAttend.API.Controllers
             return Ok(result);
         }
     
-        [Authorize(Policy = "RequireProfessorRole")]
+        [Authorize(Roles = "Professor")]
         [HttpPost("classes/{classId}/confirm")]
         public async Task<IActionResult> ConfirmAttendance(int classId)
         {
@@ -55,7 +55,7 @@ namespace UniAttend.API.Controllers
     /// Gets attendance records for a specific class
     /// </summary>
     [HttpGet("classes/{classId}")]
-    [Authorize(Policy = "RequireProfessorRole")]
+        [Authorize(Roles = "Professor")]
     public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetClassAttendance(
         int classId,
         [FromQuery] DateTime? date,
@@ -74,7 +74,7 @@ namespace UniAttend.API.Controllers
     /// Gets attendance records for the authenticated student
     /// </summary>
     [HttpGet("student")]
-    [Authorize(Policy = "RequireStudentRole")]
+    [Authorize(Roles = "Student")]
     public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetStudentAttendance(
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate,

@@ -15,9 +15,9 @@ using UniAttend.Core.Enums;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;

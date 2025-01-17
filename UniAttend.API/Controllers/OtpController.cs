@@ -9,9 +9,9 @@ using System.Security.Claims;
 
 namespace UniAttend.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/attendance/otp")]
-    [Authorize]
     public class OtpController : ControllerBase
     {
         private readonly IOtpService _otpService;
@@ -24,7 +24,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpPost("generate")]
-        [Authorize(Policy = "RequireProfessorRole")]
+        [Authorize(Roles = "Professor")]
         public async Task<ActionResult<OtpCode>> GenerateOtp([FromBody] GenerateOtpRequest request, CancellationToken cancellationToken)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
@@ -74,7 +74,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet("{classId}/current")]
-        [Authorize(Policy = "RequireProfessorRole")]
+        [Authorize(Roles = "Professor")]
         public async Task<ActionResult<OtpCode>> GetCurrentOtp(int classId, CancellationToken cancellationToken)
         {
             var otpCode = await _otpService.GetCurrentOtpAsync(classId, cancellationToken);
