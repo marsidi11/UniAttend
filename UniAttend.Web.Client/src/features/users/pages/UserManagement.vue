@@ -109,7 +109,9 @@ const staff = computed(() =>
   users.value.map(user => ({
     ...user,
     id: user.id || 0,
-    role: mapRole(user.role || 0)
+    role: mapRole(user.role || 0),
+    fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+    departmentName: user.departmentName || 'Null'
   })) as StaffTableItem[]
 )
 

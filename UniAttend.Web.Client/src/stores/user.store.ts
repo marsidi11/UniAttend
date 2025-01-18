@@ -107,6 +107,7 @@ export const useUserStore = defineStore('user', () => {
     try {
       await userApi.userProfileUpdate(profileData);
       await fetchProfile(); // Refresh profile data
+      return 'Profile updated successfully';
     } catch (err) {
       handleError(err);
       throw err;
@@ -135,6 +136,7 @@ export const useUserStore = defineStore('user', () => {
     isLoading.value = true;
     try {
       await userApi.userChangePasswordUpdate(passwordData);
+      return 'Password changed successfully';
     } catch (err) {
       handleError(err);
       throw err;

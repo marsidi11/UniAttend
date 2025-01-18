@@ -107,7 +107,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'submit', data: UpdateProfileCommand & Partial<ChangePasswordCommand>): void
+  (e: 'updateProfile', data: UpdateProfileCommand): void
+  (e: 'updatePassword', data: ChangePasswordCommand): void
 }>()
 
 const isLoading = ref(false)
@@ -140,7 +141,17 @@ async function handleSubmit() {
     isLoading.value = true
     error.value = ''
 
-    // Validate password change if attempted
+    // Track what needs to be updated
+    const updates: { profile?: boolean; password?: boolean } = {};
+
+    // Check if profile details have changed
+    if (form.value.firstName !== props.user?.firstName || 
+        form.value.lastName !== props.user?.lastName || 
+        form.value.email !== props.user?.email) {
+      updates.profile = true;
+    }
+
+    // Check if password change is attempted
     if (passwordForm.value.newPassword || passwordForm.value.currentPassword || passwordForm.value.confirmPassword) {
       if (!passwordForm.value.currentPassword) {
         error.value = 'Current password is required to change password'
@@ -150,15 +161,21 @@ async function handleSubmit() {
         error.value = 'New passwords do not match'
         return
       }
+      updates.password = true;
     }
 
-    emit('submit', {
-      ...form.value,
-      ...(passwordForm.value.newPassword ? {
+    // Emit appropriate events
+    if (updates.profile) {
+      emit('updateProfile', form.value)
+    }
+    
+    if (updates.password) {
+      emit('updatePassword', {
         currentPassword: passwordForm.value.currentPassword,
         newPassword: passwordForm.value.newPassword
-      } : {})
-    })
+      })
+    }
+
   } finally {
     isLoading.value = false
   }

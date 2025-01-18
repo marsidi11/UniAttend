@@ -81,7 +81,7 @@ import type {
   DepartmentDto,
   CreateUserCommand,
   UpdateUserCommand,
-  UserRole // Add this import
+  UserRole 
 } from '@/api/generated/data-contracts'
 
 interface Props {

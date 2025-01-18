@@ -7,6 +7,10 @@ using UniAttend.Infrastructure.Data.Configurations;
 
 namespace UniAttend.Infrastructure.Data
 {
+    /// <summary>
+    /// Represents the main database context for the application,
+    /// handling entity configurations and database operations.
+    /// </summary>
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
