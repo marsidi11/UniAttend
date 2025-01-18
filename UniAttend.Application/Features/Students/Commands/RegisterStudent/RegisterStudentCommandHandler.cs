@@ -35,6 +35,9 @@ namespace UniAttend.Application.Features.Students.Commands.RegisterStudent
                 await _unitOfWork.Students.CardIdExistsAsync(request.CardId, cancellationToken))
                 throw new ValidationException("Card ID already exists");
 
+            if (await _unitOfWork.Users.EmailExistsAsync(request.Email))
+                throw new ValidationException("Email {request.Email} is already registered");
+
             try
             {
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);

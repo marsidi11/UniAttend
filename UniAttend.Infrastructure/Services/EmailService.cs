@@ -1,8 +1,10 @@
-using UniAttend.Core.Interfaces.Services;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 using Microsoft.Extensions.Options;
-using System.Net.Mail;
-using UniAttend.Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
+using UniAttend.Core.Interfaces.Services;
+using UniAttend.Infrastructure.Settings;
 
 namespace UniAttend.Infrastructure.Services
 {
@@ -41,25 +43,27 @@ namespace UniAttend.Infrastructure.Services
             await SendEmailAsync(email, subject, body, cancellationToken);
         }
 
-        /// <summary>
-        /// Sends an email using configured SMTP settings
-        /// </summary>
-        /// <param name="to">Recipient email address</param>
-        /// <param name="subject">Email subject</param>
-        /// <param name="body">Email body content</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        public async Task SendEmailAsync(string to, string subject,
-            string body, CancellationToken cancellationToken = default)
+        public async Task SendEmailAsync(string to, string subject, string body, 
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                using var client = new SmtpClient(_settings.SmtpServer, _settings.Port)
+                var email = new MimeMessage();
+                email.From.Add(new MailboxAddress(_settings.DisplayName, _settings.FromAddress));
+                email.To.Add(MailboxAddress.Parse(to));
+                email.Subject = subject;
+
+                var builder = new BodyBuilder
                 {
-                    EnableSsl = _settings.EnableSsl,
-                    Credentials = new System.Net.NetworkCredential(_settings.Username, _settings.Password)
+                    TextBody = body
                 };
-                using var message = new MailMessage(_settings.FromAddress, to, subject, body);
-                await client.SendMailAsync(message, cancellationToken);
+                email.Body = builder.ToMessageBody();
+
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync(_settings.SmtpServer, _settings.Port, SecureSocketOptions.StartTls, cancellationToken);
+                await smtp.AuthenticateAsync(_settings.Username, _settings.Password, cancellationToken);
+                await smtp.SendAsync(email, cancellationToken);
+                await smtp.DisconnectAsync(true, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -69,27 +73,27 @@ namespace UniAttend.Infrastructure.Services
         }
 
         public async Task SendWelcomeEmailAsync(
-        string email,
-        string fullName,
-        string username,
-        string temporaryPassword,
-        CancellationToken cancellationToken = default)
+            string email, 
+            string fullName, 
+            string username,
+            string temporaryPassword,
+            CancellationToken cancellationToken = default)
         {
             var subject = "Welcome to UniAttend - Account Details";
             var body = $"""
-            Dear {fullName},
+                Dear {fullName},
 
-            Welcome to UniAttend! Your account has been created successfully.
+                Welcome to UniAttend! Your account has been created successfully.
 
-            Here are your login credentials:
-            Username: {username}
-            Temporary Password: {temporaryPassword}
+                Here are your login credentials:
+                Username: {username}
+                Temporary Password: {temporaryPassword}
 
-            For security reasons, please change your password after your first login.
+                For security reasons, please change your password after your first login.
 
-            Best regards,
-            The UniAttend Team
-            """;
+                Best regards,
+                The UniAttend Team
+                """;
 
             await SendEmailAsync(email, subject, body, cancellationToken);
         }
