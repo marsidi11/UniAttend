@@ -7,7 +7,7 @@
     ]"
     :disabled="disabled"
     :type="type"
-    @click="$emit('click')"
+    @click="(event) => $emit('click', event)"
   >
     <slot></slot>
   </button>

@@ -16,7 +16,7 @@ export interface Column<T extends TableItem> {
 export interface Action<T = any> {
   label: string;
   icon?: string;
-  action: (item: T) => void;
+  action: (item: T, event?: Event) => void;
 }
 
 export interface StaffTableItem extends TableItem {

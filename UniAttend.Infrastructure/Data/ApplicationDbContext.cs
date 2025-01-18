@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Entities.Attendance;
+using UniAttend.Core.Entities.Audit;
 using UniAttend.Infrastructure.Data.Configurations;
 
 namespace UniAttend.Infrastructure.Data
@@ -23,6 +24,7 @@ namespace UniAttend.Infrastructure.Data
         public DbSet<CourseSession> CourseSession { get; set; }
         public DbSet<OtpCode> OtpCodes { get; set; }
         public DbSet<GroupStudent> GroupStudents { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

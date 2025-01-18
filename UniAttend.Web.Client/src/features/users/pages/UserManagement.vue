@@ -73,7 +73,7 @@ import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/user.store'
 import { useDepartmentStore } from '@/stores/department.store'
-import type { TableItem, StaffTableItem } from '@/types/tableItem.types'
+import type { TableItem, StaffTableItem, Action } from '@/types/tableItem.types'
 import type { StringRole } from '@/types/base.types'
 import type { 
   UserDto, 
@@ -132,16 +132,22 @@ const columns = [
   }
 ]
 
-const tableActions = [
+const tableActions: Action<TableItem>[] = [
   { 
     label: 'Edit', 
     icon: 'edit', 
-    action: (item: TableItem) => handleEdit(item as UserDto)
+    action: (item: TableItem, event?: Event) => {
+      event?.stopPropagation();
+      handleEdit(item as UserDto);
+    }
   },
   { 
     label: 'Toggle Status', 
     icon: 'toggle_on', 
-    action: (item: TableItem) => handleToggleStatus(item as UserDto)
+    action: (item: TableItem, event?: Event) => {
+      event?.stopPropagation();
+      handleToggleStatus(item as UserDto);
+    }
   }
 ]
 
@@ -191,14 +197,25 @@ function handleEdit(staff: UserDto) {
 }
 
 async function handleToggleStatus(staff: UserDto) {
-  if (!staff.id) return
+  if (!staff.id) return;
   
-  if (confirm(`Are you sure you want to ${staff.isActive ? 'deactivate' : 'activate'} this staff member?`)) {
-    try {
-      await userStore.updateUser(staff.id, { isActive: !staff.isActive })
-    } catch (err) {
-      console.error('Failed to update staff status:', err)
+  try {
+    if (staff.isActive) {
+      // Deactivate user
+      if (confirm('Are you sure you want to deactivate this staff member?')) {
+        await userStore.deactivateUser(staff.id);
+      }
+    } else {
+      // Activate user
+      if (confirm('Are you sure you want to activate this staff member?')) {
+        await userStore.updateUser(staff.id, { 
+          id: staff.id,
+          isActive: true 
+        });
+      }
     }
+  } catch (err) {
+    console.error('Failed to update staff status:', err);
   }
 }
 
