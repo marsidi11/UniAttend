@@ -1,21 +1,9 @@
 using MediatR;
-using UniAttend.Application.Features.Auth.DTOs;
 
 namespace UniAttend.Application.Features.Auth.Commands.ResetPassword
 {
-    /// <summary>
-    /// Represents a command to reset a user's password.
-    /// </summary>
-    public record ResetPasswordCommand : IRequest<AuthResult>
+    public record ResetPasswordCommand : IRequest<Unit>
     {
-        /// <summary>
-        /// The user's unique identifier.
-        /// </summary>
-        public int UserId { get; init; }
-
-        /// <summary>
-        /// The new password for the user.
-        /// </summary>
-        public string NewPassword { get; init; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
     }
 }

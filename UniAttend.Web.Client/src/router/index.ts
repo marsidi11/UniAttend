@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/auth.store';
 // Public pages
 import HomePage from '@/features/home/pages/HomePage.vue';
 import LoginPage from '@/features/auth/pages/LoginPage.vue';
+import ForgotPasswordPage from '@/features/auth/pages/ForgotPasswordPage.vue';
 
 // Dashboard pages
 import AdminDashboard from '@/features/dashboard/pages/AdminDashboard.vue';
@@ -62,6 +63,12 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginPage,
+    meta: { requiresAuth: false, layout: 'auth' }
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPasswordPage,
     meta: { requiresAuth: false, layout: 'auth' }
   },
   {

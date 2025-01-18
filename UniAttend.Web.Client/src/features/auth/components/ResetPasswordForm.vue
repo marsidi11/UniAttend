@@ -1,6 +1,13 @@
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-6">
     <div>
+      <h2 class="text-center text-xl font-bold mb-4">Reset Password</h2>
+      <p class="text-center text-sm text-gray-600 mb-6">
+        Enter your email address and we'll send you instructions to reset your password.
+      </p>
+    </div>
+
+    <div>
       <label for="email" class="block text-sm font-medium text-gray-700">
         Email address
       </label>
@@ -17,8 +24,8 @@
 
     <!-- Success/Error messages -->
     <div v-if="message" :class="[
-      'text-sm',
-      success ? 'text-green-600' : 'text-red-600'
+      'p-4 rounded-md',
+      success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
     ]">
       {{ message }}
     </div>
@@ -55,14 +62,16 @@ const message = ref('')
 const success = ref(false)
 
 async function handleSubmit() {
+  if (!email.value) return
+  
   isLoading.value = true
   message.value = ''
   success.value = false
 
   try {
-    await authStore.requestPasswordReset(email.value)
+    await authStore.resetPassword({ email: email.value })
     success.value = true
-    message.value = 'Password reset instructions have been sent to your email'
+    message.value = 'If an account exists with this email, you will receive password reset instructions.'
     email.value = ''
   } catch (err: any) {
     message.value = err?.response?.data?.message || 'Failed to request password reset'

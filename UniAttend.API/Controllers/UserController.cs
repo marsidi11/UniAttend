@@ -12,6 +12,7 @@ using UniAttend.Application.Features.Users.Queries.GetUserDetails;
 using UniAttend.Application.Features.Users.Queries.GetUserProfile;
 using UniAttend.API.Extensions;
 using UniAttend.Core.Enums;
+using UniAttend.Application.Features.Auth.Commands.ResetPassword;
 
 namespace UniAttend.API.Controllers
 {
@@ -123,6 +124,14 @@ namespace UniAttend.API.Controllers
             command.UserId = User.GetUserId();
             await _mediator.Send(command, cancellationToken);
             return NoContent();
+        }
+
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ResetPasswordCommand command, CancellationToken cancellationToken)
+        {
+            await _mediator.Send(command, cancellationToken);
+            return Ok(new { message = "If an account exists with this email, password reset instructions will be sent." });
         }
     }
 }

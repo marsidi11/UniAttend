@@ -20,12 +20,6 @@ import {
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
-  groupsDetail(id: number): { data: any; } | PromiseLike<{ data: any; }> {
-    throw new Error('Method not implemented.');
-  }
-  groupsList(): { data: any; } | PromiseLike<{ data: any; }> {
-    throw new Error('Method not implemented.');
-  }
   /**
    * No description
    *

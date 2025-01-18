@@ -185,7 +185,7 @@ export interface CreateUserCommand {
   lastName?: string | null;
   role?: UserRole;
   /** @format int32 */
-  departmentId?: number;
+  departmentId?: number | null;
 }
 
 export interface DailyAttendanceDto {
@@ -362,9 +362,7 @@ export interface RegisterStudentCommand {
 }
 
 export interface ResetPasswordCommand {
-  /** @format int32 */
-  userId?: number;
-  newPassword?: string | null;
+  email?: string | null;
 }
 
 export interface ScheduleDto {

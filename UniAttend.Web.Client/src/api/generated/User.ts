@@ -12,6 +12,7 @@
 import {
   ChangePasswordCommand,
   CreateUserCommand,
+  ResetPasswordCommand,
   UpdateProfileCommand,
   UpdateUserCommand,
   UserDetailsDto,
@@ -188,6 +189,23 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
     this.request<void, any>({
       path: `/api/User/change-password`,
       method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags User
+   * @name UserForgotPasswordCreate
+   * @request POST:/api/User/forgot-password
+   * @secure
+   */
+  userForgotPasswordCreate = (data: ResetPasswordCommand, params: RequestParams = {}) =>
+    this.request<void, any>({
+      path: `/api/User/forgot-password`,
+      method: "POST",
       body: data,
       secure: true,
       type: ContentType.Json,
