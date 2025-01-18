@@ -1,8 +1,8 @@
 using MediatR;
 using UniAttend.Core.Interfaces.Repositories;
-using UniAttend.Application.Features.Groups.DTOs;
+using UniAttend.Application.Features.StudyGroups.DTOs;
 
-namespace UniAttend.Application.Features.Groups.Queries.GetGroupStudents
+namespace UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents
 {
     public class GetGroupStudentsQueryHandler 
         : IRequestHandler<GetGroupStudentsQuery, IEnumerable<GroupStudentDto>>

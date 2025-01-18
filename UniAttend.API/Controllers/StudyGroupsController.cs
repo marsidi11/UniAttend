@@ -1,25 +1,25 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniAttend.Application.Features.Groups.Commands.CreateGroup;
-using UniAttend.Application.Features.Groups.Commands.UpdateGroup;
-using UniAttend.Application.Features.Groups.Commands.EnrollStudents;
-using UniAttend.Application.Features.Groups.Commands.RemoveStudentFromGroup;
-using UniAttend.Application.Features.Groups.Commands.TransferStudent;
-using UniAttend.Application.Features.Groups.Queries.GetGroupStudents;
-using UniAttend.Application.Features.Groups.Queries.GetProfessorGroups;
-using UniAttend.Application.Features.Groups.DTOs;
+using UniAttend.Application.Features.StudyGroups.Commands.CreateGroup;
+using UniAttend.Application.Features.StudyGroups.Commands.UpdateGroup;
+using UniAttend.Application.Features.StudyGroups.Commands.EnrollStudents;
+using UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromGroup;
+using UniAttend.Application.Features.StudyGroups.Commands.TransferStudent;
+using UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents;
+using UniAttend.Application.Features.StudyGroups.Queries.GetProfessorGroups;
+using UniAttend.Application.Features.StudyGroups.DTOs;
 
 namespace UniAttend.API.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class GroupsController : ControllerBase
+    public class StudyGroupsController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public GroupsController(IMediator mediator)
+        public StudyGroupsController(IMediator mediator)
         {
             _mediator = mediator;
         }

@@ -1,4 +1,4 @@
-namespace UniAttend.Application.Features.Groups.DTOs
+namespace UniAttend.Application.Features.StudyGroups.DTOs
 {
     public record StudyGroupDto
     {

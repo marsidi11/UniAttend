@@ -2,9 +2,9 @@ using MediatR;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Shared.Exceptions;
-using UniAttend.Application.Features.Groups.DTOs;
+using UniAttend.Application.Features.StudyGroups.DTOs;
 
-namespace UniAttend.Application.Features.Groups.Commands.CreateGroup
+namespace UniAttend.Application.Features.StudyGroups.Commands.CreateGroup
 {
     public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, StudyGroupDto>
     {

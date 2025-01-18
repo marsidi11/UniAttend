@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace UniAttend.Application.Features.Groups.Commands.EnrollStudents
+namespace UniAttend.Application.Features.StudyGroups.Commands.EnrollStudents
 {
     public record EnrollStudentsCommand : IRequest<Unit>
     {

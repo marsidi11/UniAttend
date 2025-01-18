@@ -6,7 +6,7 @@ using UniAttend.Application.Features.AcademicYears.Commands.UpdateAcademicYear;
 using UniAttend.Application.Features.AcademicYears.Commands.CloseAcademicYear;
 using UniAttend.Application.Features.AcademicYears.Queries.GetAcademicYears;
 using UniAttend.Application.Features.AcademicYears.Queries.GetActiveAcademicYear;
-using UniAttend.Application.Features.Groups.DTOs;
+using UniAttend.Application.Features.StudyGroups.DTOs;
 using UniAttend.Application.Features.AcademicYears.DTOs;
 
 namespace UniAttend.API.Controllers

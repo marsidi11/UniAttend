@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Interfaces.Repositories;
-using UniAttend.Application.Features.Groups.DTOs;
+using UniAttend.Application.Features.StudyGroups.DTOs;
 
-namespace UniAttend.Application.Features.Groups.Queries.GetProfessorGroups
+namespace UniAttend.Application.Features.StudyGroups.Queries.GetProfessorGroups
 {
     public class GetProfessorGroupsQueryHandler 
         : IRequestHandler<GetProfessorGroupsQuery, IEnumerable<StudyGroupDto>>

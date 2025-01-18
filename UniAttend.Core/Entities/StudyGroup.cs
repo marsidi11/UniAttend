@@ -26,7 +26,6 @@ namespace UniAttend.Core.Entities
             _professorId = professorId;
         }
 
-        // Properties - Changed from init to standard properties with backing fields
         public string Name => _name;
         public int SubjectId => _subjectId;
         public int AcademicYearId { get; private init; }

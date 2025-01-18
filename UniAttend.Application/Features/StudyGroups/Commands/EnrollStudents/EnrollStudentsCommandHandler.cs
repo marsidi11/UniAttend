@@ -1,7 +1,7 @@
 using MediatR;
 using UniAttend.Core.Interfaces.Repositories;
 
-namespace UniAttend.Application.Features.Groups.Commands.EnrollStudents
+namespace UniAttend.Application.Features.StudyGroups.Commands.EnrollStudents
 {
     public class EnrollStudentsCommandHandler : IRequestHandler<EnrollStudentsCommand, Unit>
     {

@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace UniAttend.Application.Features.Groups.Commands.RemoveStudentFromGroup
+namespace UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromGroup
 {
     public record RemoveStudentFromGroupCommand : IRequest<Unit>
     {

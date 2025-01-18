@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace UniAttend.Application.Features.Groups.Commands.CreateGroup
+namespace UniAttend.Application.Features.StudyGroups.Commands.CreateGroup
 {
     public class CreateGroupCommandValidator : AbstractValidator<CreateGroupCommand>
     {

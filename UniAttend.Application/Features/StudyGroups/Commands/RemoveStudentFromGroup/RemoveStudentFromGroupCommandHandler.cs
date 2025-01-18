@@ -3,7 +3,7 @@ using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Core.Exceptions;
 using UniAttend.Shared.Exceptions;
 
-namespace UniAttend.Application.Features.Groups.Commands.RemoveStudentFromGroup
+namespace UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromGroup
 {
     public class RemoveStudentFromGroupCommandHandler : IRequestHandler<RemoveStudentFromGroupCommand, Unit>
     {

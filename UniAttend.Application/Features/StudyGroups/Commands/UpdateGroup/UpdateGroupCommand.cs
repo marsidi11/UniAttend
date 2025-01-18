@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace UniAttend.Application.Features.Groups.Commands.UpdateGroup
+namespace UniAttend.Application.Features.StudyGroups.Commands.UpdateGroup
 {
     public record UpdateGroupCommand : IRequest<Unit>
     {

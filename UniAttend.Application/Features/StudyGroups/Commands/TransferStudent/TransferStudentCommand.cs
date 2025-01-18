@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace UniAttend.Application.Features.Groups.Commands.TransferStudent
+namespace UniAttend.Application.Features.StudyGroups.Commands.TransferStudent
 {
     public record TransferStudentCommand : IRequest<Unit>
     {

@@ -2,7 +2,7 @@ using MediatR;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Shared.Exceptions;
 
-namespace UniAttend.Application.Features.Groups.Commands.UpdateGroup
+namespace UniAttend.Application.Features.StudyGroups.Commands.UpdateGroup
 {
     public class UpdateGroupCommandHandler : IRequestHandler<UpdateGroupCommand, Unit>
     {

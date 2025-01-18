@@ -3,7 +3,7 @@ using UniAttend.Application.Features.Students.DTOs;
 using UniAttend.Application.Features.Departments.DTOs;
 using UniAttend.Application.Features.AcademicYears.DTOs;
 using UniAttend.Application.Features.Subjects.DTOs;
-using UniAttend.Application.Features.Groups.DTOs;
+using UniAttend.Application.Features.StudyGroups.DTOs;
 using UniAttend.Application.Features.Classes.DTOs;
 using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.Application.Features.Users.DTOs;
