@@ -120,11 +120,7 @@ const columns: Column<TableItem>[] = [
   { 
     key: 'fullName', 
     label: 'Full Name', 
-    sortable: true,
-    render: (value: any) => {
-      const student = value as UserDetailsDto
-      return `${student.firstName} ${student.lastName}`
-    }
+    sortable: true
   },
   {
     key: 'email',

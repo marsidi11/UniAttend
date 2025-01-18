@@ -5,6 +5,9 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Serilog;
+using Serilog.Events;
+using UniAttend.Infrastructure.Configuration;
 using UniAttend.API.Middleware;
 using UniAttend.Application;
 using UniAttend.Infrastructure;
@@ -15,6 +18,26 @@ using UniAttend.Infrastructure.Settings;
 using UniAttend.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog 
+builder.Host.UseSerilog((context, services, configuration) => {
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .WriteTo.Console()
+        .WriteTo.File(
+            Path.Combine("logs", "general-.txt"),
+            rollingInterval: RollingInterval.Day,
+            shared: true)
+        .WriteTo.File(
+            Path.Combine("logs", "errors-.txt"),
+            restrictedToMinimumLevel: LogEventLevel.Error,
+            rollingInterval: RollingInterval.Day,
+            shared: true);
+});
 
 // Configure JwtSettings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
@@ -130,4 +153,16 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllers();
 
-app.Run();
+try
+{
+    Log.Information("Starting web application");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

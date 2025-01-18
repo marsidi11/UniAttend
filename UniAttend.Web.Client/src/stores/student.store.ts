@@ -42,25 +42,30 @@ export const useStudentStore = defineStore('student', () => {
   });
 
   // Actions
-  async function fetchStudentsList() {
-    isLoading.value = true;
-    try {
-      const response = await studentApi.studentList();
-      console.log('API Response:', response.data)
-      // Type assertion to handle the response
-      const studentData = response as unknown as { data: ExtendedStudentDto[] };
-      if (studentData && Array.isArray(studentData.data)) {
-        students.value = studentData.data;
-        return studentData.data;
+        async function fetchStudentsList() {
+      isLoading.value = true;
+      try {
+        const response = await studentApi.studentList();
+        
+        const jsonData = await response.json();
+        
+        if (Array.isArray(jsonData)) {
+          students.value = jsonData;
+          return jsonData;
+        }
+        // Fallback to checking data property
+        else if (jsonData && Array.isArray(jsonData.data)) {
+          students.value = jsonData.data;
+          return jsonData.data;
+        }
+        return [];
+      } catch (err) {
+        handleError(err, error);
+        throw err;
+      } finally {
+        isLoading.value = false;
       }
-      return [];
-    } catch (err) {
-      handleError(err, error);
-      throw err;
-    } finally {
-      isLoading.value = false;
     }
-  }
 
   async function createStudent(studentData: RegisterStudentCommand) {
     isLoading.value = true;

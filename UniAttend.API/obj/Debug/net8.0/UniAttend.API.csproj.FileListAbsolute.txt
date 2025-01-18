@@ -139,3 +139,15 @@ C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\obj\Debug\net8.0
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\obj\Debug\net8.0\UniAttend.API.pdb
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\obj\Debug\net8.0\UniAttend.API.genruntimeconfig.cache
 C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\obj\Debug\net8.0\ref\UniAttend.API.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.AspNetCore.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Enrichers.Environment.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Enrichers.Process.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Enrichers.Thread.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\bin\Debug\net8.0\Serilog.Sinks.File.dll
