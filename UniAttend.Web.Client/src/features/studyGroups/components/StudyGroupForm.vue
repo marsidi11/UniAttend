@@ -94,15 +94,24 @@ import type {
 
 interface Props {
   group?: StudyGroupDto | null
-  subjects: Array<SubjectDto>
+  subjects: SubjectDto[]
+}
+
+interface FormData {
+  name: string
+  subjectId: number | undefined
+  professorId: number | undefined
+  academicYearId: number | undefined
+  isActive: boolean
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'submit', data: Partial<CreateGroupCommand | UpdateGroupCommand>): void
+  (e: 'submit', data: CreateGroupCommand | UpdateGroupCommand): void
   (e: 'cancel'): void
 }>()
 
+// Store setup
 const userStore = useUserStore()
 const academicYearStore = useAcademicYearStore()
 
@@ -110,45 +119,47 @@ const { users } = storeToRefs(userStore)
 const { academicYears } = storeToRefs(academicYearStore)
 
 const isLoading = ref(false)
-const form = ref({
+const form = ref<FormData>({
   name: '',
-  subjectId: 0,
-  professorId: 0,
-  academicYearId: 0,
+  subjectId: undefined,
+  professorId: undefined,
+  academicYearId: undefined,
   isActive: true
 })
 
-// Filter professors from users - using role 2 for Professor
+// Filter professors from users and ensure they're active
 const professors = computed(() => 
-  users.value.filter(user => user.role === 2 && user.isActive)
+  users.value.filter(user => user.role === 3 && user.isActive)
 )
 
-// Since professors aren't pre-assigned to subjects in DB, show all professors
+// Show all available professors
 const availableProfessors = computed(() => professors.value)
 
+// Watch for changes in props.group and update form
 watch(() => props.group, (newGroup) => {
   if (newGroup) {
     form.value = {
-      name: newGroup.name ?? '',
-      subjectId: newGroup.subjectId ?? 0,
-      professorId: newGroup.professorId ?? 0,
-      academicYearId: newGroup.academicYearId ?? 0,
-      isActive: newGroup.isActive ?? true
+      name: newGroup.name ?? '', // Use nullish coalescing
+      subjectId: newGroup.subjectId,
+      professorId: newGroup.professorId,
+      academicYearId: newGroup.academicYearId,
+      isActive: newGroup.isActive ?? true // Use nullish coalescing
     }
   } else {
     form.value = {
       name: '',
-      subjectId: 0,
-      professorId: 0,
-      academicYearId: 0,
+      subjectId: undefined,
+      professorId: undefined,
+      academicYearId: undefined,
       isActive: true
     }
   }
 }, { immediate: true })
 
 onMounted(async () => {
+  // Load required data if not already loaded
   if (!users.value.length) {
-    await userStore.fetchUsers({ role: 2, isActive: true })
+    await userStore.fetchUsers({ role: 3, isActive: true })
   }
   if (!academicYears.value.length) {
     await academicYearStore.fetchAcademicYears()
@@ -157,14 +168,27 @@ onMounted(async () => {
 
 async function handleSubmit() {
   try {
+    if (!form.value.subjectId || !form.value.professorId || !form.value.academicYearId) {
+      return // Early return if required fields are missing
+    }
+
     isLoading.value = true
-    emit('submit', {
+    const formData = {
       name: form.value.name,
       subjectId: form.value.subjectId,
       professorId: form.value.professorId,
       academicYearId: form.value.academicYearId,
       isActive: form.value.isActive
-    })
+    }
+
+    if (props.group?.id) {
+      emit('submit', { 
+        id: props.group.id,
+        ...formData 
+      } as UpdateGroupCommand)
+    } else {
+      emit('submit', formData as CreateGroupCommand)
+    }
   } finally {
     isLoading.value = false
   }

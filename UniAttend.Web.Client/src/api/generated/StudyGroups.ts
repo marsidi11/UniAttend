@@ -19,16 +19,16 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class StudyGroups<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
-   * @tags Groups
-   * @name GroupsProfessorDetail
-   * @request GET:/api/Groups/professor/{professorId}
+   * @tags StudyGroups
+   * @name StudyGroupsProfessorDetail
+   * @request GET:/api/StudyGroups/professor/{professorId}
    * @secure
    */
-  groupsProfessorDetail = (
+  studyGroupsProfessorDetail = (
     professorId: number,
     query?: {
       /** @format int32 */
@@ -37,7 +37,7 @@ export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataT
     params: RequestParams = {},
   ) =>
     this.request<StudyGroupDto[], any>({
-      path: `/api/Groups/professor/${professorId}`,
+      path: `/api/StudyGroups/professor/${professorId}`,
       method: "GET",
       query: query,
       secure: true,
@@ -47,14 +47,14 @@ export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   /**
    * No description
    *
-   * @tags Groups
-   * @name GroupsStudentsDetail
-   * @request GET:/api/Groups/{id}/students
+   * @tags StudyGroups
+   * @name StudyGroupsStudentsDetail
+   * @request GET:/api/StudyGroups/{id}/students
    * @secure
    */
-  groupsStudentsDetail = (id: number, params: RequestParams = {}) =>
+  studyGroupsStudentsDetail = (id: number, params: RequestParams = {}) =>
     this.request<GroupStudentDto[], any>({
-      path: `/api/Groups/${id}/students`,
+      path: `/api/StudyGroups/${id}/students`,
       method: "GET",
       secure: true,
       format: "json",
@@ -63,14 +63,14 @@ export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   /**
    * No description
    *
-   * @tags Groups
-   * @name GroupsCreate
-   * @request POST:/api/Groups
+   * @tags StudyGroups
+   * @name StudyGroupsCreate
+   * @request POST:/api/StudyGroups
    * @secure
    */
-  groupsCreate = (data: CreateGroupCommand, params: RequestParams = {}) =>
+  studyGroupsCreate = (data: CreateGroupCommand, params: RequestParams = {}) =>
     this.request<StudyGroupDto, any>({
-      path: `/api/Groups`,
+      path: `/api/StudyGroups`,
       method: "POST",
       body: data,
       secure: true,
@@ -81,14 +81,14 @@ export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   /**
    * No description
    *
-   * @tags Groups
-   * @name GroupsUpdate
-   * @request PUT:/api/Groups/{id}
+   * @tags StudyGroups
+   * @name StudyGroupsUpdate
+   * @request PUT:/api/StudyGroups/{id}
    * @secure
    */
-  groupsUpdate = (id: number, data: UpdateGroupCommand, params: RequestParams = {}) =>
+  studyGroupsUpdate = (id: number, data: UpdateGroupCommand, params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/Groups/${id}`,
+      path: `/api/StudyGroups/${id}`,
       method: "PUT",
       body: data,
       secure: true,
@@ -98,14 +98,14 @@ export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   /**
    * No description
    *
-   * @tags Groups
-   * @name GroupsStudentsEnrollCreate
-   * @request POST:/api/Groups/{id}/students/enroll
+   * @tags StudyGroups
+   * @name StudyGroupsStudentsEnrollCreate
+   * @request POST:/api/StudyGroups/{id}/students/enroll
    * @secure
    */
-  groupsStudentsEnrollCreate = (id: number, data: EnrollStudentsCommand, params: RequestParams = {}) =>
+  studyGroupsStudentsEnrollCreate = (id: number, data: EnrollStudentsCommand, params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/Groups/${id}/students/enroll`,
+      path: `/api/StudyGroups/${id}/students/enroll`,
       method: "POST",
       body: data,
       secure: true,
@@ -115,14 +115,14 @@ export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   /**
    * No description
    *
-   * @tags Groups
-   * @name GroupsStudentsDelete
-   * @request DELETE:/api/Groups/{groupId}/students/{studentId}
+   * @tags StudyGroups
+   * @name StudyGroupsStudentsDelete
+   * @request DELETE:/api/StudyGroups/{groupId}/students/{studentId}
    * @secure
    */
-  groupsStudentsDelete = (groupId: number, studentId: number, params: RequestParams = {}) =>
+  studyGroupsStudentsDelete = (groupId: number, studentId: number, params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/Groups/${groupId}/students/${studentId}`,
+      path: `/api/StudyGroups/${groupId}/students/${studentId}`,
       method: "DELETE",
       secure: true,
       ...params,
@@ -130,14 +130,14 @@ export class Groups<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   /**
    * No description
    *
-   * @tags Groups
-   * @name GroupsTransferStudentCreate
-   * @request POST:/api/Groups/transfer-student
+   * @tags StudyGroups
+   * @name StudyGroupsTransferStudentCreate
+   * @request POST:/api/StudyGroups/transfer-student
    * @secure
    */
-  groupsTransferStudentCreate = (data: TransferStudentCommand, params: RequestParams = {}) =>
+  studyGroupsTransferStudentCreate = (data: TransferStudentCommand, params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/Groups/transfer-student`,
+      path: `/api/StudyGroups/transfer-student`,
       method: "POST",
       body: data,
       secure: true,

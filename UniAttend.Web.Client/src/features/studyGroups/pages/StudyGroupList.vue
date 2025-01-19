@@ -61,52 +61,62 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useGroupStore } from '@/stores/group.store'
+import { useGroupStore } from '@/stores/studyGroup.store'
 import { useSubjectStore } from '@/stores/subject.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { StudyGroup } from '@/types/group.types'
+import type { StudyGroupDto } from '@/api/generated/data-contracts'
 import type { TableItem } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import StudyGroupForm from '../components/StudyGroupForm.vue'
 
+interface ExtendedStudyGroup extends Omit<StudyGroupDto, 'id'>, TableItem {
+  id: number; 
+}
 const router = useRouter()
 const groupStore = useGroupStore()
 const subjectStore = useSubjectStore()
 const authStore = useAuthStore()
 
+// Store refs
 const { groups, isLoading } = storeToRefs(groupStore)
 const { subjects } = storeToRefs(subjectStore)
 
+// Component state
 const showModal = ref(false)
-const selectedGroup = ref<StudyGroup | null>(null)
+const selectedGroup = ref<StudyGroupDto | null>(null)
 const selectedSubject = ref('')
 const selectedStatus = ref('')
 
-const isAdmin = computed(() => authStore.userRole === 'admin')
+// Computed properties
+const isAdmin = computed(() => 
+  authStore.userRole === 'admin' || authStore.userRole === 'secretary'
+)
 
 const columns = [
   { key: 'name', label: 'Group Name' },
   { key: 'subjectName', label: 'Subject' },
   { key: 'professorName', label: 'Professor' },
   { key: 'studentsCount', label: 'Students' },
-  { key: 'isActive', label: 'Status',
+  { 
+    key: 'isActive', 
+    label: 'Status',
     render: (value: boolean) => value ? 'Active' : 'Inactive'
   }
 ]
 
 const tableActions = computed(() => [
-  { 
-    label: 'View Details', 
+  {
+    label: 'View Details',
     icon: 'visibility',
-    action: (item: TableItem) => handleViewDetails(item as StudyGroup)
+    action: (item: TableItem) => handleViewDetails(item as StudyGroupDto)
   },
   ...(isAdmin.value ? [
-    { 
-      label: 'Edit', 
+    {
+      label: 'Edit',
       icon: 'edit',
-      action: (item: TableItem) => handleEdit(item as StudyGroup)
+      action: (item: TableItem) => handleEdit(item as StudyGroupDto)
     }
   ] : [])
 ])
@@ -116,7 +126,10 @@ const modalTitle = computed(() =>
 )
 
 const filteredGroups = computed(() => {
-  let filtered = [...groups.value]
+  let filtered = groups.value.map(group => ({
+    ...group,
+    id: group.id ?? 0 // Use nullish coalescing
+  })) as ExtendedStudyGroup[]
   
   if (selectedSubject.value) {
     filtered = filtered.filter(g => g.subjectId === Number(selectedSubject.value))
@@ -129,32 +142,26 @@ const filteredGroups = computed(() => {
   return filtered
 })
 
-onMounted(async () => {
-  await Promise.all([
-    groupStore.fetchGroups(),
-    subjectStore.fetchSubjects()
-  ])
-})
-
+// Methods
 function openCreateModal() {
   selectedGroup.value = null
   showModal.value = true
 }
 
-function handleViewDetails(group: StudyGroup) {
+function handleViewDetails(group: StudyGroupDto) {
   router.push(`/dashboard/groups/${group.id}`)
 }
 
-function handleEdit(group: StudyGroup) {
+function handleEdit(group: StudyGroupDto) {
   selectedGroup.value = group
   showModal.value = true
 }
 
 function handleRowClick(group: TableItem) {
-  handleViewDetails(group as StudyGroup)
+  handleViewDetails(group as StudyGroupDto)
 }
 
-async function handleSubmit(groupData: Partial<StudyGroup>) {
+async function handleSubmit(groupData: Partial<StudyGroupDto>) {
   try {
     if (selectedGroup.value?.id) {
       await groupStore.updateGroup(selectedGroup.value.id, groupData)
@@ -166,4 +173,12 @@ async function handleSubmit(groupData: Partial<StudyGroup>) {
     console.error('Failed to save group:', err)
   }
 }
+
+// Lifecycle hooks
+onMounted(async () => {
+  await Promise.all([
+    groupStore.fetchGroups(),
+    subjectStore.fetchSubjects()
+  ])
+})
 </script>

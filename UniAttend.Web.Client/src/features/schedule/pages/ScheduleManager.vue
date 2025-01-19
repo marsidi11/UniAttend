@@ -82,7 +82,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useScheduleStore } from '@/stores/schedule.store'
-import { useGroupStore } from '@/stores/group.store'
+import { useGroupStore } from '@/stores/studyGroup.store'
 import { useClassroomStore } from '@/stores/classroom.store'
 import type { Schedule } from '@/types/schedule.types'
 import Button from '@/shared/components/ui/Button.vue'

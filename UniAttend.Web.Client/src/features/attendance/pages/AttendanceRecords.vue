@@ -30,7 +30,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAttendanceStore } from '@/stores/attendance.store'
-import { useGroupStore } from '@/stores/group.store'
+import { useGroupStore } from '@/stores/studyGroup.store'
 import { useReportStore } from '@/stores/report.store'
 import type { AttendanceRecordDto } from '@/api/generated/data-contracts'
 import type { TableItem } from '@/types/tableItem.types'

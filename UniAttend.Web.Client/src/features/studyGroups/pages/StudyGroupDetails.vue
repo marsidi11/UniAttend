@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
+    <!-- Header with Actions -->
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-bold text-gray-900">Group Details</h1>
       <div class="flex space-x-3">
@@ -11,6 +11,7 @@
       </div>
     </div>
 
+    <!-- Loading and Error States -->
     <div v-if="isLoading">
       <Spinner :size="6" />
     </div>
@@ -19,8 +20,9 @@
       {{ error }}
     </div>
 
+    <!-- Main Content -->
     <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Group Info -->
+      <!-- Group Info Card -->
       <div class="col-span-1 bg-white shadow rounded-lg p-6">
         <h2 class="text-lg font-medium mb-4">Group Information</h2>
         <dl class="space-y-4">
@@ -47,70 +49,55 @@
         </dl>
       </div>
 
-      <!-- Stats and Lists -->
+      <!-- Stats and Students Section -->
       <div class="col-span-2 space-y-6">
-        <!-- Stats -->
+        <!-- Stats Cards -->
         <div class="grid grid-cols-3 gap-4">
-          <StatCard title="Total Students" :value="group?.studentsCount || 0" />
+          <StatCard title="Total Students" :value="group?.totalStudents || 0" />
           <StatCard title="Average Attendance" :value="`${group?.averageAttendance || 0}%`" />
-          <StatCard title="Classes Held" :value="group?.classesCount || 0" />
+          <StatCard title="Total Classes" :value="group?.totalClasses || 0" />
         </div>
 
         <!-- Students List -->
         <div class="bg-white shadow rounded-lg p-6">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-medium">Enrolled Students</h2>
-            <Button
-              v-if="isAdmin"
-              variant="secondary"
-              @click="openEnrollModal"
-            >
+            <Button v-if="isAdmin" variant="secondary" @click="openEnrollModal">
               Enroll Students
             </Button>
           </div>
-          <DataTable
-            :data="students"
-            :columns="studentColumns"
-            :loading="isLoadingStudents"
-            :actions="studentActions"
-          />
+          <DataTable :data="students" :columns="studentColumns" :loading="isLoadingStudents"
+            :actions="studentActions" />
         </div>
       </div>
     </div>
 
-    <!-- Edit Group Modal -->
+    <!-- Modals -->
     <Modal v-model="showEditModal" title="Edit Group">
-      <StudyGroupForm
-        v-if="showEditModal"
-        :group="group"
-        :subjects="subjects"
-        @submit="handleUpdateGroup"
-        @cancel="showEditModal = false"
-      />
+      <StudyGroupForm v-if="showEditModal" :group="group" :subjects="subjects" @submit="handleUpdateGroup"
+        @cancel="showEditModal = false" />
     </Modal>
 
-    <!-- Enroll Students Modal -->
     <Modal v-model="showEnrollModal" title="Enroll Students">
-      <EnrollStudentsForm
-        v-if="showEnrollModal"
-        :groupId="Number(route.params.id)"
-        @submit="handleEnrollStudents"
-        @cancel="showEnrollModal = false"
-      />
+      <EnrollStudentsForm v-if="showEnrollModal" :groupId="Number(route.params.id)" @submit="handleEnrollStudents"
+        @cancel="showEnrollModal = false" />
     </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router' 
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useGroupStore } from '@/stores/group.store'
+import { useGroupStore } from '@/stores/studyGroup.store'
 import { useSubjectStore } from '@/stores/subject.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { StudyGroup, GroupStudent } from '@/types/group.types'
-import type { TableItem } from '@/types/tableItem.types' 
+import { useReportStore } from '@/stores/report.store'
+import type { StudyGroupDto } from '@/api/generated/data-contracts'
+import type { TableItem } from '@/types/tableItem.types'
 import type { Action } from '@/types/tableItem.types'
+
+// UI Components
 import Button from '@/shared/components/ui/Button.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 import Spinner from '@/shared/components/ui/Spinner.vue'
@@ -120,26 +107,65 @@ import Modal from '@/shared/components/ui/Modal.vue'
 import StudyGroupForm from '../components/StudyGroupForm.vue'
 import EnrollStudentsForm from '../components/EnrollStudentsForm.vue'
 
+interface ExtendedGroupStats {
+  averageAttendance: number
+  totalClasses: number
+  totalStudents: number
+}
+
+export interface StudyGroup extends StudyGroupDto, ExtendedGroupStats {}
+
+export interface GroupStudent extends TableItem {
+  id: number
+  studentId: number
+  studentNumber: string
+  fullName: string
+  attendedClasses: number
+  attendanceRate: number
+}
+
+// Setup stores and route
 const route = useRoute()
 const groupStore = useGroupStore()
 const subjectStore = useSubjectStore()
 const authStore = useAuthStore()
+const reportStore = useReportStore()
 
-const { currentGroup: group, isLoading, error } = storeToRefs(groupStore)
+// Store refs
+const { currentGroup: baseGroup, isLoading, error } = storeToRefs(groupStore)
 const { subjects } = storeToRefs(subjectStore)
 
+const group = computed<StudyGroup | null>(() => {
+  if (!baseGroup.value) return null
+  
+  return {
+    ...baseGroup.value,
+    averageAttendance: 0,
+    totalClasses: 0,
+    totalStudents: students.value.length
+  }
+})
+
+// Component state
 const showEditModal = ref(false)
 const showEnrollModal = ref(false)
 const isLoadingStudents = ref(false)
 const students = ref<GroupStudent[]>([])
 
+// Computed properties
 const isAdmin = computed(() => authStore.userRole === 'admin')
 
 const studentColumns = [
-  { key: 'studentId', label: 'Student ID' },
+  { key: 'studentNumber', label: 'Student ID' },
   { key: 'fullName', label: 'Full Name' },
-  { key: 'attendanceRate', label: 'Attendance Rate',
+  { 
+    key: 'attendanceRate', 
+    label: 'Attendance Rate',
     render: (value: number) => `${value}%`
+  },
+  { 
+    key: 'attendedClasses', 
+    label: 'Classes Attended' 
   }
 ]
 
@@ -147,35 +173,67 @@ const studentActions = computed<Action<TableItem>[]>(() => isAdmin.value ? [
   {
     label: 'Remove',
     icon: 'remove_circle',
-    action: (item: TableItem) => handleRemoveStudent(item as GroupStudent)
+    action: (item: TableItem) => handleRemoveStudent(item)
   }
 ] : [])
 
+// Methods
 async function loadGroupData() {
   const groupId = Number(route.params.id)
   if (groupId) {
-    const [_, loadedStudents] = await Promise.all([
-      groupStore.fetchGroupById(groupId),
-      loadStudents(groupId)
-    ])
-    students.value = loadedStudents
+    try {
+      await Promise.all([
+        groupStore.fetchGroupById(groupId),
+        loadStudents(groupId),
+        loadGroupStats(groupId)
+      ])
+    } catch (err) {
+      console.error('Failed to load group data:', err)
+    }
   }
 }
 
-async function loadStudents(groupId: number): Promise<GroupStudent[]> {
+async function loadStudents(groupId: number) {
   isLoadingStudents.value = true
   try {
     const result = await groupStore.fetchGroupStudents(groupId)
     if (Array.isArray(result)) {
       students.value = result
-      return result
     }
-    return []
   } catch (err) {
     console.error('Failed to load students:', err)
-    return []
   } finally {
     isLoadingStudents.value = false
+  }
+}
+
+async function loadGroupStats(groupId: number) {
+  try {
+    const report = await reportStore.getGroupReport(groupId)
+    if (baseGroup.value && report) {
+      // Create a properly typed object combining baseGroup and stats
+      const updatedGroup: StudyGroup = {
+        ...baseGroup.value,
+        averageAttendance: report.averageAttendance ?? 0, // Use nullish coalescing
+        totalClasses: report.totalClasses ?? 0, // Use nullish coalescing
+        totalStudents: students.value.length
+      }
+      baseGroup.value = updatedGroup
+      
+      // Update students with proper type assertions and null checks
+      if (report.students) {
+        students.value = report.students.map(student => ({
+          id: student.studentId ?? 0,
+          studentId: student.studentId ?? 0,
+          studentNumber: student.studentNumber ?? '',
+          fullName: student.fullName ?? '',
+          attendedClasses: student.attendedClasses ?? 0,
+          attendanceRate: student.attendanceRate ?? 0
+        })) as GroupStudent[]
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load group stats:', err)
   }
 }
 
@@ -183,6 +241,7 @@ async function handleUpdateGroup(groupData: Partial<StudyGroup>) {
   try {
     if (group.value?.id) {
       await groupStore.updateGroup(group.value.id, groupData)
+      await loadGroupData()
       showEditModal.value = false
     }
   } catch (err) {
@@ -193,17 +252,18 @@ async function handleUpdateGroup(groupData: Partial<StudyGroup>) {
 async function handleEnrollStudents(studentIds: number[]) {
   try {
     await groupStore.enrollStudents(Number(route.params.id), studentIds)
-    showEnrollModal.value = false
     await loadStudents(Number(route.params.id))
+    showEnrollModal.value = false
   } catch (err) {
     console.error('Failed to enroll students:', err)
   }
 }
 
-async function handleRemoveStudent(student: GroupStudent) {
+async function handleRemoveStudent(student: TableItem) {
+  const groupStudent = student as GroupStudent
   if (confirm('Are you sure you want to remove this student from the group?')) {
     try {
-      await groupStore.removeStudentFromGroup(Number(route.params.id), student.id)
+      await groupStore.removeStudent(Number(route.params.id), groupStudent.studentId)
       await loadStudents(Number(route.params.id))
     } catch (err) {
       console.error('Failed to remove student:', err)
@@ -219,6 +279,7 @@ function openEnrollModal() {
   showEnrollModal.value = true
 }
 
+// Lifecycle hooks
 onMounted(() => {
   loadGroupData()
 })

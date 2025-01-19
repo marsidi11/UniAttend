@@ -32,8 +32,8 @@ import ProfessorList from '@/features/professors/pages/ProfessorList.vue';
 
 // Schedule & Groups
 import ScheduleManager from '@/features/schedule/pages/ScheduleManager.vue';
-import StudyGroupList from '@/features/groups/pages/StudyGroupList.vue';
-import StudyGroupDetails from '@/features/groups/pages/StudyGroupDetails.vue';
+import StudyGroupList from '@/features/studyGroups/pages/StudyGroupList.vue';
+import StudyGroupDetails from '@/features/studyGroups/pages/StudyGroupDetails.vue';
 import ClassroomList from '@/features/classrooms/pages/ClassroomList.vue';
 
 // Attendance
