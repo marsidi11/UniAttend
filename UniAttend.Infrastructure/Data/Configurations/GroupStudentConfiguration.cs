@@ -13,17 +13,19 @@ namespace UniAttend.Infrastructure.Data.Configurations
         public override void Configure(EntityTypeBuilder<GroupStudent> builder)
         {
             base.Configure(builder);
-            
+
+            builder.ToTable("GroupStudents");
+
             // Required properties
             builder.Property(x => x.GroupId)
                 .IsRequired();
-            
+
             builder.Property(x => x.StudentId)
                 .IsRequired();
 
-            // Relationships
+            // Single relationship to StudyGroup
             builder.HasOne(gs => gs.Group)
-                .WithMany()
+                .WithMany(g => g.Students)
                 .HasForeignKey(gs => gs.GroupId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -35,9 +37,6 @@ namespace UniAttend.Infrastructure.Data.Configurations
             // Unique constraint on GroupId and StudentId combination
             builder.HasIndex(gs => new { gs.GroupId, gs.StudentId })
                 .IsUnique();
-
-            // Table name
-            builder.ToTable("GroupStudents");
         }
     }
 }

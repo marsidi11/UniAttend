@@ -55,5 +55,14 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 await DeleteAsync(groupStudent.Id, cancellationToken);
             }
         }
+
+        public async Task<IEnumerable<GroupStudent>> GetByGroupIdWithDetailsAsync( int groupId,  CancellationToken cancellationToken)
+        {
+            return await DbSet
+                .Include(gs => gs.Student)
+                    .ThenInclude(s => s.User)
+                .Where(gs => gs.GroupId == groupId)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

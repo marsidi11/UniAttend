@@ -90,6 +90,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet("available")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<ClassroomDto>>> GetAvailable(
             [FromQuery] DateTime startTime,
             [FromQuery] DateTime endTime,

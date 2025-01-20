@@ -4,7 +4,7 @@
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-bold text-gray-900">Group Details</h1>
       <div class="flex space-x-3">
-        <Button v-if="isAdmin" @click="openEditModal">Edit Group</Button>
+        <Button v-if="isAdminOrSecretary" @click="openEditModal">Edit Group</Button>
         <Button variant="secondary" @click="$router.push('/dashboard/groups')">
           Back to List
         </Button>
@@ -62,7 +62,7 @@
         <div class="bg-white shadow rounded-lg p-6">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-medium">Enrolled Students</h2>
-            <Button v-if="isAdmin" variant="secondary" @click="openEnrollModal">
+            <Button v-if="isAdminOrSecretary" variant="secondary" @click="openEnrollModal">
               Enroll Students
             </Button>
           </div>
@@ -93,7 +93,7 @@ import { useGroupStore } from '@/stores/studyGroup.store'
 import { useSubjectStore } from '@/stores/subject.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { useReportStore } from '@/stores/report.store'
-import type { StudyGroupDto } from '@/api/generated/data-contracts'
+import type { StudyGroupDto, GroupStudentDto } from '@/api/generated/data-contracts'
 import type { TableItem } from '@/types/tableItem.types'
 import type { Action } from '@/types/tableItem.types'
 
@@ -113,15 +113,13 @@ interface ExtendedGroupStats {
   totalStudents: number
 }
 
-export interface StudyGroup extends StudyGroupDto, ExtendedGroupStats {}
-
-export interface GroupStudent extends TableItem {
+export interface StudyGroup extends StudyGroupDto, ExtendedGroupStats { }
+export interface GroupStudent extends GroupStudentDto, TableItem {
   id: number
-  studentId: number
-  studentNumber: string
   fullName: string
+  studentNumber: string 
   attendedClasses: number
-  attendanceRate: number
+  attendanceRate: number 
 }
 
 // Setup stores and route
@@ -137,7 +135,7 @@ const { subjects } = storeToRefs(subjectStore)
 
 const group = computed<StudyGroup | null>(() => {
   if (!baseGroup.value) return null
-  
+
   return {
     ...baseGroup.value,
     averageAttendance: 0,
@@ -153,29 +151,32 @@ const isLoadingStudents = ref(false)
 const students = ref<GroupStudent[]>([])
 
 // Computed properties
-const isAdmin = computed(() => authStore.userRole === 'admin')
-
+const isAdminOrSecretary = computed(() =>
+  ['admin', 'secretary'].includes(authStore.userRole || '')
+)
 const studentColumns = [
   { key: 'studentNumber', label: 'Student ID' },
   { key: 'fullName', label: 'Full Name' },
-  { 
-    key: 'attendanceRate', 
+  {
+    key: 'attendanceRate',
     label: 'Attendance Rate',
     render: (value: number) => `${value}%`
   },
-  { 
-    key: 'attendedClasses', 
-    label: 'Classes Attended' 
+  {
+    key: 'attendedClasses',
+    label: 'Classes Attended'
   }
 ]
 
-const studentActions = computed<Action<TableItem>[]>(() => isAdmin.value ? [
-  {
-    label: 'Remove',
-    icon: 'remove_circle',
-    action: (item: TableItem) => handleRemoveStudent(item)
-  }
-] : [])
+const studentActions = computed<Action<TableItem>[]>(() =>
+  isAdminOrSecretary.value ? [
+    {
+      label: 'Remove',
+      icon: 'remove_circle',
+      action: (item: TableItem) => handleRemoveStudent(item)
+    }
+  ] : []
+)
 
 // Methods
 async function loadGroupData() {
@@ -198,7 +199,14 @@ async function loadStudents(groupId: number) {
   try {
     const result = await groupStore.fetchGroupStudents(groupId)
     if (Array.isArray(result)) {
-      students.value = result
+      students.value = result.map(student => ({
+        ...student,
+        id: student.studentId,
+        fullName: student.studentName || '',
+        studentNumber: student.studentNumber || '',
+        attendedClasses: 0,
+        attendanceRate: 0
+      })) as GroupStudent[]
     }
   } catch (err) {
     console.error('Failed to load students:', err)
@@ -211,25 +219,24 @@ async function loadGroupStats(groupId: number) {
   try {
     const report = await reportStore.getGroupReport(groupId)
     if (baseGroup.value && report) {
-      // Create a properly typed object combining baseGroup and stats
       const updatedGroup: StudyGroup = {
         ...baseGroup.value,
-        averageAttendance: report.averageAttendance ?? 0, // Use nullish coalescing
-        totalClasses: report.totalClasses ?? 0, // Use nullish coalescing
+        averageAttendance: report.averageAttendance ?? 0,
+        totalClasses: report.totalClasses ?? 0,
         totalStudents: students.value.length
       }
       baseGroup.value = updatedGroup
-      
-      // Update students with proper type assertions and null checks
-      if (report.students) {
-        students.value = report.students.map(student => ({
-          id: student.studentId ?? 0,
-          studentId: student.studentId ?? 0,
-          studentNumber: student.studentNumber ?? '',
-          fullName: student.fullName ?? '',
-          attendedClasses: student.attendedClasses ?? 0,
-          attendanceRate: student.attendanceRate ?? 0
-        })) as GroupStudent[]
+
+      // Fix nullable report.students check
+      if (report.students && Array.isArray(report.students)) {
+        students.value = students.value.map(student => {
+          const studentStats = report.students?.find(s => s.studentId === student.studentId)
+          return {
+            ...student,
+            attendedClasses: studentStats?.attendedClasses ?? 0,
+            attendanceRate: studentStats?.attendanceRate ?? 0
+          }
+        })
       }
     }
   } catch (err) {
@@ -251,20 +258,38 @@ async function handleUpdateGroup(groupData: Partial<StudyGroup>) {
 
 async function handleEnrollStudents(studentIds: number[]) {
   try {
+    if (!route.params.id || !studentIds.length) {
+      throw new Error('Invalid parameters for enrollment')
+    }
+    
     await groupStore.enrollStudents(Number(route.params.id), studentIds)
     await loadStudents(Number(route.params.id))
     showEnrollModal.value = false
   } catch (err) {
     console.error('Failed to enroll students:', err)
+    // Add user feedback here (e.g., toast notification)
   }
 }
 
 async function handleRemoveStudent(student: TableItem) {
   const groupStudent = student as GroupStudent
+  const groupId = Number(route.params.id)
+  
+  // Add checks for both groupId and studentId
+  if (!groupId) {
+    console.error('Invalid group ID')
+    return
+  }
+
+  if (typeof groupStudent.studentId === 'undefined') {
+    console.error('Invalid student ID')
+    return
+  }
+
   if (confirm('Are you sure you want to remove this student from the group?')) {
     try {
-      await groupStore.removeStudent(Number(route.params.id), groupStudent.studentId)
-      await loadStudents(Number(route.params.id))
+      await groupStore.removeStudent(groupId, groupStudent.studentId)
+      await loadStudents(groupId)
     } catch (err) {
       console.error('Failed to remove student:', err)
     }

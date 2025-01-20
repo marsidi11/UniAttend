@@ -90,18 +90,20 @@ export const useClassroomStore = defineStore('classroom', () => {
     }
   }
 
-  async function assignReader(id: number, deviceId: string) {
-    isLoading.value = true;
-    try {
-      await classroomApi.classroomsReaderCreate(id, { deviceId });
-      await getClassroomById(id);
-    } catch (err) {
-      handleError(err, error);
-      throw err;
-    } finally {
-      isLoading.value = false;
+    async function assignReader(id: number, deviceId: string) {
+      isLoading.value = true;
+      try {
+        await classroomApi.classroomsReaderCreate(id, { 
+          readerDeviceId: deviceId 
+        });
+        await getClassroomById(id);
+      } catch (err) {
+        handleError(err, error);
+        throw err;
+      } finally {
+        isLoading.value = false;
+      }
     }
-  }
 
   async function removeReader(id: number) {
     isLoading.value = true;

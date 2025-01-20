@@ -21,24 +21,11 @@
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
       >
         <option value="">No Reader</option>
-        <option v-for="reader in availableReaders" :key="reader.id" :value="reader.id">
-          {{ reader.name }}
+        <option v-for="classroom in availableReaders" 
+                :key="classroom.id" 
+                :value="classroom.readerDeviceId">
+          {{ classroom.name }} - {{ classroom.readerDeviceId }}
         </option>
-      </select>
-    </div>
-
-    <!-- Status -->
-    <div>
-      <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-      <select
-        id="status"
-        v-model="form.status"
-        required
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-      >
-        <option value="available">Available</option>
-        <option value="inUse">In Use</option>
-        <option value="maintenance">Maintenance</option>
       </select>
     </div>
 
@@ -54,74 +41,65 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useClassroomStore } from '@/stores/classroom.store'
 import Button from '@/shared/components/ui/Button.vue'
-import type { Classroom } from '@/types/classroom.types'
+import type { 
+  ClassroomDto, 
+  CreateClassroomCommand, 
+  UpdateClassroomCommand 
+} from '@/api/generated/data-contracts'
 
 interface Props {
-  classroom?: Classroom | null
-}
-
-type ClassroomStatus = 'available' | 'inUse' | 'maintenance'
-
-interface ClassroomFormData {
-  name: string
-  readerDeviceId: string
-  status: ClassroomStatus
+  classroom?: ClassroomDto | null
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'submit', data: Partial<Classroom>): void
+  (e: 'submit', data: CreateClassroomCommand | UpdateClassroomCommand): void
   (e: 'cancel'): void
 }>()
 
 const classroomStore = useClassroomStore()
-const { readers } = storeToRefs(classroomStore)
+const { isLoading, classroomsWithReaders } = storeToRefs(classroomStore)
 
-const isLoading = ref(false)
-const form = ref<ClassroomFormData>({
+const form = ref<CreateClassroomCommand>({
   name: '',
-  readerDeviceId: '',
-  status: 'available'
+  readerDeviceId: null
 })
 
 const availableReaders = computed(() => 
-  readers.value.filter(r => !r.classroomId || r.classroomId === props.classroom?.id)
+  classroomsWithReaders.value.filter(c => 
+    !c.readerDeviceId || c.id === props.classroom?.id
+  )
 )
 
 watch(() => props.classroom, (newClassroom) => {
   if (newClassroom) {
     form.value = {
-      name: newClassroom.name,
-      readerDeviceId: newClassroom.readerDeviceId || '',
-      status: newClassroom.status || 'available'
+      name: newClassroom.name ?? '',
+      readerDeviceId: newClassroom.readerDeviceId
     }
   } else {
     form.value = {
       name: '',
-      readerDeviceId: '',
-      status: 'available'
+      readerDeviceId: null
     }
   }
 }, { immediate: true })
 
-onMounted(async () => {
-  if (!readers.value.length) {
-    await classroomStore.fetchReaders()
-  }
-})
-
 async function handleSubmit() {
   try {
     isLoading.value = true
-    emit('submit', {
-      name: form.value.name,
-      readerDeviceId: form.value.readerDeviceId || null,
-      status: form.value.status
-    })
+    if (props.classroom?.id) {
+      emit('submit', {
+        id: props.classroom.id,
+        ...form.value
+      } as UpdateClassroomCommand)
+    } else {
+      emit('submit', form.value as CreateClassroomCommand)
+    }
   } finally {
     isLoading.value = false
   }

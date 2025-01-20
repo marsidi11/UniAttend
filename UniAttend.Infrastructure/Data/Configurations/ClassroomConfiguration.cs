@@ -18,15 +18,12 @@ namespace UniAttend.Infrastructure.Data.Configurations
                 .HasMaxLength(100);
 
             builder.Property("ReaderDeviceId")
+                .IsRequired(false)
                 .HasMaxLength(50);
-
+                
             // Indexes for performance
             builder.HasIndex("Name")
                 .IsUnique();
-            
-            builder.HasIndex("ReaderDeviceId")
-                .IsUnique()
-                .HasFilter("[ReaderDeviceId] IS NOT NULL");
         }
     }
 }

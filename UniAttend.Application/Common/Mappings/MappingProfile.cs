@@ -7,6 +7,7 @@ using UniAttend.Application.Features.StudyGroups.DTOs;
 using UniAttend.Application.Features.Classes.DTOs;
 using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.Application.Features.Users.DTOs;
+using UniAttend.Application.Features.Classrooms.DTOs;
 using UniAttend.Core.Entities;
 using UniAttend.Core.Enums;
 using UniAttend.Core.Entities.Identity;
@@ -89,6 +90,11 @@ namespace UniAttend.Application.Common.Mappings
             .ForMember(d => d.AttendanceStats, opt => opt.Ignore())
             .ForMember(d => d.DepartmentId, opt => opt.Ignore())
             .ForMember(d => d.DepartmentName, opt => opt.Ignore());
+
+            CreateMap<Classroom, ClassroomDto>()
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, opt => opt.MapFrom(s => s.Name))
+                .ForMember(d => d.ReaderDeviceId, opt => opt.MapFrom(s => s.ReaderDeviceId));
         }
     }
 }

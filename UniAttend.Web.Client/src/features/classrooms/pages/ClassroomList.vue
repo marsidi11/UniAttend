@@ -3,33 +3,28 @@
     <!-- Header -->
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-bold text-gray-900">Classrooms</h1>
-      <Button v-if="isAdmin" @click="openCreateModal">Add Classroom</Button>
-    </div>
-
-    <!-- Filters -->
-    <div class="flex gap-4 bg-white p-4 rounded-lg shadow">
-      <div class="w-64">
-        <label class="block text-sm font-medium text-gray-700">Status</label>
-        <select v-model="selectedStatus"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-          <option value="">All</option>
-          <option value="available">Available</option>
-          <option value="inUse">In Use</option>
-          <option value="maintenance">Maintenance</option>
-        </select>
-      </div>
+      <Button v-if="canManageClassrooms" @click="openCreateModal">Add Classroom</Button>
     </div>
 
     <!-- Classrooms Table -->
     <div class="bg-white shadow rounded-lg">
-      <DataTable :data="filteredClassrooms" :columns="columns" :loading="isLoading" :actions="tableActions"
-        @row-click="handleRowClick" />
+      <DataTable 
+        :data="filteredClassrooms" 
+        :columns="tableColumns" 
+        :loading="isLoading" 
+        :actions="tableActions"
+        @row-click="handleRowClick" 
+      />
     </div>
 
     <!-- Create/Edit Modal -->
     <Modal v-model="showModal" :title="modalTitle">
-      <ClassroomForm v-if="showModal" :classroom="selectedClassroom" @submit="handleSubmit"
-        @cancel="showModal = false" />
+      <ClassroomForm 
+        v-if="showModal" 
+        :classroom="selectedClassroom" 
+        @submit="handleSubmit"
+        @cancel="showModal = false" 
+      />
     </Modal>
   </div>
 </template>
@@ -39,8 +34,8 @@ import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useClassroomStore } from '@/stores/classroom.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { Classroom, CreateClassroomRequest, ClassroomStatus } from '@/types/classroom.types'
-import type { TableItem } from '@/types/tableItem.types'
+import type { ClassroomDto, CreateClassroomCommand, UpdateClassroomCommand } from '@/api/generated/data-contracts'
+import type { TableItem, Column } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
@@ -51,35 +46,40 @@ const authStore = useAuthStore()
 
 const { classrooms, isLoading } = storeToRefs(classroomStore)
 const showModal = ref(false)
-const selectedClassroom = ref<Classroom | null>(null)
-const selectedStatus = ref('')
+const selectedClassroom = ref<ClassroomDto | null>(null)
 
-const isAdmin = computed(() => authStore.userRole === 'admin')
+const canManageClassrooms = computed(() => 
+  ['admin', 'secretary'].includes(authStore.userRole?.toLowerCase() || '')
+)
 
 const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'building', label: 'Building' },
-  { key: 'capacity', label: 'Capacity' },
-  {
-    key: 'readerDeviceId', label: 'Reader Device',
-    render: (value: string) => value || 'Not Assigned'
+  { 
+    key: 'name', 
+    label: 'Name',
+    render: (value: string) => value || 'N/A' // Add render function
   },
-  {
-    key: 'status', label: 'Status',
-    render: (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
+  { 
+    key: 'readerDeviceId', 
+    label: 'Reader Device',
+    render: (value: string | null) => value || 'Not Assigned'
   }
-]
+] as const
 
-const tableActions = computed(() => isAdmin.value ? [
+const tableColumns: Column<TableItem>[] = columns.map(col => ({
+  ...col,
+  render: col.render as ((value: any) => string)
+}))
+
+const tableActions = computed(() => canManageClassrooms.value ? [
   {
     label: 'Edit',
     icon: 'edit',
-    action: (item: TableItem) => handleEdit(item as Classroom)
+    action: (item: TableItem) => handleEdit(item as ClassroomDto)
   },
   {
     label: 'Configure Reader',
     icon: 'settings',
-    action: (item: TableItem) => handleConfigureReader(item as Classroom)
+    action: (item: TableItem) => handleConfigureReader(item as ClassroomDto)
   }
 ] : [])
 
@@ -87,13 +87,11 @@ const modalTitle = computed(() =>
   selectedClassroom.value ? 'Edit Classroom' : 'Add Classroom'
 )
 
-const filteredClassrooms = computed(() => {
-  let filtered = [...classrooms.value]
-
-  if (selectedStatus.value) {
-    filtered = filtered.filter(c => c.status === selectedStatus.value)
-  }
-
+const filteredClassrooms = computed((): TableItem[] => {
+  let filtered = classrooms.value.map(classroom => ({
+    ...classroom,
+    id: classroom.id ?? 0
+  }))
   return filtered
 })
 
@@ -106,30 +104,34 @@ function openCreateModal() {
   showModal.value = true
 }
 
-function handleEdit(classroom: Classroom) {
+function handleEdit(classroom: ClassroomDto) {
   selectedClassroom.value = classroom
   showModal.value = true
 }
 
-async function handleConfigureReader(classroom: Classroom) {
-  // Implementation for configuring reader device
-  console.log('Configure reader for classroom:', classroom.id)
+async function handleConfigureReader(classroom: ClassroomDto) {
+  if (!classroom.id) return
+  
+  try {
+    if (classroom.readerDeviceId) {
+      await classroomStore.removeReader(classroom.id)
+    } else {
+      const deviceId = window.prompt('Enter reader device ID:')
+      if (deviceId) {
+        await classroomStore.assignReader(classroom.id, deviceId)
+      }
+    }
+  } catch (err) {
+    console.error('Failed to configure reader:', err)
+  }
 }
 
-async function handleSubmit(formData: Partial<Classroom>) {
+async function handleSubmit(formData: CreateClassroomCommand | UpdateClassroomCommand) {
   try {
-    if (selectedClassroom.value?.id) {
-      // For updates, we can use Partial<Classroom>
-      await classroomStore.updateClassroom(selectedClassroom.value.id, formData)
+    if ('id' in formData && formData.id) {
+      await classroomStore.updateClassroom(formData.id, formData)
     } else {
-      // For creation, we need to construct a proper CreateClassroomRequest
-      const createRequest: CreateClassroomRequest = {
-        name: formData.name || '',
-        status: (formData.status as ClassroomStatus) || 'available',
-        readerDeviceId: formData.readerDeviceId,
-        createdAt: new Date()
-      }
-      await classroomStore.createClassroom(createRequest)
+      await classroomStore.createClassroom(formData as CreateClassroomCommand)
     }
     showModal.value = false
   } catch (err) {
@@ -138,6 +140,8 @@ async function handleSubmit(formData: Partial<Classroom>) {
 }
 
 function handleRowClick(classroom: TableItem) {
-  handleEdit(classroom as Classroom)
+  if (canManageClassrooms.value) {
+    handleEdit(classroom as ClassroomDto)
+  }
 }
 </script>

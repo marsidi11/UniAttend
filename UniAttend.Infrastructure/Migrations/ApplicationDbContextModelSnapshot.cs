@@ -342,10 +342,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.HasIndex("ReaderDeviceId")
-                        .IsUnique()
-                        .HasFilter("[ReaderDeviceId] IS NOT NULL");
-
                     b.ToTable("Classrooms", (string)null);
                 });
 
@@ -463,9 +459,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StudyGroupId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime")
                         .HasColumnName("UpdatedAt");
@@ -473,8 +466,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("StudentId");
-
-                    b.HasIndex("StudyGroupId");
 
                     b.HasIndex("GroupId", "StudentId")
                         .IsUnique();
@@ -846,7 +837,7 @@ namespace UniAttend.Infrastructure.Migrations
             modelBuilder.Entity("UniAttend.Core.Entities.GroupStudent", b =>
                 {
                     b.HasOne("UniAttend.Core.Entities.StudyGroup", "Group")
-                        .WithMany()
+                        .WithMany("Students")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -856,10 +847,6 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
-                        .WithMany("Students")
-                        .HasForeignKey("StudyGroupId");
 
                     b.Navigation("Group");
 

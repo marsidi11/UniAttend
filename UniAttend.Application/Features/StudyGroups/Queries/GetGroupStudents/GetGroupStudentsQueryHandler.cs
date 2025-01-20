@@ -4,7 +4,7 @@ using UniAttend.Application.Features.StudyGroups.DTOs;
 
 namespace UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents
 {
-    public class GetGroupStudentsQueryHandler 
+    public class GetGroupStudentsQueryHandler
         : IRequestHandler<GetGroupStudentsQuery, IEnumerable<GroupStudentDto>>
     {
         private readonly IGroupStudentRepository _groupStudentRepository;
@@ -15,19 +15,22 @@ namespace UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents
         }
 
         public async Task<IEnumerable<GroupStudentDto>> Handle(
-            GetGroupStudentsQuery request, 
+            GetGroupStudentsQuery request,
             CancellationToken cancellationToken)
         {
+            // Get students with included navigation properties
             var groupStudents = await _groupStudentRepository
-                .GetByGroupIdAsync(request.GroupId, cancellationToken);
-
+                .GetByGroupIdWithDetailsAsync(request.GroupId, cancellationToken);
+        
             return groupStudents.Select(gs => new GroupStudentDto
             {
                 StudentId = gs.StudentId,
-                StudentName = $"{gs.Student?.User.FirstName} {gs.Student?.User.LastName}",
-                StudentNumber = gs.Student?.StudentId ?? string.Empty,
-                AttendanceRate = 0, // Calculate this based on attendance records
-                IsActive = gs.Student?.User.IsActive ?? false
+                StudentName = gs.Student?.User != null 
+                    ? $"{gs.Student.User.FirstName ?? "N/A"} {gs.Student.User.LastName ?? ""}".Trim()
+                    : "Unknown Student",
+                StudentNumber = gs.Student?.StudentId ?? "N/A",
+                AttendanceRate = 0, // Consider calculating this
+                IsActive = gs.Student?.User?.IsActive ?? false
             });
         }
     }

@@ -19,7 +19,7 @@ namespace UniAttend.Application.Features.Classrooms.Commands.CreateClassroom
             if (await _unitOfWork.Classrooms.ExistsWithNameAsync(request.Name, cancellationToken))
                 throw new ValidationException($"Classroom with name {request.Name} already exists");
 
-            var classroom = new Classroom(request.Name, request.ReaderDeviceId);
+            var classroom = new Classroom(request.Name, request.ReaderDeviceId ?? null);
             
             await _unitOfWork.Classrooms.AddAsync(classroom, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -157,8 +157,25 @@ async function loadData() {
 
 async function handleSubmit() {
   try {
+    if (!selectedStudents.value.length) {
+      throw new Error('Please select at least one student')
+    }
+    
     isLoading.value = true
+    
+    // Validate students before submitting
+    const invalidStudents = selectedStudents.value.filter(id => 
+      !students.value.find(s => s.id === id && s.isActive)
+    )
+    
+    if (invalidStudents.length) {
+      throw new Error('Some selected students are no longer active')
+    }
+    
     emit('submit', selectedStudents.value)
+  } catch (err) {
+    console.error('Failed to enroll students:', err)
+    // You may want to add a notification system here
   } finally {
     isLoading.value = false
   }

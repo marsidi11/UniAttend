@@ -10,5 +10,6 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task AddStudentToGroupAsync(int groupId, int studentId, CancellationToken cancellationToken = default);
         Task RemoveStudentFromGroupAsync(int groupId, int studentId, CancellationToken cancellationToken = default);
         Task<IEnumerable<GroupStudent>> GetActiveGroupsByStudentIdAsync(int studentId, int academicYearId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<GroupStudent>> GetByGroupIdWithDetailsAsync(int groupId, CancellationToken cancellationToken);
     }
 }
