@@ -16,13 +16,27 @@ export const useProfessorStore = defineStore('professor', () => {
     professors.value.filter(p => p.isActive)
   );
 
+  const professorsByDepartment = computed(() => {
+    const grouped = new Map<string, ProfessorDto[]>();
+    professors.value.forEach(professor => {
+      const dept = professor.departmentName || 'Unassigned';
+      if (!grouped.has(dept)) {
+        grouped.set(dept, []);
+      }
+      grouped.get(dept)?.push(professor);
+    });
+    return grouped;
+  });
+
   // Actions
   async function fetchProfessors(filters?: { departmentId?: number; isActive?: boolean }) {
     isLoading.value = true;
     try {
-      const { data } = await professorApi.professorList(filters);
-      professors.value = data;
-      return data;
+      const response = await professorApi.professorList(filters);
+      if (response && response.data) {
+        professors.value = response.data;
+      }
+      return response.data;
     } catch (err) {
       handleError(err, error);
       throw err;
@@ -34,9 +48,11 @@ export const useProfessorStore = defineStore('professor', () => {
   async function fetchProfessorById(id: number) {
     isLoading.value = true;
     try {
-      const { data } = await professorApi.professorDetail(id);
-      currentProfessor.value = data;
-      return data;
+      const response = await professorApi.professorDetail(id);
+      if (response && response.data) {
+        currentProfessor.value = response.data;
+      }
+      return response.data;
     } catch (err) {
       handleError(err, error);
       throw err;
@@ -54,6 +70,7 @@ export const useProfessorStore = defineStore('professor', () => {
     
     // Getters
     activeProfessors,
+    professorsByDepartment,
     
     // Actions
     fetchProfessors,
