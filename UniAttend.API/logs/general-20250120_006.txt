@@ -1,0 +1,43 @@
+2025-01-20 11:43:19.141 +01:00 [INF] Starting web application
+2025-01-20 11:43:24.041 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-01-20 11:43:26.186 +01:00 [ERR] An unhandled exception occurred
+AutoMapper.AutoMapperMappingException: Error mapping types.
+
+Mapping types:
+List`1 -> IEnumerable`1
+System.Collections.Generic.List`1[[UniAttend.Core.Entities.Subject, UniAttend.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]] -> System.Collections.Generic.IEnumerable`1[[UniAttend.Application.Features.Subjects.DTOs.SubjectDto, UniAttend.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+ ---> AutoMapper.AutoMapperMappingException: Error mapping types.
+
+Mapping types:
+Subject -> SubjectDto
+UniAttend.Core.Entities.Subject -> UniAttend.Application.Features.Subjects.DTOs.SubjectDto
+
+Type Map configuration:
+Subject -> SubjectDto
+UniAttend.Core.Entities.Subject -> UniAttend.Application.Features.Subjects.DTOs.SubjectDto
+
+Destination Member:
+AverageAttendance
+
+ ---> System.InvalidOperationException: Sequence contains no elements
+   at System.Linq.ThrowHelper.ThrowNoElementsException()
+   at System.Linq.Enumerable.Average[TSource,TSelector,TAccumulator,TResult](IEnumerable`1 source, Func`2 selector)
+   at lambda_method143(Closure, Object, IEnumerable`1, ResolutionContext)
+   --- End of inner exception stack trace ---
+   at lambda_method143(Closure, Object, IEnumerable`1, ResolutionContext)
+   --- End of inner exception stack trace ---
+   at lambda_method143(Closure, Object, IEnumerable`1, ResolutionContext)
+   at UniAttend.Application.Features.Subjects.Queries.GetSubjects.GetSubjectsQueryHandler.Handle(GetSubjectsQuery request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Subjects\Queries\GetSubjects\GetSubjectsQueryHandler.cs:line 38
+   at UniAttend.API.Controllers.SubjectsController.GetAll(Nullable`1 departmentId, Nullable`1 isActive, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\SubjectsController.cs:line 37
+   at lambda_method9(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
+2025-01-20 11:45:00.059 +01:00 [INF] Starting web application

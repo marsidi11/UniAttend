@@ -17,6 +17,17 @@ namespace UniAttend.Core.Entities
             Department = null!;
         }
 
+        public Subject(string name, string description, int credits, int departmentId)
+        {
+            ValidateName(name);
+            ValidateCredits(credits);
+
+            Name = name;
+            Description = description ?? string.Empty;
+            Credits = credits;
+            DepartmentId = departmentId;
+        }
+
         public Subject(string name, string description, int credits, Department department)
         {
             if (string.IsNullOrWhiteSpace(name))

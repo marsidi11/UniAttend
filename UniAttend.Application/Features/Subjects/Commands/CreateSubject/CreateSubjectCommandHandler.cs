@@ -18,30 +18,34 @@ namespace UniAttend.Application.Features.Subjects.Commands.CreateSubject
             _mapper = mapper;
         }
 
-                public async Task<SubjectDto> Handle(CreateSubjectCommand request, CancellationToken cancellationToken)
+        public async Task<SubjectDto> Handle(CreateSubjectCommand request, CancellationToken cancellationToken)
         {
-            // Check if department exists
+            // First verify department exists
             var department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentId, cancellationToken)
                 ?? throw new NotFoundException($"Department with ID {request.DepartmentId} not found");
-        
+
             // Check if subject name already exists in department
-            if (await _unitOfWork.Subjects.ExistsInDepartmentAsync(request.Name, request.DepartmentId, cancellationToken))
+            if (await _unitOfWork.Subjects.ExistsInDepartmentAsync(
+                request.Name,
+                request.DepartmentId,
+                cancellationToken))
             {
                 throw new ValidationException($"A subject with name '{request.Name}' already exists in this department");
             }
-        
+
+            // Create new subject
             var subject = new Subject(
-                name: request.Name,
-                description: request.Description,
-                credits: request.Credits,
-                department: department
+                request.Name,
+                request.Description,
+                request.Credits,
+                request.DepartmentId
             );
-        
+
             await _unitOfWork.Subjects.AddAsync(subject, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-            // Use the mapping profile directly
-            return _mapper.Map<SubjectDto>(subject);
+
+            var subjectDto = _mapper.Map<SubjectDto>(subject);
+            return subjectDto with { DepartmentName = department.Name };
         }
     }
 }

@@ -104,12 +104,6 @@ const routes = [
         meta: { roles: ['admin'] }
       },
       {
-        path: 'subjects',
-        name: 'subjects',
-        component: SubjectList,
-        meta: { roles: ['admin'] }
-      },
-      {
         path: 'academic-years',
         name: 'academic-years',
         component: AcademicYearList,
@@ -219,6 +213,18 @@ const routes = [
         path: 'absence-alerts',
         name: 'absence-alerts',
         component: AbsenceAlerts,
+        meta: { roles: ['admin', 'secretary'] }
+      },
+      {
+        path: 'subjects',
+        name: 'subjects',
+        component: SubjectList,
+        meta: { roles: ['admin', 'secretary'] }  
+      },
+      {
+        path: 'subjects/:id',
+        name: 'subject-details',
+        component: SubjectDetails,
         meta: { roles: ['admin', 'secretary'] }
       },
       {

@@ -49,9 +49,9 @@ namespace UniAttend.API.Controllers
             };
             await _mediator.Send(command);
             return Ok();
-        }
+    }
 
-        /// <summary>
+    /// <summary>
     /// Gets attendance records for a specific class
     /// </summary>
     [HttpGet("classes/{classId}")]
@@ -74,7 +74,7 @@ namespace UniAttend.API.Controllers
     /// Gets attendance records for the authenticated student
     /// </summary>
     [HttpGet("student")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = "Student, Secretary")]
     public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetStudentAttendance(
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate,

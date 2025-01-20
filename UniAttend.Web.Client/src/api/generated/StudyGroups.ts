@@ -24,6 +24,80 @@ export class StudyGroups<SecurityDataType = unknown> extends HttpClient<Security
    * No description
    *
    * @tags StudyGroups
+   * @name StudyGroupsList
+   * @request GET:/api/StudyGroups
+   * @secure
+   */
+  studyGroupsList = (
+    query?: {
+      /** @format int32 */
+      academicYearId?: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<StudyGroupDto[], any>({
+      path: `/api/StudyGroups`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags StudyGroups
+   * @name StudyGroupsCreate
+   * @request POST:/api/StudyGroups
+   * @secure
+   */
+  studyGroupsCreate = (data: CreateGroupCommand, params: RequestParams = {}) =>
+    this.request<StudyGroupDto, any>({
+      path: `/api/StudyGroups`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags StudyGroups
+   * @name StudyGroupsDetail
+   * @request GET:/api/StudyGroups/{id}
+   * @secure
+   */
+  studyGroupsDetail = (id: number, params: RequestParams = {}) =>
+    this.request<StudyGroupDto, any>({
+      path: `/api/StudyGroups/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags StudyGroups
+   * @name StudyGroupsUpdate
+   * @request PUT:/api/StudyGroups/{id}
+   * @secure
+   */
+  studyGroupsUpdate = (id: number, data: UpdateGroupCommand, params: RequestParams = {}) =>
+    this.request<void, any>({
+      path: `/api/StudyGroups/${id}`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags StudyGroups
    * @name StudyGroupsProfessorDetail
    * @request GET:/api/StudyGroups/professor/{professorId}
    * @secure
@@ -58,41 +132,6 @@ export class StudyGroups<SecurityDataType = unknown> extends HttpClient<Security
       method: "GET",
       secure: true,
       format: "json",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags StudyGroups
-   * @name StudyGroupsCreate
-   * @request POST:/api/StudyGroups
-   * @secure
-   */
-  studyGroupsCreate = (data: CreateGroupCommand, params: RequestParams = {}) =>
-    this.request<StudyGroupDto, any>({
-      path: `/api/StudyGroups`,
-      method: "POST",
-      body: data,
-      secure: true,
-      type: ContentType.Json,
-      format: "json",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags StudyGroups
-   * @name StudyGroupsUpdate
-   * @request PUT:/api/StudyGroups/{id}
-   * @secure
-   */
-  studyGroupsUpdate = (id: number, data: UpdateGroupCommand, params: RequestParams = {}) =>
-    this.request<void, any>({
-      path: `/api/StudyGroups/${id}`,
-      method: "PUT",
-      body: data,
-      secure: true,
-      type: ContentType.Json,
       ...params,
     });
   /**

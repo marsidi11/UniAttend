@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using UniAttend.Application.Features.Subjects.Commands.CreateSubject;
 using UniAttend.Application.Features.Subjects.Commands.UpdateSubject;
 using UniAttend.Application.Features.Subjects.Commands.DeactivateSubject;
-using UniAttend.Application.Features.Subjects.Queries.GetDepartmentSubjects;
+using UniAttend.Application.Features.Subjects.Queries.GetSubjects;
 using UniAttend.Application.Features.Subjects.Queries.GetSubjectById;
 using UniAttend.Application.Features.Subjects.DTOs;
 
@@ -23,15 +23,15 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,Secretary,Professor")]
+        [Authorize(Roles = "Admin, Secretary, Professor")]
         public async Task<ActionResult<IEnumerable<SubjectDto>>> GetAll(
             [FromQuery] int? departmentId,
             [FromQuery] bool? isActive,
             CancellationToken cancellationToken)
         {
-            var query = new GetDepartmentSubjectsQuery 
+            var query = new GetSubjectsQuery 
             { 
-                DepartmentId = departmentId ?? 0,
+                DepartmentId = departmentId,
                 IsActive = isActive
             };
             var result = await _mediator.Send(query, cancellationToken);
@@ -39,7 +39,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Secretary,Professor")]
+        [Authorize(Roles = "Admin, Secretary, Professor")]
         public async Task<ActionResult<SubjectDto>> GetById(int id, CancellationToken cancellationToken)
         {
             var query = new GetSubjectByIdQuery { Id = id };
@@ -48,7 +48,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Secretary")]
         public async Task<ActionResult<SubjectDto>> Create(
             [FromBody] CreateSubjectCommand command,
             CancellationToken cancellationToken)
@@ -58,7 +58,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Secretary")]
         public async Task<IActionResult> Update(
             int id,
             [FromBody] UpdateSubjectCommand command,
@@ -72,7 +72,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Secretary")]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var command = new DeactivateSubjectCommand { Id = id };

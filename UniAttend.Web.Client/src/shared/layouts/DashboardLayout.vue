@@ -146,8 +146,11 @@ const secretaryLinks = [
   { to: '/dashboard/students', icon: 'school', text: 'Students' },
   { to: '/dashboard/cards', icon: 'credit_card', text: 'Cards' },
   { to: '/dashboard/schedule', icon: 'schedule', text: 'Schedule' },
-  { to: '/dashboard/groups', icon: 'groups', text: 'Groups' },
-  { to: '/dashboard/classrooms', icon: 'meeting_room', text: 'Classrooms' }
+  { to: '/dashboard/groups', icon: 'groups', text: 'Study Groups' },
+  { to: '/dashboard/subjects', icon: 'book', text: 'Subjects' },
+  { to: '/dashboard/classrooms', icon: 'meeting_room', text: 'Classrooms' },
+  { to: '/dashboard/attendance/records', icon: 'fact_check', text: 'Attendance Records' },
+  { to: '/dashboard/reports', icon: 'analytics', text: 'Reports' }
 ]
 
 const professorLinks = [

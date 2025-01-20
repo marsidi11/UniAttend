@@ -86,6 +86,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet("profile")]
+        [Authorize]
         public async Task<ActionResult<UserProfileDto>> GetProfile(CancellationToken cancellationToken)
         {
             var query = new GetUserProfileQuery { UserId = User.GetUserId() };
@@ -94,6 +95,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpPut("profile")]
+        [Authorize]
         public async Task<IActionResult> UpdateProfile(UpdateProfileCommand command, CancellationToken cancellationToken)
         {
             command.UserId = User.GetUserId();
@@ -111,6 +113,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet("details")]
+        [Authorize]
         public async Task<ActionResult<UserDetailsDto>> GetCurrentUserDetails(CancellationToken cancellationToken)
         {
             var query = new GetUserDetailsQuery { UserId = User.GetUserId() };
@@ -119,6 +122,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpPut("change-password")]
+        [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordCommand command, CancellationToken cancellationToken)
         {
             command.UserId = User.GetUserId();

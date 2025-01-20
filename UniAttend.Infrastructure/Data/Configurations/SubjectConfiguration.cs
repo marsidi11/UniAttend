@@ -25,10 +25,12 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.Property(x => x.DepartmentId)
                 .IsRequired();
 
+            // Relationship with Department
             builder.HasOne(x => x.Department)
                 .WithMany(x => x.Subjects)
                 .HasForeignKey(x => x.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();                
 
             // Add unique constraint for name within department
             builder.HasIndex(x => new { x.Name, x.DepartmentId })

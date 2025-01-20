@@ -331,6 +331,19 @@ export interface ProblemDetails {
   [key: string]: any;
 }
 
+export interface ProfessorDto {
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  userId?: number;
+  fullName?: string | null;
+  email?: string | null;
+  /** @format int32 */
+  departmentId?: number;
+  departmentName?: string | null;
+  isActive?: boolean;
+}
+
 export interface RecordCardAttendanceCommand {
   cardId?: string | null;
   deviceId?: string | null;

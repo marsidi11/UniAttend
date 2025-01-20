@@ -49,14 +49,20 @@ namespace UniAttend.Application.Common.Mappings
                 .ForMember(d => d.TotalStudents, opt =>
                     opt.MapFrom(src => src.StudyGroups.Sum(g => g.Students.Count)));
 
-            CreateMap<Subject, SubjectDto>()
-                .ForMember(d => d.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
-                .ForMember(d => d.GroupsCount, opt => opt.MapFrom(src => src.StudyGroups.Count))
-                .ForMember(d => d.StudentsCount, opt =>
-                    opt.MapFrom(src => src.StudyGroups.Sum(g => g.Students.Count)))
-                .ForMember(d => d.AverageAttendance, opt =>
-                    opt.MapFrom(src => src.StudyGroups.SelectMany(g => g.AttendanceRecords)
-                        .Average(a => a.IsConfirmed ? 1 : 0) * 100));
+                        CreateMap<Subject, SubjectDto>()
+                .ForMember(dest => dest.DepartmentName, 
+                    opt => opt.MapFrom(src => src.Department.Name))
+                .ForMember(dest => dest.GroupsCount,
+                    opt => opt.MapFrom(src => src.StudyGroups.Count))
+                .ForMember(dest => dest.StudentsCount,
+                    opt => opt.MapFrom(src => src.StudyGroups.SelectMany(g => g.Students).Count()))
+                .ForMember(dest => dest.AverageAttendance,
+                    opt => opt.MapFrom((src, dest, member, context) => {
+                        var records = src.StudyGroups.SelectMany(g => g.AttendanceRecords);
+                        if (!records.Any())
+                            return 0m;
+                        return records.Average(a => a.IsConfirmed ? 100m : 0m);
+                    }));
 
             CreateMap<StudyGroup, StudyGroupDto>()
                 .ForMember(d => d.StudentsCount, opt => opt.MapFrom(src => src.Students.Count))

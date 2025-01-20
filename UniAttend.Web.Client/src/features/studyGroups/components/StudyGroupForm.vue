@@ -39,7 +39,7 @@
       >
         <option value="">Select Professor</option>
         <option v-for="professor in availableProfessors" :key="professor.id" :value="professor.id">
-          {{ professor.firstName }} {{ professor.lastName }}
+          {{ professor.fullName }}
         </option>
       </select>
     </div>
@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useUserStore } from '@/stores/user.store'
+import { useProfessorStore } from '@/stores/professor.store'
 import { useAcademicYearStore } from '@/stores/academicYear.store'
 import Button from '@/shared/components/ui/Button.vue'
 import type { 
@@ -112,10 +112,10 @@ const emit = defineEmits<{
 }>()
 
 // Store setup
-const userStore = useUserStore()
+const professorStore = useProfessorStore()
 const academicYearStore = useAcademicYearStore()
 
-const { users } = storeToRefs(userStore)
+const { professors } = storeToRefs(professorStore)
 const { academicYears } = storeToRefs(academicYearStore)
 
 const isLoading = ref(false)
@@ -127,13 +127,10 @@ const form = ref<FormData>({
   isActive: true
 })
 
-// Filter professors from users and ensure they're active
-const professors = computed(() => 
-  users.value.filter(user => user.role === 3 && user.isActive)
+// Show only active professors
+const availableProfessors = computed(() => 
+  professors.value.filter(p => p.isActive)
 )
-
-// Show all available professors
-const availableProfessors = computed(() => professors.value)
 
 // Watch for changes in props.group and update form
 watch(() => props.group, (newGroup) => {
@@ -158,8 +155,8 @@ watch(() => props.group, (newGroup) => {
 
 onMounted(async () => {
   // Load required data if not already loaded
-  if (!users.value.length) {
-    await userStore.fetchUsers({ role: 3, isActive: true })
+  if (!professors.value.length) {
+    await professorStore.fetchProfessors()
   }
   if (!academicYears.value.length) {
     await academicYearStore.fetchAcademicYears()

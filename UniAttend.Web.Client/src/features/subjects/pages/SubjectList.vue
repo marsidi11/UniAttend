@@ -90,8 +90,9 @@ const selectedDepartment = ref('')
 const selectedStatus = ref('')
 
 // Computed properties
-const isAdmin = computed(() => authStore.userRole === 'admin')
-
+const isAdmin = computed(() => 
+  authStore.userRole === 'admin' || authStore.userRole === 'secretary'
+)
 const columns = [
   { key: 'name', label: 'Name' },
   { key: 'departmentName', label: 'Department' },

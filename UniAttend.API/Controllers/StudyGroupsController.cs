@@ -8,6 +8,8 @@ using UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromGroup
 using UniAttend.Application.Features.StudyGroups.Commands.TransferStudent;
 using UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents;
 using UniAttend.Application.Features.StudyGroups.Queries.GetProfessorGroups;
+using UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroups;
+using UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroupById;
 using UniAttend.Application.Features.StudyGroups.DTOs;
 
 namespace UniAttend.API.Controllers
@@ -23,6 +25,28 @@ namespace UniAttend.API.Controllers
         {
             _mediator = mediator;
         }
+
+        [HttpGet]
+[Authorize(Roles = "Admin,Secretary,Professor")] 
+public async Task<ActionResult<IEnumerable<StudyGroupDto>>> GetAll(
+    [FromQuery] int? academicYearId,
+    CancellationToken cancellationToken)
+{
+    var query = new GetStudyGroupsQuery { AcademicYearId = academicYearId };
+    var result = await _mediator.Send(query, cancellationToken);
+    return Ok(result);
+}
+
+        [HttpGet("{id}")]
+[Authorize(Roles = "Admin,Secretary,Professor")]
+public async Task<ActionResult<StudyGroupDto>> GetById(
+    int id,
+    CancellationToken cancellationToken)
+{
+    var query = new GetStudyGroupByIdQuery { Id = id };
+    var result = await _mediator.Send(query, cancellationToken);
+    return result != null ? Ok(result) : NotFound();
+}
 
         [HttpGet("professor/{professorId}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
