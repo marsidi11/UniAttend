@@ -52,7 +52,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetDepartmentReport
 
                 groupSummaries.Add(new GroupSummaryDto
                 {
-                    GroupId = group.Id,
+                    StudyGroupId = group.Id,
                     GroupName = group.Name,
                     SubjectName = group.Subject?.Name ?? "Unknown",
                     EnrolledStudents = group.Students.Count,

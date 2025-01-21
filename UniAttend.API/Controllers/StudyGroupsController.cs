@@ -69,7 +69,7 @@ public async Task<ActionResult<StudyGroupDto>> GetById(
             int id, 
             CancellationToken cancellationToken)
         {
-            var query = new GetGroupStudentsQuery { GroupId = id };
+            var query = new GetGroupStudentsQuery { StudyGroupId = id };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
@@ -105,23 +105,23 @@ public async Task<ActionResult<StudyGroupDto>> GetById(
             [FromBody] EnrollStudentsCommand command,
             CancellationToken cancellationToken)
         {
-            if (id != command.GroupId)
+            if (id != command.StudyGroupId)
                 return BadRequest();
 
             await _mediator.Send(command, cancellationToken);
             return NoContent();
         }
 
-        [HttpDelete("{groupId}/students/{studentId}")]
+        [HttpDelete("{studyGroupId}/students/{studentId}")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<IActionResult> RemoveStudent(
-            int groupId,
+            int studyGroupId,
             int studentId,
             CancellationToken cancellationToken)
         {
             var command = new RemoveStudentFromGroupCommand 
             { 
-                GroupId = groupId,
+                StudyGroupId = studyGroupId,
                 StudentId = studentId
             };
             await _mediator.Send(command, cancellationToken);

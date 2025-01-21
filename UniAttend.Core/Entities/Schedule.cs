@@ -7,12 +7,12 @@ namespace UniAttend.Core.Entities
     {
         private Schedule() { } // For domain events/serialization
 
-        public Schedule(int groupId, int classroomId, int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
+        public Schedule(int studyGroupId, int classroomId, int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
         {
             ValidateTimeRange(startTime, endTime);
             ValidateDayOfWeek(dayOfWeek);
             
-            GroupId = groupId;
+            StudyGroupId = studyGroupId;
             ClassroomId = classroomId;
             DayOfWeek = dayOfWeek;
             StartTime = startTime;
@@ -20,14 +20,14 @@ namespace UniAttend.Core.Entities
         }
 
         // Identity properties - immutable
-        public int GroupId { get; }
+        public int StudyGroupId { get; }
         public int ClassroomId { get; }
         public int DayOfWeek { get; }
         public TimeSpan StartTime { get; }
         public TimeSpan EndTime { get; }
 
         // Domain references without EF Core annotations
-        public StudyGroup Group { get; }
+        public StudyGroup StudyGroup { get; }
         public Classroom Classroom { get; }
 
         // Domain validation

@@ -115,7 +115,7 @@ export const useGroupStore = defineStore('group', () => {
   async function enrollStudents(id: number, studentIds: number[]) {
     isLoading.value = true;
     try {
-      await studyGroupApi.studyGroupsStudentsEnrollCreate(id, { groupId: id, studentIds });
+      await studyGroupApi.studyGroupsStudentsEnrollCreate(id, { studyGroupId: id, studentIds });
       await fetchGroupStudents(id);
     } catch (err) {
       handleError(err, error);
@@ -125,10 +125,10 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function removeStudent(groupId: number, studentId: number) {
+  async function removeStudent(studyGroupId: number, studentId: number) {
     isLoading.value = true;
     try {
-      await studyGroupApi.studyGroupsStudentsDelete(groupId, studentId);
+      await studyGroupApi.studyGroupsStudentsDelete(studyGroupId, studentId);
       groupStudents.value = groupStudents.value.filter(
         gs => gs.studentId !== studentId
       );

@@ -24,13 +24,13 @@ namespace UniAttend.Application.Features.Reports.Queries.ExportAttendanceReport
             try
             {
                 return await _printService.GenerateAttendanceReportPdfAsync(
-                    request.GroupId,
+                    request.StudyGroupId,
                     request.StartDate,
                     request.EndDate);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating PDF report for group {GroupId}", request.GroupId);
+                _logger.LogError(ex, "Error generating PDF report for group {StudyGroupId}", request.StudyGroupId);
                 throw;
             }
         }

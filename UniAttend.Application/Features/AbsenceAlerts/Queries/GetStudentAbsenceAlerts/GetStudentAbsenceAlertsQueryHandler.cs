@@ -26,9 +26,9 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Queries.GetStudentAbsence
             {
                 alerts = await _absenceAlertRepository.GetByStudentIdAsync(request.StudentId.Value, cancellationToken);
             }
-            else if (request.GroupId.HasValue)
+            else if (request.StudyGroupId.HasValue)
             {
-                alerts = await _absenceAlertRepository.GetByGroupIdAsync(request.GroupId.Value, cancellationToken);
+                alerts = await _absenceAlertRepository.GetByGroupIdAsync(request.StudyGroupId.Value, cancellationToken);
             }
             else
             {
@@ -38,7 +38,7 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Queries.GetStudentAbsence
             return alerts.Select(a => new AbsenceAlertDto
             {
                 StudentId = a.StudentId,
-                GroupId = a.GroupId,
+                StudyGroupId = a.StudyGroupId,
                 AbsencePercentage = a.AbsencePercentage,
                 EmailSent = a.EmailSent,
                 CreatedAt = a.CreatedAt

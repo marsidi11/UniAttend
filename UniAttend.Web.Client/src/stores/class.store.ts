@@ -33,7 +33,7 @@ export const useClassStore = defineStore('class', () => {
 
   // Actions
   async function fetchClasses(filters?: { 
-    groupId?: number;
+    studyGroupId?: number;
     classroomId?: number;
     date?: Date;
   }) {
@@ -100,10 +100,10 @@ export const useClassStore = defineStore('class', () => {
     }
   }
 
-  async function getClassesByGroup(groupId: number) {
+  async function getClassesByGroup(studyGroupId: number) {
     isLoading.value = true;
     try {
-      const { data } = await classApi.classesGroupDetail(groupId);
+      const { data } = await classApi.classesGroupDetail(studyGroupId);
       return data;
     } catch (err) {
       handleError(err, error);

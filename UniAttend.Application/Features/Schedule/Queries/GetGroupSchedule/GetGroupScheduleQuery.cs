@@ -5,6 +5,6 @@ namespace UniAttend.Application.Features.Schedule.Queries.GetGroupSchedule
 {
     public record GetGroupScheduleQuery : IRequest<IEnumerable<ScheduleDto>>
     {
-        public int GroupId { get; init; }
+        public int StudyGroupId { get; init; }
     }
 }

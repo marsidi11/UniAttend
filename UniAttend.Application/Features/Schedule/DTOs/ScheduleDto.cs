@@ -5,7 +5,7 @@ namespace UniAttend.Application.Features.Schedule.DTOs
     public class ScheduleDto
     {
         public int Id { get; init; }
-        public int GroupId { get; init; }
+        public int StudyGroupId { get; init; }
         public string GroupName { get; init; } = string.Empty;
         public int ClassroomId { get; init; }
         public string ClassroomName { get; init; } = string.Empty;

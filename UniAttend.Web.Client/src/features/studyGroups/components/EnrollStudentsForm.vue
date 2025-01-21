@@ -79,7 +79,7 @@ interface Student extends UserDetailsDto {
 }
 
 defineProps<{
-  groupId: number
+  studyGroupId: number
 }>()
 
 const emit = defineEmits<{

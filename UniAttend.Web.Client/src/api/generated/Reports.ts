@@ -114,7 +114,7 @@ export class Reports<SecurityDataType = unknown> extends HttpClient<SecurityData
       /** @format int32 */
       subjectId?: number;
       /** @format int32 */
-      groupId?: number;
+      studyGroupId?: number;
     },
     params: RequestParams = {},
   ) =>
@@ -153,7 +153,7 @@ export class Reports<SecurityDataType = unknown> extends HttpClient<SecurityData
   reportsExportAttendanceList = (
     query?: {
       /** @format int32 */
-      groupId?: number;
+      studyGroupId?: number;
       /** @format date-time */
       startDate?: string;
       /** @format date-time */

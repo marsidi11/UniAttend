@@ -19,7 +19,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
             DateTime endDate,
             int? departmentId = null,
             int? subjectId = null,
-            int? groupId = null,
+            int? studyGroupId = null,
             CancellationToken cancellationToken = default)
         {
             var query = _context.Set<AttendanceRecord>()
@@ -45,10 +45,10 @@ namespace UniAttend.Infrastructure.Data.Repositories
                                         ar.Course.StudyGroup.SubjectId == subjectId.Value);
             }
 
-            if (groupId.HasValue)
+            if (studyGroupId.HasValue)
             {
                 query = query.Where(ar => ar.Course != null && 
-                                        ar.Course.StudyGroupId == groupId.Value);
+                                        ar.Course.StudyGroupId == studyGroupId.Value);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -68,7 +68,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 var enrolledStudents = await _context.Set<GroupStudent>()
                     .Include(gs => gs.Student!)
                         .ThenInclude(s => s.User)
-                    .Where(gs => gs.GroupId == group.Id && gs.Student != null)
+                    .Where(gs => gs.StudyGroupId == group.Id && gs.Student != null)
                     .ToListAsync(cancellationToken);
 
                 foreach (var enrollment in enrolledStudents)
@@ -93,11 +93,11 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
         private async Task<double> CalculateStudentAttendancePercentage(
             int studentId,
-            int groupId,
+            int studyGroupId,
             CancellationToken cancellationToken)
         {
             var totalClasses = await _context.Set<Course>()
-                .CountAsync(c => c.StudyGroupId == groupId && c.IsActive, cancellationToken);
+                .CountAsync(c => c.StudyGroupId == studyGroupId && c.IsActive, cancellationToken);
 
             if (totalClasses == 0)
             {
@@ -108,7 +108,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .CountAsync(ar =>
                     ar.StudentId == studentId &&
                     ar.Course != null &&
-                    ar.Course.StudyGroupId == groupId &&
+                    ar.Course.StudyGroupId == studyGroupId &&
                     ar.IsConfirmed,
                     cancellationToken);
 

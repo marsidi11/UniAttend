@@ -71,9 +71,9 @@ namespace UniAttend.Core.Entities
         private void ValidateName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new DomainException("Group name cannot be empty");
+                throw new DomainException("StudyGroup name cannot be empty");
             if (name.Length > 100)
-                throw new DomainException("Group name cannot exceed 100 characters");
+                throw new DomainException("StudyGroup name cannot exceed 100 characters");
         }
 
         public void Activate() => SetActive(true);

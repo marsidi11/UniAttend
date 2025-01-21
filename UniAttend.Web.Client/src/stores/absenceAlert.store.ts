@@ -48,10 +48,10 @@
 //     }
 //   }
 
-//   async function fetchGroupAlerts(groupId: number) {
+//   async function fetchGroupAlerts(studyGroupId: number) {
 //     isLoading.value = true;
 //     try {
-//       const { data } = await alertApi.getGroupAlerts(groupId);
+//       const { data } = await alertApi.getGroupAlerts(studyGroupId);
 //       alerts.value = data;
 //       return data;
 //     } catch (err) {

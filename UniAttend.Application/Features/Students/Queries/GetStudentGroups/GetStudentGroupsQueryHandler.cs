@@ -28,15 +28,15 @@ namespace UniAttend.Application.Features.Students.Queries.GetStudentGroups
                     cancellationToken);
         
             return groups
-                .Where(g => g.Group != null) // Filter out records with null Group
+                .Where(g => g.StudyGroup != null) // Filter out records with null StudyGroup
                 .Select(g => new StudentGroupDto
                 {
-                    GroupId = g.GroupId,
-                    GroupName = g.Group!.Name,
-                    SubjectName = g.Group.Subject?.Name ?? "Unknown Subject",
-                    AcademicYear = g.Group.AcademicYear?.Name ?? "Unknown Year",
-                    ProfessorName = g.Group.Professor?.User != null 
-                        ? $"{g.Group.Professor.User.FirstName} {g.Group.Professor.User.LastName}"
+                    StudyGroupId = g.StudyGroupId,
+                    GroupName = g.StudyGroup!.Name,
+                    SubjectName = g.StudyGroup.Subject?.Name ?? "Unknown Subject",
+                    AcademicYear = g.StudyGroup.AcademicYear?.Name ?? "Unknown Year",
+                    ProfessorName = g.StudyGroup.Professor?.User != null 
+                        ? $"{g.StudyGroup.Professor.User.FirstName} {g.StudyGroup.Professor.User.LastName}"
                         : "Unknown Professor"
                 });
         }

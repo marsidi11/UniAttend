@@ -17,8 +17,8 @@ namespace UniAttend.Application.Features.Classes.Commands.OpenClass
 
         public async Task<ClassDto> Handle(OpenClassCommand request, CancellationToken cancellationToken)
         {
-            var group = await _unitOfWork.StudyGroups.GetByIdAsync(request.GroupId, cancellationToken)
-                ?? throw new NotFoundException($"Group with ID {request.GroupId} not found");
+            var group = await _unitOfWork.StudyGroups.GetByIdAsync(request.StudyGroupId, cancellationToken)
+                ?? throw new NotFoundException($"StudyGroup with ID {request.StudyGroupId} not found");
 
             var classroom = await _unitOfWork.Classrooms.GetByIdAsync(request.ClassroomId, cancellationToken)
                 ?? throw new NotFoundException($"Classroom with ID {request.ClassroomId} not found");
@@ -27,7 +27,7 @@ namespace UniAttend.Application.Features.Classes.Commands.OpenClass
                 ?? throw new NotFoundException($"Course with ID {request.CourseId} not found");
 
             var courseSession = new CourseSession(
-                groupId: request.GroupId,
+                studyGroupId: request.StudyGroupId,
                 classroomId: request.ClassroomId,
                 courseId: request.CourseId,
                 date: request.Date,
@@ -42,7 +42,7 @@ namespace UniAttend.Application.Features.Classes.Commands.OpenClass
             return new ClassDto
             {
                 Id = courseSession.Id,
-                GroupId = courseSession.GroupId,
+                StudyGroupId = courseSession.StudyGroupId,
                 GroupName = group.Name,
                 ClassroomId = courseSession.ClassroomId,
                 ClassroomName = classroom.Name,

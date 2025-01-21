@@ -16,7 +16,7 @@ namespace UniAttend.Application.Features.Classes.Queries.GetActiveClasses
         public async Task<IEnumerable<ClassDto>> Handle(GetActiveClassesQuery request, CancellationToken cancellationToken)
         {
             var sessions = await _unitOfWork.CourseSessions.GetActiveSessionsAsync(
-                groupId: request.GroupId,
+                studyGroupId: request.StudyGroupId,
                 classroomId: request.ClassroomId,
                 date: request.Date,
                 cancellationToken: cancellationToken);
@@ -24,8 +24,8 @@ namespace UniAttend.Application.Features.Classes.Queries.GetActiveClasses
             return sessions.Select(s => new ClassDto
             {
                 Id = s.Id,
-                GroupId = s.GroupId,
-                GroupName = s.Group.Name,
+                StudyGroupId = s.StudyGroupId,
+                GroupName = s.StudyGroup.Name,
                 ClassroomId = s.ClassroomId,
                 ClassroomName = s.Classroom.Name,
                 Date = s.Date,

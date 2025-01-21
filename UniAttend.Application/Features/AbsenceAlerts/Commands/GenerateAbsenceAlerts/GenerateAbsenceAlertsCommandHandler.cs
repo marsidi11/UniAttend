@@ -23,7 +23,7 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Commands.GenerateAbsenceA
             // Check if alert already exists
             if (await _unitOfWork.AbsenceAlerts.HasActiveAlertAsync(
                 request.StudentId,
-                request.GroupId,
+                request.StudyGroupId,
                 cancellationToken))
             {
                 throw new ValidationException("Active absence alert already exists for this student and group");
@@ -32,15 +32,15 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Commands.GenerateAbsenceA
             var student = await _unitOfWork.Students.GetByIdWithDetailsAsync(request.StudentId, cancellationToken)
                 ?? throw new NotFoundException($"Student with ID {request.StudentId} not found");
         
-            var group = await _unitOfWork.StudyGroups.GetByIdWithDetailsAsync(request.GroupId, cancellationToken)
-                ?? throw new NotFoundException($"Group with ID {request.GroupId} not found");
+            var group = await _unitOfWork.StudyGroups.GetByIdWithDetailsAsync(request.StudyGroupId, cancellationToken)
+                ?? throw new NotFoundException($"StudyGroup with ID {request.StudyGroupId} not found");
         
             if (student.User?.Email == null)
             {
                 throw new ValidationException("Student email is required for sending alerts");
             }
         
-            var alert = new AbsenceAlert(request.StudentId, request.GroupId, request.AbsencePercentage);
+            var alert = new AbsenceAlert(request.StudentId, request.StudyGroupId, request.AbsencePercentage);
             await _unitOfWork.AbsenceAlerts.AddAsync(alert, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         
@@ -59,7 +59,7 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Commands.GenerateAbsenceA
             return new AbsenceAlertDto
             {
                 StudentId = alert.StudentId,
-                GroupId = alert.GroupId,
+                StudyGroupId = alert.StudyGroupId,
                 AbsencePercentage = alert.AbsencePercentage,
                 EmailSent = alert.EmailSent,
                 CreatedAt = alert.CreatedAt

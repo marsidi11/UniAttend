@@ -73,7 +73,7 @@ namespace UniAttend.Application.Common.Mappings
                     opt.MapFrom(src => $"{src.Professor.User.FirstName} {src.Professor.User.LastName}"));
 
             CreateMap<CourseSession, ClassDto>()
-                .ForMember(d => d.GroupName, opt => opt.MapFrom(src => src.Group.Name))
+                .ForMember(d => d.GroupName, opt => opt.MapFrom(src => src.StudyGroup.Name))
                 .ForMember(d => d.ClassroomName, opt => opt.MapFrom(src => src.Classroom.Name));
 
             CreateMap<AttendanceRecord, AttendanceRecordDto>()

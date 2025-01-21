@@ -23,7 +23,7 @@ namespace UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromG
 
         public async Task<Unit> Handle(RemoveStudentFromGroupCommand request, CancellationToken cancellationToken)
         {
-            var group = await _groupRepository.GetByIdAsync(request.GroupId, cancellationToken)
+            var group = await _groupRepository.GetByIdAsync(request.StudyGroupId, cancellationToken)
                 ?? throw new NotFoundException("Study group not found");
 
             var student = await _studentRepository.GetByIdAsync(request.StudentId, cancellationToken)

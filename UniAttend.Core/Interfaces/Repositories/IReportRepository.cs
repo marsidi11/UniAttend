@@ -14,7 +14,7 @@ namespace UniAttend.Core.Interfaces.Repositories
             DateTime endDate,
             int? departmentId = null,
             int? subjectId = null, 
-            int? groupId = null,
+            int? studyGroupId = null,
             CancellationToken cancellationToken = default);
 
         Task<IEnumerable<Student>> GetStudentsWithHighAbsenceAsync(

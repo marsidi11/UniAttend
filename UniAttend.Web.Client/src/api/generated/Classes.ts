@@ -24,7 +24,7 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
   classesList = (
     query?: {
       /** @format int32 */
-      groupId?: number;
+      studyGroupId?: number;
       /** @format int32 */
       classroomId?: number;
       /** @format date-time */
@@ -94,12 +94,12 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
    *
    * @tags Classes
    * @name ClassesGroupDetail
-   * @request GET:/api/Classes/group/{groupId}
+   * @request GET:/api/Classes/group/{studyGroupId}
    * @secure
    */
-  classesGroupDetail = (groupId: number, params: RequestParams = {}) =>
+  classesGroupDetail = (studyGroupId: number, params: RequestParams = {}) =>
     this.request<ClassDto[], any>({
-      path: `/api/Classes/group/${groupId}`,
+      path: `/api/Classes/group/${studyGroupId}`,
       method: "GET",
       secure: true,
       format: "json",

@@ -7,25 +7,25 @@ namespace UniAttend.Core.Entities
     {
         private AbsenceAlert() { } // For domain events/serialization
 
-        public AbsenceAlert(int studentId, int groupId, decimal absencePercentage)
+        public AbsenceAlert(int studentId, int studyGroupId, decimal absencePercentage)
         {
             ValidateAbsencePercentage(absencePercentage);
             
             StudentId = studentId;
-            GroupId = groupId;
+            StudyGroupId = studyGroupId;
             AbsencePercentage = absencePercentage;
             EmailSent = false;
         }
 
         // Identity properties - immutable
         public int StudentId { get; }
-        public int GroupId { get; }
+        public int StudyGroupId { get; }
         public decimal AbsencePercentage { get; }
         public bool EmailSent { get; private set; }
 
         // Domain references without EF Core annotations
         public Student Student { get; }
-        public StudyGroup Group { get; }
+        public StudyGroup StudyGroup { get; }
 
         // Domain methods
         public void MarkAsSent() => EmailSent = true;

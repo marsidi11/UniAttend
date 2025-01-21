@@ -20,9 +20,9 @@ namespace UniAttend.Application.Features.StudyGroups.Commands.EnrollStudents
         {
             foreach (var studentId in request.StudentIds)
             {
-                if (!await _groupStudentRepository.ExistsAsync(request.GroupId, studentId, cancellationToken))
+                if (!await _groupStudentRepository.ExistsAsync(request.StudyGroupId, studentId, cancellationToken))
                 {
-                    await _groupStudentRepository.AddStudentToGroupAsync(request.GroupId, studentId, cancellationToken);
+                    await _groupStudentRepository.AddStudentToGroupAsync(request.StudyGroupId, studentId, cancellationToken);
                 }
             }
 

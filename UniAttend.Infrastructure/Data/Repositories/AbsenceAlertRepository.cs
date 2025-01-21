@@ -12,21 +12,21 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public async Task<IEnumerable<AbsenceAlert>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(aa => aa.Student)
-                .Include(aa => aa.Group)
+                .Include(aa => aa.StudyGroup)
                 .Where(aa => aa.StudentId == studentId)
                 .ToListAsync(cancellationToken);
 
-        public async Task<IEnumerable<AbsenceAlert>> GetByGroupIdAsync(int groupId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AbsenceAlert>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(aa => aa.Student)
-                .Include(aa => aa.Group)
-                .Where(aa => aa.GroupId == groupId)
+                .Include(aa => aa.StudyGroup)
+                .Where(aa => aa.StudyGroupId == studyGroupId)
                 .ToListAsync(cancellationToken);
 
         public async Task<IEnumerable<AbsenceAlert>> GetUnsentAlertsAsync(CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(aa => aa.Student)
-                .Include(aa => aa.Group)
+                .Include(aa => aa.StudyGroup)
                 .Where(aa => !aa.EmailSent)
                 .ToListAsync(cancellationToken);
 
@@ -40,10 +40,10 @@ namespace UniAttend.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<bool> HasActiveAlertAsync(int studentId, int groupId, CancellationToken cancellationToken = default)
+        public async Task<bool> HasActiveAlertAsync(int studentId, int studyGroupId, CancellationToken cancellationToken = default)
             => await DbSet.AnyAsync(aa => 
                 aa.StudentId == studentId && 
-                aa.GroupId == groupId && 
+                aa.StudyGroupId == studyGroupId && 
                 !aa.EmailSent, 
                 cancellationToken);
     }

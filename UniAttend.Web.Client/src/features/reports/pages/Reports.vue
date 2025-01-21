@@ -34,7 +34,7 @@
         <h2 class="text-lg font-medium mb-4">Group Reports</h2>
         <div class="space-y-4">
           <div class="flex flex-col gap-4">
-            <input type="number" v-model="filters.groupId" placeholder="Group ID" class="rounded-md border-gray-300" />
+            <input type="number" v-model="filters.studyGroupId" placeholder="Group ID" class="rounded-md border-gray-300" />
             <DatePicker v-model="filters.startDate" placeholder="Start Date" />
             <DatePicker v-model="filters.endDate" placeholder="End Date" />
             <Button @click="handleGroupReport" :loading="reportStore.isLoading">
@@ -87,7 +87,7 @@ const authStore = useAuthStore()
 
 const filters = ref({
   studentId: null as number | null,
-  groupId: null as number | null,
+  studyGroupId: null as number | null,
   departmentId: null as number | null,
   academicYearId: null as number | null,
   startDate: '' as string,
@@ -121,9 +121,9 @@ async function handleStudentReport() {
 }
 
 async function handleGroupReport() {
-  if (!filters.value.groupId) return
+  if (!filters.value.studyGroupId) return
   await reportStore.getGroupReport(
-    filters.value.groupId,
+    filters.value.studyGroupId,
     stringToDate(filters.value.startDate),
     stringToDate(filters.value.endDate)
   )
@@ -138,12 +138,12 @@ async function handleDepartmentReport() {
 }
 
 async function handleExportAttendance() {
-  if (!filters.value.groupId || !filters.value.startDate || !filters.value.endDate) {
+  if (!filters.value.studyGroupId || !filters.value.startDate || !filters.value.endDate) {
     return
   }
   
   await reportStore.exportAttendanceReport(
-    filters.value.groupId,
+    filters.value.studyGroupId,
     new Date(filters.value.startDate),
     new Date(filters.value.endDate)
   )

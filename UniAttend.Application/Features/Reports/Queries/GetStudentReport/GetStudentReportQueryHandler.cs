@@ -41,7 +41,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetStudentReport
                 var attendance = await _attendanceRepository
                     .GetStudentGroupAttendanceAsync(
                         request.StudentId, 
-                        enrollment.GroupId,
+                        enrollment.StudyGroupId,
                         request.StartDate,
                         request.EndDate, 
                         cancellationToken);
@@ -51,9 +51,9 @@ namespace UniAttend.Application.Features.Reports.Queries.GetStudentReport
 
                 subjects.Add(new SubjectAttendanceDto
                 {
-                    SubjectId = enrollment.Group?.SubjectId ?? 0,
-                    SubjectName = enrollment.Group?.Subject?.Name ?? "Unknown",
-                    GroupName = enrollment.Group?.Name ?? "Unknown",
+                    SubjectId = enrollment.StudyGroup?.SubjectId ?? 0,
+                    SubjectName = enrollment.StudyGroup?.Subject?.Name ?? "Unknown",
+                    GroupName = enrollment.StudyGroup?.Name ?? "Unknown",
                     AttendedClasses = attendance.AttendedClasses,
                     TotalClasses = attendance.TotalClasses,
                     AttendanceRate = attendance.TotalClasses > 0 

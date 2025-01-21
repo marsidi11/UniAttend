@@ -23,20 +23,20 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets all active classes with optional filtering
         /// </summary>
-        /// <param name="groupId">Optional group ID filter</param>
+        /// <param name="studyGroupId">Optional group ID filter</param>
         /// <param name="classroomId">Optional classroom ID filter</param>
         /// <param name="date">Optional date filter</param>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ClassDto>>> GetActiveClasses(
-            [FromQuery] int? groupId,
+            [FromQuery] int? studyGroupId,
             [FromQuery] int? classroomId,
             [FromQuery] DateTime? date,
             CancellationToken cancellationToken)
         {
             var query = new GetActiveClassesQuery
             {
-                GroupId = groupId,
+                StudyGroupId = studyGroupId,
                 ClassroomId = classroomId,
                 Date = date
             };
@@ -93,7 +93,7 @@ namespace UniAttend.API.Controllers
             int id,
             CancellationToken cancellationToken)
         {
-            var query = new GetActiveClassesQuery { GroupId = id };
+            var query = new GetActiveClassesQuery { StudyGroupId = id };
             var result = await _mediator.Send(query, cancellationToken);
             var classDto = result.FirstOrDefault();
 
@@ -106,14 +106,14 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets all classes for a specific group
         /// </summary>
-        /// <param name="groupId">The ID of the group</param>
-        [HttpGet("group/{groupId}")]
+        /// <param name="studyGroupId">The ID of the group</param>
+        [HttpGet("group/{studyGroupId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ClassDto>>> GetByGroup(
-            int groupId,
+            int studyGroupId,
             CancellationToken cancellationToken)
         {
-            var query = new GetActiveClassesQuery { GroupId = groupId };
+            var query = new GetActiveClassesQuery { StudyGroupId = studyGroupId };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }

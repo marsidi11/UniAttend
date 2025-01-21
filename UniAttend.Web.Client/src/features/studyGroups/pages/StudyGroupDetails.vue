@@ -79,7 +79,7 @@
     </Modal>
 
     <Modal v-model="showEnrollModal" title="Enroll Students">
-      <EnrollStudentsForm v-if="showEnrollModal" :groupId="Number(route.params.id)" @submit="handleEnrollStudents"
+      <EnrollStudentsForm v-if="showEnrollModal" :studyGroupId="Number(route.params.id)" @submit="handleEnrollStudents"
         @cancel="showEnrollModal = false" />
     </Modal>
   </div>
@@ -180,13 +180,13 @@ const studentActions = computed<Action<TableItem>[]>(() =>
 
 // Methods
 async function loadGroupData() {
-  const groupId = Number(route.params.id)
-  if (groupId) {
+  const studyGroupId = Number(route.params.id)
+  if (studyGroupId) {
     try {
       await Promise.all([
-        groupStore.fetchGroupById(groupId),
-        loadStudents(groupId),
-        loadGroupStats(groupId)
+        groupStore.fetchGroupById(studyGroupId),
+        loadStudents(studyGroupId),
+        loadGroupStats(studyGroupId)
       ])
     } catch (err) {
       console.error('Failed to load group data:', err)
@@ -194,10 +194,10 @@ async function loadGroupData() {
   }
 }
 
-async function loadStudents(groupId: number) {
+async function loadStudents(studyGroupId: number) {
   isLoadingStudents.value = true
   try {
-    const result = await groupStore.fetchGroupStudents(groupId)
+    const result = await groupStore.fetchGroupStudents(studyGroupId)
     if (Array.isArray(result)) {
       students.value = result.map(student => ({
         ...student,
@@ -215,9 +215,9 @@ async function loadStudents(groupId: number) {
   }
 }
 
-async function loadGroupStats(groupId: number) {
+async function loadGroupStats(studyGroupId: number) {
   try {
-    const report = await reportStore.getGroupReport(groupId)
+    const report = await reportStore.getGroupReport(studyGroupId)
     if (baseGroup.value && report) {
       const updatedGroup: StudyGroup = {
         ...baseGroup.value,
@@ -273,10 +273,10 @@ async function handleEnrollStudents(studentIds: number[]) {
 
 async function handleRemoveStudent(student: TableItem) {
   const groupStudent = student as GroupStudent
-  const groupId = Number(route.params.id)
+  const studyGroupId = Number(route.params.id)
   
-  // Add checks for both groupId and studentId
-  if (!groupId) {
+  // Add checks for both studyGroupId and studentId
+  if (!studyGroupId) {
     console.error('Invalid group ID')
     return
   }
@@ -288,8 +288,8 @@ async function handleRemoveStudent(student: TableItem) {
 
   if (confirm('Are you sure you want to remove this student from the group?')) {
     try {
-      await groupStore.removeStudent(groupId, groupStudent.studentId)
-      await loadStudents(groupId)
+      await groupStore.removeStudent(studyGroupId, groupStudent.studentId)
+      await loadStudents(studyGroupId)
     } catch (err) {
       console.error('Failed to remove student:', err)
     }

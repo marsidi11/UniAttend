@@ -8,9 +8,9 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<StudyGroup?> GetWithStudentsAsync(int id, CancellationToken cancellationToken = default);
         Task<IEnumerable<StudyGroup>> GetByProfessorIdAsync(int professorId, CancellationToken cancellationToken = default);
         Task<IEnumerable<StudyGroup>> GetBySubjectIdAsync(int subjectId, CancellationToken cancellationToken = default);
-        Task<bool> HasStudentAsync(int groupId, int studentId, CancellationToken cancellationToken = default);
+        Task<bool> HasStudentAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default);
         Task<StudyGroup?> GetWithScheduleAsync(int id, CancellationToken cancellationToken = default);
-        Task<AttendanceStats> GetAttendanceStatsAsync(int groupId, CancellationToken cancellationToken = default);
+        Task<AttendanceStats> GetAttendanceStatsAsync(int studyGroupId, CancellationToken cancellationToken = default);
         Task<IEnumerable<StudyGroup>> GetByDepartmentIdAsync(
             int departmentId,
             int? academicYearId = null,

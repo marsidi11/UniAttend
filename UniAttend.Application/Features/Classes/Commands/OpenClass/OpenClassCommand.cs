@@ -5,7 +5,7 @@ namespace UniAttend.Application.Features.Classes.Commands.OpenClass
 {
     public class OpenClassCommand : IRequest<ClassDto>
     {
-        public int GroupId { get; set; }
+        public int StudyGroupId { get; set; }
         public int ClassroomId { get; set; }
         public int CourseId { get; set; }
         public DateTime Date { get; set; }

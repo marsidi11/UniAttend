@@ -4,7 +4,7 @@ namespace UniAttend.Core.Entities.Attendance
 {
     public class CourseSession : Entity
     {
-        public int GroupId { get; private set; }
+        public int StudyGroupId { get; private set; }
         public int ClassroomId { get; private set; }
         public int CourseId { get; private set; }
         public DateTime Date { get; private set; }
@@ -13,7 +13,7 @@ namespace UniAttend.Core.Entities.Attendance
         public string Status { get; private set; }
 
         // Navigation properties
-        public StudyGroup Group { get; private set; }
+        public StudyGroup StudyGroup { get; private set; }
         public Classroom Classroom { get; private set; }
         public Course Course { get; private set; }
         private readonly List<AttendanceRecord> _attendanceRecords = new();
@@ -21,10 +21,10 @@ namespace UniAttend.Core.Entities.Attendance
 
         private CourseSession() { } // For EF
 
-        public CourseSession(int groupId, int classroomId, int courseId, DateTime date, 
+        public CourseSession(int studyGroupId, int classroomId, int courseId, DateTime date, 
             TimeSpan startTime, TimeSpan endTime, string status)
         {
-            GroupId = groupId;
+            StudyGroupId = studyGroupId;
             ClassroomId = classroomId;
             CourseId = courseId;
             Date = date;

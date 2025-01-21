@@ -17,16 +17,16 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.ToTable("GroupStudents");
 
             // Required properties
-            builder.Property(x => x.GroupId)
+            builder.Property(x => x.StudyGroupId)
                 .IsRequired();
 
             builder.Property(x => x.StudentId)
                 .IsRequired();
 
             // Single relationship to StudyGroup
-            builder.HasOne(gs => gs.Group)
+            builder.HasOne(gs => gs.StudyGroup)
                 .WithMany(g => g.Students)
-                .HasForeignKey(gs => gs.GroupId)
+                .HasForeignKey(gs => gs.StudyGroupId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(gs => gs.Student)
@@ -34,8 +34,8 @@ namespace UniAttend.Infrastructure.Data.Configurations
                 .HasForeignKey(gs => gs.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Unique constraint on GroupId and StudentId combination
-            builder.HasIndex(gs => new { gs.GroupId, gs.StudentId })
+            // Unique constraint on StudyGroupId and StudentId combination
+            builder.HasIndex(gs => new { gs.StudyGroupId, gs.StudentId })
                 .IsUnique();
         }
     }

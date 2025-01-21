@@ -34,10 +34,10 @@ namespace UniAttend.Infrastructure.Data.Repositories
             => await DbSet
                 .FirstOrDefaultAsync(a => a.StudentId == studentId && a.CourseId == courseId, cancellationToken);
 
-        public async Task<double> GetStudentAttendancePercentageAsync(int studentId, int groupId, CancellationToken cancellationToken = default)
+        public async Task<double> GetStudentAttendancePercentageAsync(int studentId, int studyGroupId, CancellationToken cancellationToken = default)
         {
             var totalClasses = await Context.Set<Course>()
-                .CountAsync(c => c.StudyGroupId == groupId && c.IsActive, cancellationToken);
+                .CountAsync(c => c.StudyGroupId == studyGroupId && c.IsActive, cancellationToken);
 
             if (totalClasses == 0) return 0;
 
@@ -64,7 +64,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
         }
 
         public async Task<IEnumerable<AttendanceRecord>> GetGroupAttendanceAsync(
-        int groupId,
+        int studyGroupId,
         DateTime startDate,
         DateTime endDate,
         CancellationToken cancellationToken = default)
@@ -75,7 +75,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(ar => ar.Course)
                     .ThenInclude(c => c.StudyGroup)
                 .Where(ar =>
-                    ar.Course.StudyGroupId == groupId &&
+                    ar.Course.StudyGroupId == studyGroupId &&
                     ar.CheckInTime >= startDate &&
                     ar.CheckInTime <= endDate)
                 .OrderByDescending(ar => ar.CheckInTime)
@@ -88,7 +88,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
         {
             var session = await Context.Set<CourseSession>()
                 .Include(cs => cs.Course)
-                .Include(cs => cs.Group)
+                .Include(cs => cs.StudyGroup)
                     .ThenInclude(g => g.Students)
                         .ThenInclude(gs => gs.Student)
                             .ThenInclude(s => s.User)
@@ -105,7 +105,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
         public async Task<(int TotalClasses, int AttendedClasses)> GetStudentGroupAttendanceAsync(
         int studentId,
-        int groupId,
+        int studyGroupId,
         DateTime? startDate = null,
         DateTime? endDate = null,
         CancellationToken cancellationToken = default)
@@ -114,7 +114,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(ar => ar.Course)
                 .Where(ar =>
                     ar.StudentId == studentId &&
-                    ar.Course.StudyGroupId == groupId);
+                    ar.Course.StudyGroupId == studyGroupId);
 
             if (startDate.HasValue)
                 query = query.Where(ar => ar.CheckInTime >= startDate.Value);
@@ -126,7 +126,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
             var totalClasses = await Context.Set<Course>()
                 .CountAsync(c =>
-                    c.StudyGroupId == groupId &&
+                    c.StudyGroupId == studyGroupId &&
                     (!startDate.HasValue || c.StartTime >= startDate.Value) &&
                     (!endDate.HasValue || c.EndTime <= endDate.Value),
                     cancellationToken);
@@ -157,14 +157,14 @@ namespace UniAttend.Infrastructure.Data.Repositories
         }
 
         public async Task<AttendanceReportResult> GetGroupAttendanceReportAsync(
-            int groupId,
+            int studyGroupId,
             DateTime? startDate = null,
             DateTime? endDate = null,
             CancellationToken cancellationToken = default)
         {
             var query = DbSet
                 .Include(ar => ar.Course)
-                .Where(ar => ar.Course.StudyGroupId == groupId);
+                .Where(ar => ar.Course.StudyGroupId == studyGroupId);
 
             if (startDate.HasValue)
                 query = query.Where(ar => ar.CheckInTime >= startDate.Value);

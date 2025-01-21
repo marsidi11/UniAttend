@@ -107,7 +107,7 @@ export interface ClassDto {
   /** @format int32 */
   id?: number;
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   groupName?: string | null;
   /** @format int32 */
   classroomId?: number;
@@ -124,7 +124,6 @@ export interface ClassroomDto {
   id?: number;
   name?: string | null;
   readerDeviceId?: string | null;
-  status?: string | null;
   /** @format date-time */
   createdAt?: string;
   /** @format date-time */
@@ -160,7 +159,7 @@ export interface CreateGroupCommand {
 
 export interface CreateScheduleCommand {
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   /** @format int32 */
   classroomId?: number;
   /** @format int32 */
@@ -233,7 +232,7 @@ export interface DepartmentReportDto {
 
 export interface EnrollStudentsCommand {
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   studentIds?: number[] | null;
 }
 
@@ -246,7 +245,7 @@ export interface GenerateOtpRequest {
 
 export interface GroupReportDto {
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   groupName?: string | null;
   subjectName?: string | null;
   professorName?: string | null;
@@ -271,7 +270,7 @@ export interface GroupStudentDto {
 
 export interface GroupSummaryDto {
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   groupName?: string | null;
   subjectName?: string | null;
   /** @format int32 */
@@ -287,7 +286,7 @@ export interface LoginCommand {
 
 export interface OpenClassCommand {
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   /** @format int32 */
   classroomId?: number;
   /** @format int32 */
@@ -382,7 +381,7 @@ export interface ScheduleDto {
   /** @format int32 */
   id?: number;
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   groupName?: string | null;
   /** @format int32 */
   classroomId?: number;
@@ -569,7 +568,7 @@ export interface UpdateScheduleCommand {
   /** @format int32 */
   id?: number;
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   /** @format int32 */
   classroomId?: number;
   /** @format int32 */
@@ -649,7 +648,7 @@ export interface UserDto {
 
 export interface UserGroupDto {
   /** @format int32 */
-  groupId?: number;
+  studyGroupId?: number;
   groupName?: string | null;
   subjectName?: string | null;
   academicYearName?: string | null;

@@ -20,7 +20,7 @@ namespace UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents
         {
             // Get students with included navigation properties
             var groupStudents = await _groupStudentRepository
-                .GetByGroupIdWithDetailsAsync(request.GroupId, cancellationToken);
+                .GetByGroupIdWithDetailsAsync(request.StudyGroupId, cancellationToken);
         
             return groupStudents.Select(gs => new GroupStudentDto
             {

@@ -156,12 +156,12 @@ export class StudyGroups<SecurityDataType = unknown> extends HttpClient<Security
    *
    * @tags StudyGroups
    * @name StudyGroupsStudentsDelete
-   * @request DELETE:/api/StudyGroups/{groupId}/students/{studentId}
+   * @request DELETE:/api/StudyGroups/{studyGroupId}/students/{studentId}
    * @secure
    */
-  studyGroupsStudentsDelete = (groupId: number, studentId: number, params: RequestParams = {}) =>
+  studyGroupsStudentsDelete = (studyGroupId: number, studentId: number, params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/StudyGroups/${groupId}/students/${studentId}`,
+      path: `/api/StudyGroups/${studyGroupId}/students/${studentId}`,
       method: "DELETE",
       secure: true,
       ...params,

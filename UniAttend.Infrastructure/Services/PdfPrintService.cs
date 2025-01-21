@@ -21,15 +21,15 @@ namespace UniAttend.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task<byte[]> GenerateAttendanceReportPdfAsync(int groupId, DateTime startDate, DateTime endDate)
+        public async Task<byte[]> GenerateAttendanceReportPdfAsync(int studyGroupId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                var records = await _attendanceRepository.GetGroupAttendanceAsync(groupId, startDate, endDate);
+                var records = await _attendanceRepository.GetGroupAttendanceAsync(studyGroupId, startDate, endDate);
 
                 if (!records.Any())
                 {
-                    throw new InvalidOperationException($"No attendance records found for group {groupId}");
+                    throw new InvalidOperationException($"No attendance records found for studyGroup {studyGroupId}");
                 }
 
                 using var stream = new MemoryStream();
@@ -70,7 +70,7 @@ namespace UniAttend.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating attendance report PDF for group {GroupId}", groupId);
+                _logger.LogError(ex, "Error generating attendance report PDF for group {StudyGroupId}", studyGroupId);
                 throw;
             }
         }
@@ -81,7 +81,7 @@ namespace UniAttend.Infrastructure.Services
             {
                 var session = await _attendanceRepository.GetSessionWithDetailsAsync(sessionId);
 
-                if (session?.Group?.Students == null)
+                if (session?.StudyGroup?.Students == null)
                 {
                     throw new InvalidOperationException($"Invalid session or missing data for session {sessionId}");
                 }
@@ -108,7 +108,7 @@ namespace UniAttend.Infrastructure.Services
                 table.AddHeaderCell("Time");
                 table.AddHeaderCell("Signature");
 
-                foreach (var groupStudent in session.Group.Students.Where(gs => gs.Student?.User != null))
+                foreach (var groupStudent in session.StudyGroup.Students.Where(gs => gs.Student?.User != null))
                 {
                     table.AddCell(new Cell().Add(new Paragraph(groupStudent.Student!.StudentId)));
                     table.AddCell(new Cell().Add(new Paragraph(

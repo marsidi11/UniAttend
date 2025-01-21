@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { 
+import type {
   ScheduleDto,
   CreateScheduleCommand,
-  UpdateScheduleCommand 
+  UpdateScheduleCommand
 } from '@/api/generated/data-contracts';
 import { scheduleApi } from '@/api/apiInstances';
 import { handleError } from '@/utils/errorHandler';
+import { useToast, POSITION } from 'vue-toastification';
 
 export const useScheduleStore = defineStore('schedule', () => {
   // State
@@ -14,6 +15,7 @@ export const useScheduleStore = defineStore('schedule', () => {
   const currentSchedule = ref<ScheduleDto | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const toast = useToast();
 
   // Getters
   const schedulesByDay = computed(() => {
@@ -29,12 +31,12 @@ export const useScheduleStore = defineStore('schedule', () => {
   });
 
   // Actions
-  async function fetchSchedules(groupId?: number, classroomId?: number) {
+  async function fetchSchedules(studyGroupId?: number, classroomId?: number) {
     isLoading.value = true;
     try {
-      const { data } = classroomId 
+      const { data } = classroomId
         ? await scheduleApi.scheduleClassroomDetail(classroomId)
-        : await scheduleApi.scheduleGroupDetail(groupId!);
+        : await scheduleApi.scheduleGroupDetail(studyGroupId!);
       schedules.value = data;
       return data;
     } catch (err) {
@@ -49,7 +51,8 @@ export const useScheduleStore = defineStore('schedule', () => {
     isLoading.value = true;
     try {
       const { data: scheduleId } = await scheduleApi.scheduleCreate(schedule);
-      await fetchSchedules(schedule.groupId);
+      await fetchSchedules(schedule.studyGroupId);
+      toast.success('Schedule created successfully');
       return scheduleId;
     } catch (err) {
       handleError(err, error);
@@ -63,20 +66,25 @@ export const useScheduleStore = defineStore('schedule', () => {
     isLoading.value = true;
     try {
       await scheduleApi.scheduleUpdate(id, { id, ...schedule });
-      await fetchSchedules(schedule.groupId);
-    } catch (err) {
-      handleError(err, error);
+      await fetchSchedules(schedule.studyGroupId);
+      toast.success('Schedule updated successfully');
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error('Failed to update schedule');
+      }
       throw err;
     } finally {
       isLoading.value = false;
     }
   }
 
-  async function deleteSchedule(id: number, groupId: number) {
+  async function deleteSchedule(id: number, studyGroupId: number) {
     isLoading.value = true;
     try {
       await scheduleApi.scheduleDelete(id);
-      await fetchSchedules(groupId);
+      await fetchSchedules(studyGroupId);
     } catch (err) {
       handleError(err, error);
       throw err;

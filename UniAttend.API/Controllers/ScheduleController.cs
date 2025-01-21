@@ -33,12 +33,12 @@ namespace UniAttend.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("group/{groupId}")]
+        [HttpGet("group/{studyGroupId}")]
         public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetByGroup(
-            int groupId, 
+            int studyGroupId, 
             CancellationToken cancellationToken)
         {
-            var query = new GetGroupScheduleQuery { GroupId = groupId };
+            var query = new GetGroupScheduleQuery { StudyGroupId = studyGroupId };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
@@ -50,7 +50,7 @@ namespace UniAttend.API.Controllers
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
-            return CreatedAtAction(nameof(GetByGroup), new { groupId = command.GroupId }, result);
+            return CreatedAtAction(nameof(GetByGroup), new { studyGroupId = command.StudyGroupId }, result);
         }
 
         [HttpPut("{id}")]

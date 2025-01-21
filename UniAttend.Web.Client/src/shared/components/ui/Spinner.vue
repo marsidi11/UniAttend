@@ -21,7 +21,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  size: 4,
+  size: 6,
   color: 'primary'
 })
 

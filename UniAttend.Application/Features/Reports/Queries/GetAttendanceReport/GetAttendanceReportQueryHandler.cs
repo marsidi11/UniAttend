@@ -27,7 +27,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
                 request.EndDate,
                 request.DepartmentId,
                 request.SubjectId,
-                request.GroupId,
+                request.StudyGroupId,
                 cancellationToken);
 
             var dailyRecords = records

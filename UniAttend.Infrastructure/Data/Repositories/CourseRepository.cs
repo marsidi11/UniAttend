@@ -15,11 +15,11 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(c => c.StudyGroup)
                 .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
 
-        public async Task<IEnumerable<Course>> GetByGroupIdAsync(int groupId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Course>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(c => c.Professor)
                 .Include(c => c.StudyGroup)
-                .Where(c => c.StudyGroupId == groupId)
+                .Where(c => c.StudyGroupId == studyGroupId)
                 .ToListAsync(cancellationToken);
 
         public async Task<IEnumerable<Course>> GetByProfessorIdAsync(int professorId, CancellationToken cancellationToken = default)

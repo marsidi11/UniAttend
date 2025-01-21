@@ -7,15 +7,15 @@ namespace UniAttend.Core.Entities
     /// </summary>
     public class GroupStudent : Entity
 {
-    public GroupStudent(int groupId, int studentId)
+    public GroupStudent(int studyGroupId, int studentId)
     {
-        GroupId = groupId;
+        StudyGroupId = studyGroupId;
         StudentId = studentId;
     }
 
-    public int GroupId { get; private set; }
+    public int StudyGroupId { get; private set; }
     public int StudentId { get; private set; }
-    public virtual StudyGroup? Group { get; private set; }
+    public virtual StudyGroup? StudyGroup { get; private set; }
     public virtual Student? Student { get; private set; }
 }
 }

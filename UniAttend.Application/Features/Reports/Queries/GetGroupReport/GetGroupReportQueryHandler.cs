@@ -24,11 +24,11 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
 
         public async Task<GroupReportDto> Handle(GetGroupReportQuery request, CancellationToken cancellationToken)
         {
-            var group = await _groupRepository.GetByIdWithDetailsAsync(request.GroupId, cancellationToken)
-                ?? throw new NotFoundException($"Group with ID {request.GroupId} not found");
+            var group = await _groupRepository.GetByIdWithDetailsAsync(request.StudyGroupId, cancellationToken)
+                ?? throw new NotFoundException($"StudyGroup with ID {request.StudyGroupId} not found");
 
             var attendanceStats = await _attendanceRepository.GetGroupAttendanceReportAsync(
-                request.GroupId,
+                request.StudyGroupId,
                 request.StartDate,
                 request.EndDate,
                 cancellationToken);
@@ -38,7 +38,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
             {
                 var stats = await _attendanceRepository.GetStudentGroupAttendanceAsync(
                     student.StudentId,
-                    request.GroupId,
+                    request.StudyGroupId,
                     request.StartDate,
                     request.EndDate,
                     cancellationToken);
@@ -57,7 +57,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
 
             return new GroupReportDto
             {
-                GroupId = group.Id,
+                StudyGroupId = group.Id,
                 GroupName = group.Name,
                 SubjectName = group.Subject?.Name ?? "Unknown",
                 ProfessorName = $"{group.Professor?.User?.FirstName} {group.Professor?.User?.LastName}",

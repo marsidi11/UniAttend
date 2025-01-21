@@ -13,7 +13,7 @@ namespace UniAttend.Application.Features.Reports.DTOs
 
     public record GroupSummaryDto
     {
-        public int GroupId { get; init; }
+        public int StudyGroupId { get; init; }
         public string GroupName { get; init; } = string.Empty;
         public string SubjectName { get; init; } = string.Empty;
         public int EnrolledStudents { get; init; }

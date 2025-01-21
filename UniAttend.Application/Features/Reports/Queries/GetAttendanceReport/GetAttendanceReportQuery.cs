@@ -9,6 +9,6 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
         public DateTime EndDate { get; init; }
         public int? DepartmentId { get; init; }
         public int? SubjectId { get; init; }
-        public int? GroupId { get; init; }
+        public int? StudyGroupId { get; init; }
     }
 }

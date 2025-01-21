@@ -16,6 +16,28 @@ namespace UniAttend.Application.Features.Schedule.Commands.CreateSchedule
 
         public async Task<int> Handle(CreateScheduleCommand request, CancellationToken cancellationToken)
         {
+            // Check classroom conflicts
+            var hasClassroomConflict = await _unitOfWork.Schedules.HasClassroomConflictAsync(
+                request.ClassroomId,
+                request.DayOfWeek,
+                request.StartTime,
+                request.EndTime,
+                cancellationToken: cancellationToken);
+
+            if (hasClassroomConflict)
+                throw new ValidationException("The classroom is already booked for this time slot");
+
+            // Check group conflicts
+            var hasGroupConflict = await _unitOfWork.Schedules.HasGroupConflictAsync(
+                request.StudyGroupId,
+                request.DayOfWeek,
+                request.StartTime,
+                request.EndTime,
+                cancellationToken: cancellationToken);
+
+            if (hasGroupConflict)
+                throw new ValidationException("The group already has a class scheduled for this time slot");
+
             // Check for time conflicts
             var hasConflict = await _unitOfWork.Schedules.HasTimeConflictAsync(
                 request.ClassroomId,
@@ -28,7 +50,7 @@ namespace UniAttend.Application.Features.Schedule.Commands.CreateSchedule
                 throw new ValidationException("There is a scheduling conflict for this time slot");
 
             var schedule = new ScheduleEntity(
-                request.GroupId,
+                request.StudyGroupId,
                 request.ClassroomId,
                 request.DayOfWeek,
                 request.StartTime,

@@ -29,7 +29,13 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
         {
             if (request.Role != UserRole.Secretary && request.Role != UserRole.Professor)
                 throw new ValidationException("Invalid role for User member");
-        
+
+            if (await _unitOfWork.Users.UsernameExistsAsync(request.Username, cancellationToken))
+                throw new ValidationException("Username already exists");
+
+            if (await _unitOfWork.Users.EmailExistsAsync(request.Email, cancellationToken))
+                throw new ValidationException("Email already exists");
+
             // Skip department validation for Secretary role
             Department? department = null;
             if (request.Role == UserRole.Professor)

@@ -2,10 +2,10 @@
   <form @submit.prevent="handleSubmit" class="space-y-6">
     <!-- Group Selection -->
     <div>
-      <label for="groupId" class="block text-sm font-medium text-gray-700">Group</label>
+      <label for="studyGroupId" class="block text-sm font-medium text-gray-700">Group</label>
       <select
-        id="groupId"
-        v-model="form.groupId"
+        id="studyGroupId"
+        v-model="form.studyGroupId"
         required
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
       >
@@ -84,19 +84,23 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import Button from '@/shared/components/ui/Button.vue'
-import type { Schedule } from '@/types/schedule.types'
-import type { StudyGroup } from '@/types/group.types'
-import type { Classroom } from '@/types/classroom.types'
+import type { 
+  ScheduleDto,
+  StudyGroupDto,
+  ClassroomDto,
+  CreateScheduleCommand,
+  UpdateScheduleCommand
+} from '@/api/generated/data-contracts'
 
 interface Props {
-  schedule?: Schedule | null
-  groups: StudyGroup[]
-  classrooms: Classroom[]
+  schedule?: ScheduleDto | null
+  groups: StudyGroupDto[]
+  classrooms: ClassroomDto[]  
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'submit', data: Partial<Schedule>): void
+  (e: 'submit', data: CreateScheduleCommand | UpdateScheduleCommand): void
   (e: 'cancel'): void
 }>()
 
@@ -116,7 +120,7 @@ const dayMapping = {
 } as const
 
 const form = ref({
-  groupId: 0,
+  studyGroupId: 0,
   classroomId: 0,
   dayOfWeek: 1 as number,
   startTime: '08:00',
@@ -131,12 +135,15 @@ const endTime = computed(() => {
 
 watch(() => props.schedule, (newSchedule) => {
   if (newSchedule) {
-    const duration = calculateDuration(newSchedule.startTime, newSchedule.endTime)
+    const duration = calculateDuration(
+      newSchedule.startTime?.toString() || '08:00', 
+      newSchedule.endTime?.toString() || '09:00'
+    )
     form.value = {
-      groupId: newSchedule.groupId,
-      classroomId: newSchedule.classroomId,
-      dayOfWeek: newSchedule.dayOfWeek,
-      startTime: newSchedule.startTime,
+      studyGroupId: newSchedule.studyGroupId || 0,
+      classroomId: newSchedule.classroomId || 0,
+      dayOfWeek: newSchedule.dayOfWeek || 1,
+      startTime: newSchedule.startTime?.toString() || '08:00',
       duration
     }
   }
@@ -148,13 +155,34 @@ function calculateDuration(startTime: string, endTime: string): number {
   return endHours - startHours
 }
 
+function toTimeSpan(timeStr: string): string {
+  const [hours, minutes] = timeStr.split(':').map(Number)
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`
+}
+
 async function handleSubmit() {
   try {
     isLoading.value = true
-    emit('submit', {
-      ...form.value,
-      endTime: endTime.value
-    })
+    const baseCommand = {
+      studyGroupId: form.value.studyGroupId,
+      classroomId: form.value.classroomId,
+      dayOfWeek: form.value.dayOfWeek,
+      startTime: toTimeSpan(form.value.startTime) as any, // Type assertion needed
+      endTime: toTimeSpan(endTime.value) as any, // Type assertion needed
+    }
+
+    if (props.schedule?.id) {
+      const updateCommand: UpdateScheduleCommand = {
+        ...baseCommand,
+        id: props.schedule.id
+      }
+      emit('submit', updateCommand)
+    } else {
+      const createCommand: CreateScheduleCommand = {
+        ...baseCommand
+      }
+      emit('submit', createCommand)
+    }
   } finally {
     isLoading.value = false
   }

@@ -193,8 +193,8 @@ async function loadStudentData(studentId: number) {
       if (userData.groups) {
         groups.value = userData.groups.map(g => ({
           ...g,
-          id: g.groupId || 0,
-          groupId: g.groupId || 0,
+          id: g.studyGroupId || 0,
+          studyGroupId: g.studyGroupId || 0,
           groupName: g.groupName || '',
           subjectName: g.subjectName || '',
           attendanceRate: 0

@@ -68,11 +68,11 @@ const filteredRecords = computed(() => {
     ...record,
     id: index, // Add required id for TableItem
     studentName: record.courseName, // Map courseName to studentName
-    groupId: undefined // Add groupId property
+    studyGroupId: undefined // Add studyGroupId property
   })) as (AttendanceRecordDto & TableItem)[]
 
   if (selectedGroup.value) {
-    filtered = filtered.filter(r => r.groupId === Number(selectedGroup.value))
+    filtered = filtered.filter(r => r.studyGroupId === Number(selectedGroup.value))
   }
 
   return filtered

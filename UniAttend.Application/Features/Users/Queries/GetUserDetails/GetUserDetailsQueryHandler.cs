@@ -70,7 +70,7 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
 
             return groups.Select(g => new UserGroupDto
             {
-                GroupId = g.Id,
+                StudyGroupId = g.Id,
                 GroupName = g.Name,
                 SubjectName = g.Subject.Name,
                 AcademicYearName = g.AcademicYear.Name
@@ -97,7 +97,7 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
 
             return groups.Select(g => new UserGroupDto
             {
-                GroupId = g.Id,
+                StudyGroupId = g.Id,
                 GroupName = g.Name,
                 SubjectName = g.Subject.Name,
                 AcademicYearName = g.AcademicYear.Name

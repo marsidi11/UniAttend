@@ -16,7 +16,7 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.Property("StudentId")
                 .IsRequired();
 
-            builder.Property("GroupId")
+            builder.Property("StudyGroupId")
                 .IsRequired();
 
             builder.Property("AbsencePercentage")
@@ -35,11 +35,11 @@ namespace UniAttend.Infrastructure.Data.Configurations
 
             builder.HasOne(typeof(StudyGroup))
                 .WithMany()
-                .HasForeignKey("GroupId")
+                .HasForeignKey("StudyGroupId")
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Indexes for performance
-            builder.HasIndex("StudentId", "GroupId");
+            builder.HasIndex("StudentId", "StudyGroupId");
             builder.HasIndex("EmailSent");
         }
     }

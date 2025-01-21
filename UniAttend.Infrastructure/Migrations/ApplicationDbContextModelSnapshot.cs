@@ -45,10 +45,10 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int>("StudyGroupId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -59,9 +59,9 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("EmailSent");
 
-                    b.HasIndex("GroupId");
+                    b.HasIndex("StudyGroupId");
 
-                    b.HasIndex("StudentId", "GroupId");
+                    b.HasIndex("StudentId", "StudyGroupId");
 
                     b.ToTable("AbsenceAlerts", (string)null);
                 });
@@ -183,9 +183,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time(6)");
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time(6)");
 
@@ -193,6 +190,9 @@ namespace UniAttend.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<int>("StudyGroupId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime")
@@ -206,7 +206,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("Date");
 
-                    b.HasIndex("GroupId");
+                    b.HasIndex("StudyGroupId");
 
                     b.ToTable("CourseSessions", (string)null);
                 });
@@ -453,10 +453,10 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnName("CreatedAt")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int>("StudyGroupId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -467,7 +467,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.HasIndex("GroupId", "StudentId")
+                    b.HasIndex("StudyGroupId", "StudentId")
                         .IsUnique();
 
                     b.ToTable("GroupStudents", (string)null);
@@ -591,13 +591,10 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time(6)");
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time(6)");
 
-                    b.Property<int?>("StudyGroupId")
+                    b.Property<int>("StudyGroupId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -605,8 +602,6 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnName("UpdatedAt");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
 
                     b.HasIndex("StudyGroupId");
 
@@ -751,15 +746,15 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.AbsenceAlert", b =>
                 {
-                    b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("UniAttend.Core.Entities.Student", null)
                         .WithMany()
                         .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -806,9 +801,9 @@ namespace UniAttend.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("UniAttend.Core.Entities.StudyGroup", "Group")
+                    b.HasOne("UniAttend.Core.Entities.StudyGroup", "StudyGroup")
                         .WithMany()
-                        .HasForeignKey("GroupId")
+                        .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -816,7 +811,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.Navigation("Course");
 
-                    b.Navigation("Group");
+                    b.Navigation("StudyGroup");
                 });
 
             modelBuilder.Entity("UniAttend.Core.Entities.Course", b =>
@@ -836,21 +831,21 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.GroupStudent", b =>
                 {
-                    b.HasOne("UniAttend.Core.Entities.StudyGroup", "Group")
-                        .WithMany("Students")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("UniAttend.Core.Entities.Student", "Student")
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Group");
+                    b.HasOne("UniAttend.Core.Entities.StudyGroup", "StudyGroup")
+                        .WithMany("Students")
+                        .HasForeignKey("StudyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Student");
+
+                    b.Navigation("StudyGroup");
                 });
 
             modelBuilder.Entity("UniAttend.Core.Entities.Identity.User", b =>
@@ -883,21 +878,21 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.Schedule", b =>
                 {
-                    b.HasOne("UniAttend.Core.Entities.Classroom", null)
+                    b.HasOne("UniAttend.Core.Entities.Classroom", "Classroom")
                         .WithMany()
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
-                        .WithMany()
-                        .HasForeignKey("GroupId")
+                    b.HasOne("UniAttend.Core.Entities.StudyGroup", "StudyGroup")
+                        .WithMany("Schedules")
+                        .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
-                        .WithMany("Schedules")
-                        .HasForeignKey("StudyGroupId");
+                    b.Navigation("Classroom");
+
+                    b.Navigation("StudyGroup");
                 });
 
             modelBuilder.Entity("UniAttend.Core.Entities.Student", b =>

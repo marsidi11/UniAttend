@@ -37,19 +37,19 @@ namespace UniAttend.API.Middleware
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)GetStatusCode(exception);
+            var statusCode = GetStatusCode(exception);
+            context.Response.StatusCode = (int)statusCode;
 
             var response = new
             {
-                Status = context.Response.StatusCode,
-                Message = await _exceptionHandler.GetUserFriendlyMessageAsync(exception),
+                Type = exception.GetType().Name,
+                Code = statusCode.ToString(),
+                Message = exception.Message, // Use direct exception message
                 TraceId = context.TraceIdentifier,
-                // Detailed error info in development
-                // TODO: Remove before production
-                Detail = context.RequestServices.GetService<IWebHostEnvironment>()?.IsDevelopment() == true
+                // Development details
+                Details = context.RequestServices.GetService<IWebHostEnvironment>()?.IsDevelopment() == true
                     ? new
                     {
-                        ExceptionMessage = exception.Message,
                         StackTrace = exception.StackTrace,
                         Source = exception.Source
                     }

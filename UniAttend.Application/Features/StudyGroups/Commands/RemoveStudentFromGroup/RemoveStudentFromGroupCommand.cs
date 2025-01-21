@@ -4,7 +4,7 @@ namespace UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromG
 {
     public record RemoveStudentFromGroupCommand : IRequest<Unit>
     {
-        public int GroupId { get; init; }
+        public int StudyGroupId { get; init; }
         public int StudentId { get; init; }
     }
 }

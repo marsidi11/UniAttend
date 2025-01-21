@@ -6,7 +6,7 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Commands.GenerateAbsenceA
     public record GenerateAbsenceAlertCommand : IRequest<AbsenceAlertDto>
     {
         public int StudentId { get; init; }
-        public int GroupId { get; init; }
+        public int StudyGroupId { get; init; }
         public decimal AbsencePercentage { get; init; }
     }
 }

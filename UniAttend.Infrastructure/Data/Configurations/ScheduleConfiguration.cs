@@ -11,36 +11,34 @@ namespace UniAttend.Infrastructure.Data.Configurations
             base.Configure(builder);
             
             builder.ToTable("Schedules");
-                        
-            // Use backing fields for immutable properties
-            builder.Property("GroupId")
+            
+            builder.Property(x => x.StudyGroupId)
                 .IsRequired();
-
-            builder.Property("ClassroomId")
+        
+            builder.Property(x => x.ClassroomId)
                 .IsRequired();
-
-            builder.Property("DayOfWeek")
+        
+            builder.Property(x => x.DayOfWeek)
                 .IsRequired();
-
-            builder.Property("StartTime")
+        
+            builder.Property(x => x.StartTime)
                 .IsRequired();
-
-            builder.Property("EndTime")
+        
+            builder.Property(x => x.EndTime)
                 .IsRequired();
-
-            // Configure relationships using string names to avoid navigation property exposure
-            builder.HasOne(typeof(StudyGroup))
-                .WithMany()
-                .HasForeignKey("GroupId")
+        
+            // Configure single relationship to StudyGroup
+            builder.HasOne(x => x.StudyGroup)
+                .WithMany(x => x.Schedules)
+                .HasForeignKey(x => x.StudyGroupId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(typeof(Classroom))
+        
+            builder.HasOne(x => x.Classroom)
                 .WithMany()
-                .HasForeignKey("ClassroomId")
+                .HasForeignKey(x => x.ClassroomId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Index for performance
-            builder.HasIndex("ClassroomId", "DayOfWeek");
+        
+            builder.HasIndex(x => new { x.ClassroomId, x.DayOfWeek });
         }
     }
 }

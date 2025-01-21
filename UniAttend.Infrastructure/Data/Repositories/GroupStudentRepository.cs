@@ -15,40 +15,40 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public override async Task<GroupStudent?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(gs => gs.Student)
-                .Include(gs => gs.Group)
+                .Include(gs => gs.StudyGroup)
                 .FirstOrDefaultAsync(gs => gs.Id == id, cancellationToken);
 
-        public async Task<IEnumerable<GroupStudent>> GetByGroupIdAsync(int groupId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<GroupStudent>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default)
             => await DbSet
-                .Where(gs => gs.GroupId == groupId)
+                .Where(gs => gs.StudyGroupId == studyGroupId)
                 .Include(gs => gs.Student)
                 .ToListAsync(cancellationToken);
 
         public async Task<IEnumerable<GroupStudent>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Where(gs => gs.StudentId == studentId)
-                .Include(gs => gs.Group)
+                .Include(gs => gs.StudyGroup)
                 .ToListAsync(cancellationToken);
 
         public async Task<IEnumerable<GroupStudent>> GetActiveGroupsByStudentIdAsync(int studentId, int academicYearId, CancellationToken cancellationToken = default)
             => await DbSet
-                .Where(gs => gs.StudentId == studentId && gs.Group.AcademicYearId == academicYearId)
-                .Include(gs => gs.Group)
+                .Where(gs => gs.StudentId == studentId && gs.StudyGroup.AcademicYearId == academicYearId)
+                .Include(gs => gs.StudyGroup)
                 .ToListAsync(cancellationToken);
 
-        public async Task<bool> ExistsAsync(int groupId, int studentId, CancellationToken cancellationToken = default)
-            => await DbSet.AnyAsync(gs => gs.GroupId == groupId && gs.StudentId == studentId, cancellationToken);
+        public async Task<bool> ExistsAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default)
+            => await DbSet.AnyAsync(gs => gs.StudyGroupId == studyGroupId && gs.StudentId == studentId, cancellationToken);
 
-        public async Task AddStudentToGroupAsync(int groupId, int studentId, CancellationToken cancellationToken = default)
+        public async Task AddStudentToGroupAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default)
         {
-            var groupStudent = new GroupStudent(groupId, studentId);
+            var groupStudent = new GroupStudent(studyGroupId, studentId);
             await AddAsync(groupStudent, cancellationToken);
         }
 
-        public async Task RemoveStudentFromGroupAsync(int groupId, int studentId, CancellationToken cancellationToken = default)
+        public async Task RemoveStudentFromGroupAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default)
         {
             var groupStudent = await DbSet
-                .FirstOrDefaultAsync(gs => gs.GroupId == groupId && gs.StudentId == studentId, cancellationToken);
+                .FirstOrDefaultAsync(gs => gs.StudyGroupId == studyGroupId && gs.StudentId == studentId, cancellationToken);
             
             if (groupStudent != null)
             {
@@ -56,12 +56,12 @@ namespace UniAttend.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<IEnumerable<GroupStudent>> GetByGroupIdWithDetailsAsync( int groupId,  CancellationToken cancellationToken)
+        public async Task<IEnumerable<GroupStudent>> GetByGroupIdWithDetailsAsync( int studyGroupId,  CancellationToken cancellationToken)
         {
             return await DbSet
                 .Include(gs => gs.Student)
                     .ThenInclude(s => s.User)
-                .Where(gs => gs.GroupId == groupId)
+                .Where(gs => gs.StudyGroupId == studyGroupId)
                 .ToListAsync(cancellationToken);
         }
     }

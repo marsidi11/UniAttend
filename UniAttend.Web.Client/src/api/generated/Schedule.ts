@@ -34,12 +34,12 @@ export class Schedule<SecurityDataType = unknown> extends HttpClient<SecurityDat
    *
    * @tags Schedule
    * @name ScheduleGroupDetail
-   * @request GET:/api/Schedule/group/{groupId}
+   * @request GET:/api/Schedule/group/{studyGroupId}
    * @secure
    */
-  scheduleGroupDetail = (groupId: number, params: RequestParams = {}) =>
+  scheduleGroupDetail = (studyGroupId: number, params: RequestParams = {}) =>
     this.request<ScheduleDto[], any>({
-      path: `/api/Schedule/group/${groupId}`,
+      path: `/api/Schedule/group/${studyGroupId}`,
       method: "GET",
       secure: true,
       format: "json",

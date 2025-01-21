@@ -9,7 +9,7 @@ namespace UniAttend.Application.Features.StudyGroups.Commands.CreateGroup
             RuleFor(x => x.Name)
                 .NotEmpty()
                 .MaximumLength(100)
-                .WithMessage("Group name is required and cannot exceed 100 characters");
+                .WithMessage("StudyGroup name is required and cannot exceed 100 characters");
 
             RuleFor(x => x.SubjectId)
                 .GreaterThan(0)

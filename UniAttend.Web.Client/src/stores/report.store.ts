@@ -74,7 +74,7 @@ export const useReportStore = defineStore('report', () => {
     endDate?: Date;
     departmentId?: number;
     subjectId?: number;
-    groupId?: number;
+    studyGroupId?: number;
   }) {
     isLoading.value = true;
     try {
@@ -83,7 +83,7 @@ export const useReportStore = defineStore('report', () => {
         endDate: params.endDate?.toISOString(),
         departmentId: params.departmentId,
         subjectId: params.subjectId,
-        groupId: params.groupId
+        studyGroupId: params.studyGroupId
       });
       attendanceReport.value = data;
       return data;
@@ -109,11 +109,11 @@ export const useReportStore = defineStore('report', () => {
     }
   }
 
-  async function exportAttendanceReport(groupId: number, startDate: Date, endDate: Date) {
+  async function exportAttendanceReport(studyGroupId: number, startDate: Date, endDate: Date) {
     isLoading.value = true;
     try {
       await reportApi.reportsExportAttendanceList({
-        groupId,
+        studyGroupId,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
       });

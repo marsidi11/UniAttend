@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { useToast } from 'vue-toastification';
 import type { 
   UserDto,
   UserProfileDto, 
@@ -11,8 +12,11 @@ import type {
 } from '@/api/generated/data-contracts';
 import { UserRole } from '@/api/generated/data-contracts';
 import { userApi } from '@/api/apiInstances';
+import { handleError } from '@/utils/errorHandler';
 
 export const useUserStore = defineStore('user', () => {
+  const toast = useToast();
+  
   // State
   const users = ref<UserDto[]>([]);
   const profile = ref<UserProfileDto | null>(null);
@@ -28,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
       users.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -39,9 +43,13 @@ export const useUserStore = defineStore('user', () => {
     isLoading.value = true;
     try {
       const { data } = await userApi.userDetail(id);
+      const existingIndex = users.value.findIndex(u => u.id === id);
+      if (existingIndex !== -1) {
+        users.value[existingIndex] = data;
+      }
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -52,10 +60,11 @@ export const useUserStore = defineStore('user', () => {
     isLoading.value = true;
     try {
       const { data } = await userApi.userCreate(userData);
-      await fetchUsers(); // Refresh users list
+      users.value.push(data);
+      toast.success('User created successfully');
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -65,10 +74,16 @@ export const useUserStore = defineStore('user', () => {
   async function updateUser(id: number, userData: UpdateUserCommand) {
     isLoading.value = true;
     try {
-      await userApi.userUpdate(id, userData);
-      await fetchUsers(); // Refresh users list
+      await userApi.userUpdate(id, { id, ...userData });
+      const updatedUser = await userApi.userDetail(id);
+      const index = users.value.findIndex(u => u.id === id);
+      if (index !== -1) {
+        users.value[index] = updatedUser.data;
+      }
+      toast.success('User updated successfully');
+      return updatedUser.data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -79,9 +94,13 @@ export const useUserStore = defineStore('user', () => {
     isLoading.value = true;
     try {
       await userApi.userDeactivateCreate(id);
-      await fetchUsers(); // Refresh users list
+      const index = users.value.findIndex(u => u.id === id);
+      if (index !== -1) {
+        users.value[index] = { ...users.value[index], isActive: false };
+      }
+      toast.success('User deactivated successfully');
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -95,7 +114,7 @@ export const useUserStore = defineStore('user', () => {
       profile.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -106,10 +125,12 @@ export const useUserStore = defineStore('user', () => {
     isLoading.value = true;
     try {
       await userApi.userProfileUpdate(profileData);
-      await fetchProfile(); // Refresh profile data
-      return 'Profile updated successfully';
+      const updatedProfile = await fetchProfile();
+      profile.value = updatedProfile;
+      toast.success('Profile updated successfully');
+      return updatedProfile;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -125,7 +146,7 @@ export const useUserStore = defineStore('user', () => {
       details.value = data;
       return data;
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
@@ -136,17 +157,13 @@ export const useUserStore = defineStore('user', () => {
     isLoading.value = true;
     try {
       await userApi.userChangePasswordUpdate(passwordData);
-      return 'Password changed successfully';
+      toast.success('Password changed successfully');
     } catch (err) {
-      handleError(err);
+      handleError(err, error);
       throw err;
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function handleError(err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An error occurred';
   }
 
   return {
@@ -163,7 +180,7 @@ export const useUserStore = defineStore('user', () => {
     createUser,
     updateUser,
     deactivateUser,
-    fetchProfile,
+    fetchProfile, 
     updateProfile,
     fetchUserDetails,
     changePassword

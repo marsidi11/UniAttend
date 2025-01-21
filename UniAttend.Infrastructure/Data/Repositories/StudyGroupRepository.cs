@@ -32,9 +32,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Where(g => g.SubjectId == subjectId)
                 .ToListAsync(cancellationToken);
 
-        public async Task<bool> HasStudentAsync(int groupId, int studentId, CancellationToken cancellationToken = default)
+        public async Task<bool> HasStudentAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default)
             => await DbSet
-                .AnyAsync(g => g.Id == groupId &&
+                .AnyAsync(g => g.Id == studyGroupId &&
                     g.Students.Any(s => s.StudentId == studentId),
                     cancellationToken);
 
@@ -43,15 +43,15 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(g => g.Schedules)
                 .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
 
-        public async Task<AttendanceStats> GetAttendanceStatsAsync(int groupId, CancellationToken cancellationToken = default)
+        public async Task<AttendanceStats> GetAttendanceStatsAsync(int studyGroupId, CancellationToken cancellationToken = default)
         {
             var group = await DbSet
                 .Include(g => g.Students)
                 .Include(g => g.AttendanceRecords)
-                .FirstOrDefaultAsync(g => g.Id == groupId, cancellationToken);
+                .FirstOrDefaultAsync(g => g.Id == studyGroupId, cancellationToken);
 
             if (group == null)
-                throw new NotFoundException($"Group with ID {groupId} not found");
+                throw new NotFoundException($"StudyGroup with ID {studyGroupId} not found");
 
             return new AttendanceStats
             {

@@ -51,7 +51,7 @@ namespace UniAttend.API.Controllers
         {
             var query = new GetGroupReportQuery
             {
-                GroupId = id,
+                StudyGroupId = id,
                 StartDate = startDate,
                 EndDate = endDate
             };
@@ -82,7 +82,7 @@ namespace UniAttend.API.Controllers
             [FromQuery] DateTime endDate,
             [FromQuery] int? departmentId,
             [FromQuery] int? subjectId,
-            [FromQuery] int? groupId,
+            [FromQuery] int? studyGroupId,
             CancellationToken cancellationToken)
         {
             var query = new GetAttendanceReportQuery
@@ -91,7 +91,7 @@ namespace UniAttend.API.Controllers
                 EndDate = endDate,
                 DepartmentId = departmentId,
                 SubjectId = subjectId,
-                GroupId = groupId
+                StudyGroupId = studyGroupId
             };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
@@ -111,14 +111,14 @@ namespace UniAttend.API.Controllers
         [HttpGet("export/attendance")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<IActionResult> ExportAttendanceReport(
-            [FromQuery] int groupId,
+            [FromQuery] int studyGroupId,
             [FromQuery] DateTime startDate,
             [FromQuery] DateTime endDate,
             CancellationToken cancellationToken)
         {
             var query = new ExportAttendanceReportQuery
             {
-                GroupId = groupId,
+                StudyGroupId = studyGroupId,
                 StartDate = startDate,
                 EndDate = endDate
             };
@@ -126,7 +126,7 @@ namespace UniAttend.API.Controllers
             return File(
                 fileContent,
                 "application/pdf",
-                $"attendance-report-{groupId}-{DateTime.Now:yyyyMMdd}.pdf");
+                $"attendance-report-{studyGroupId}-{DateTime.Now:yyyyMMdd}.pdf");
         }
     }
 }

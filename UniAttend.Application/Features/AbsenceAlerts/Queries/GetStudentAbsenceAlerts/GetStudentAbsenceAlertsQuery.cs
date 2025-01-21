@@ -6,7 +6,7 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Queries.GetStudentAbsence
     public record GetStudentAbsenceAlertsQuery : IRequest<IEnumerable<AbsenceAlertDto>>
     {
         public int? StudentId { get; init; }
-        public int? GroupId { get; init; }
+        public int? StudyGroupId { get; init; }
         public bool? UnsentOnly { get; init; }
     }
 }

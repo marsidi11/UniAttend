@@ -13,7 +13,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
         public override async Task<CourseSession?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
             => await DbSet
-                .Include(cs => cs.Group)
+                .Include(cs => cs.StudyGroup)
                 .Include(cs => cs.Classroom)
                 .Include(cs => cs.AttendanceRecords)
                     .ThenInclude(ar => ar.Student)
@@ -21,18 +21,18 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync(cs => cs.Id == id, cancellationToken);
 
         public async Task<IEnumerable<CourseSession>> GetActiveSessionsAsync(
-            int? groupId = null,
+            int? studyGroupId = null,
             int? classroomId = null,
             DateTime? date = null,
             CancellationToken cancellationToken = default)
         {
             var query = DbSet
-                .Include(cs => cs.Group)
+                .Include(cs => cs.StudyGroup)
                 .Include(cs => cs.Classroom)
                 .Where(cs => cs.Status == "Active");
 
-            if (groupId.HasValue)
-                query = query.Where(cs => cs.GroupId == groupId);
+            if (studyGroupId.HasValue)
+                query = query.Where(cs => cs.StudyGroupId == studyGroupId);
 
             if (classroomId.HasValue)
                 query = query.Where(cs => cs.ClassroomId == classroomId);
@@ -49,16 +49,16 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public async Task<IEnumerable<CourseSession>> GetByDateRangeAsync(
             DateTime startDate,
             DateTime endDate,
-            int? groupId = null,
+            int? studyGroupId = null,
             CancellationToken cancellationToken = default)
         {
             var query = DbSet
-                .Include(cs => cs.Group)
+                .Include(cs => cs.StudyGroup)
                 .Include(cs => cs.Classroom)
                 .Where(cs => cs.Date >= startDate.Date && cs.Date <= endDate.Date);
 
-            if (groupId.HasValue)
-                query = query.Where(cs => cs.GroupId == groupId);
+            if (studyGroupId.HasValue)
+                query = query.Where(cs => cs.StudyGroupId == studyGroupId);
 
             return await query
                 .OrderBy(cs => cs.Date)

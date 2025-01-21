@@ -69,7 +69,11 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
           }
           case 500: {
             const serverError = await response.json();
-            throw new ApiError('Internal server error', 500, serverError);
+            throw new ApiError(
+              serverError.message || 'Internal server error', // Use server message directly
+              500,
+              serverError
+            );
           }
         }
 
