@@ -12,6 +12,14 @@ class ApiError extends Error {
   }
 }
 
+interface ApiErrorResponse {
+  type: string;
+  code: string;
+  message: string;
+  traceId: string;
+  details?: any;
+}
+
 export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType> {
   return {
     baseUrl: 'http://localhost:5255',
@@ -42,6 +50,16 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
 
         // Handle specific status codes
         switch (response.status) {
+
+          case 400: {
+            const errorData: ApiErrorResponse = await response.json();
+            throw new ApiError(
+              errorData.message || 'Bad Request',
+              400,
+              errorData
+            );
+          }
+
           case 401: {
             try {
               const authStore = useAuthStore();
@@ -65,7 +83,11 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
             throw new ApiError('Resource not found', 404);
           case 422: {
             const validationData = await response.json();
-            throw new ApiError('Validation failed', 422, validationData);
+            throw new ApiError(
+              validationData.message || 'Validation failed',
+              422,
+              validationData
+            );
           }
           case 500: {
             const serverError = await response.json();
@@ -79,7 +101,11 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
-          throw new ApiError(`HTTP error! status: ${response.status}`, response.status, errorData);
+          throw new ApiError(
+            errorData?.message || `HTTP error! status: ${response.status}`,
+            response.status,
+            errorData
+          );
         }
 
         return response;
