@@ -56,16 +56,20 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  async function createUser(userData: CreateUserCommand) {
+    async function createUser(userData: CreateUserCommand) {
     isLoading.value = true;
     try {
-      const { data } = await userApi.userCreate(userData);
-      users.value.push(data);
+      const response = await userApi.userCreate(userData);
+      // Only proceed if first call succeeds
+      const { data: newUserId } = response;
+      const { data: newUser } = await userApi.userDetail(newUserId);
+      users.value.push(newUser);
       toast.success('User created successfully');
-      return data;
+      return newUser;
     } catch (err) {
+      // Let handleError show the validation message
       handleError(err, error);
-      throw err;
+      throw err; // Re-throw to handle in component
     } finally {
       isLoading.value = false;
     }

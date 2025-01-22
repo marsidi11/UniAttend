@@ -60,7 +60,7 @@ async function loadAttendance() {
     attendanceRecords.value = attendanceData
 
     // Get stats from student report
-    const reportData = await reportStore.getStudentReport(1) // TODO: Get actual student ID
+    const reportData = await reportStore.getMyReport()
     if (reportData) {
       stats.value = {
         totalClasses: reportData.totalClasses || 0,

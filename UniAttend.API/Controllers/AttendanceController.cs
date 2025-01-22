@@ -17,19 +17,19 @@ namespace UniAttend.API.Controllers
     public class AttendanceController : ControllerBase
     {
         private readonly IMediator _mediator;
-    
+
         public AttendanceController(IMediator mediator)
         {
             _mediator = mediator;
         }
-    
+
         [HttpPost("card")]
         public async Task<IActionResult> RecordCardAttendance(RecordCardAttendanceCommand command)
         {
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-    
+
         [HttpPost("otp")]
         public async Task<IActionResult> RecordOtpAttendance(RecordOtpAttendanceCommand command)
         {
@@ -37,57 +37,57 @@ namespace UniAttend.API.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-    
+
         [Authorize(Roles = "Professor")]
         [HttpPost("classes/{classId}/confirm")]
         public async Task<IActionResult> ConfirmAttendance(int classId)
         {
-            var command = new ConfirmAttendanceCommand 
-            { 
+            var command = new ConfirmAttendanceCommand
+            {
                 ClassId = classId,
                 ProfessorId = User.GetUserId()
             };
             await _mediator.Send(command);
             return Ok();
-    }
+        }
 
-    /// <summary>
-    /// Gets attendance records for a specific class
-    /// </summary>
-    [HttpGet("classes/{classId}")]
+        /// <summary>
+        /// Gets attendance records for a specific class
+        /// </summary>
+        [HttpGet("classes/{classId}")]
         [Authorize(Roles = "Professor")]
-    public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetClassAttendance(
-        int classId,
-        [FromQuery] DateTime? date,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetClassAttendanceQuery 
-        { 
-            ClassId = classId,
-            Date = date
-        };
-        var result = await _mediator.Send(query, cancellationToken);
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Gets attendance records for the authenticated student
-    /// </summary>
-    [HttpGet("student")]
-    [Authorize(Roles = "Student, Secretary")]
-    public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetStudentAttendance(
-        [FromQuery] DateTime? startDate,
-        [FromQuery] DateTime? endDate,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetStudentAttendanceQuery
+        public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetClassAttendance(
+            int classId,
+            [FromQuery] DateTime? date,
+            CancellationToken cancellationToken)
         {
-            StudentId = User.GetUserId(),
-            StartDate = startDate,
-            EndDate = endDate
-        };
-        var result = await _mediator.Send(query, cancellationToken);
-        return Ok(result);
-    }
+            var query = new GetClassAttendanceQuery
+            {
+                ClassId = classId,
+                Date = date
+            };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets attendance records for the authenticated student
+        /// </summary>
+        [HttpGet("student")]
+        [Authorize(Roles = "Student, Secretary, Professor")]
+        public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetStudentAttendance(
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetStudentAttendanceQuery
+            {
+                StudentId = User.GetUserId(),
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
     }
 }

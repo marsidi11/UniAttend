@@ -49,6 +49,31 @@ export class Reports<SecurityDataType = unknown> extends HttpClient<SecurityData
    * No description
    *
    * @tags Reports
+   * @name ReportsMyReportList
+   * @request GET:/api/Reports/my-report
+   * @secure
+   */
+  reportsMyReportList = (
+    query?: {
+      /** @format date-time */
+      startDate?: string;
+      /** @format date-time */
+      endDate?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<StudentReportDto, any>({
+      path: `/api/Reports/my-report`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Reports
    * @name ReportsGroupsDetail
    * @request GET:/api/Reports/groups/{id}
    * @secure

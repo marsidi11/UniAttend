@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { 
+import type {
   UserDto as StudentDto,
   RegisterStudentCommand,
   AttendanceRecordDto,
@@ -25,7 +25,7 @@ export const useStudentStore = defineStore('student', () => {
   const error = ref<string | null>(null);
 
   // Getters remain the same
-  const activeStudents = computed(() => 
+  const activeStudents = computed(() =>
     students.value.filter((s: ExtendedStudentDto) => s.isActive)
   );
 
@@ -42,30 +42,30 @@ export const useStudentStore = defineStore('student', () => {
   });
 
   // Actions
-        async function fetchStudentsList() {
-      isLoading.value = true;
-      try {
-        const response = await studentApi.studentList();
-        
-        const jsonData = await response.json();
-        
-        if (Array.isArray(jsonData)) {
-          students.value = jsonData;
-          return jsonData;
-        }
-        // Fallback to checking data property
-        else if (jsonData && Array.isArray(jsonData.data)) {
-          students.value = jsonData.data;
-          return jsonData.data;
-        }
-        return [];
-      } catch (err) {
-        handleError(err, error);
-        throw err;
-      } finally {
-        isLoading.value = false;
+  async function fetchStudentsList() {
+    isLoading.value = true;
+    try {
+      const response = await studentApi.studentList();
+
+      const jsonData = await response.json();
+
+      if (Array.isArray(jsonData)) {
+        students.value = jsonData;
+        return jsonData;
       }
+      // Fallback to checking data property
+      else if (jsonData && Array.isArray(jsonData.data)) {
+        students.value = jsonData.data;
+        return jsonData.data;
+      }
+      return [];
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    } finally {
+      isLoading.value = false;
     }
+  }
 
   async function createStudent(studentData: RegisterStudentCommand) {
     isLoading.value = true;
@@ -140,9 +140,9 @@ export const useStudentStore = defineStore('student', () => {
     try {
       await studentApi.studentCardUpdate(studentId, { studentId, cardId });
       if (currentStudent.value?.id === studentId) {
-        currentStudent.value = { 
-          ...currentStudent.value, 
-          cardId 
+        currentStudent.value = {
+          ...currentStudent.value,
+          cardId
         };
       }
     } catch (err) {
@@ -158,9 +158,9 @@ export const useStudentStore = defineStore('student', () => {
     try {
       await studentApi.studentCardDelete(studentId);
       if (currentStudent.value?.id === studentId) {
-        currentStudent.value = { 
-          ...currentStudent.value, 
-          cardId: undefined 
+        currentStudent.value = {
+          ...currentStudent.value,
+          cardId: undefined
         };
       }
     } catch (err) {
@@ -179,11 +179,11 @@ export const useStudentStore = defineStore('student', () => {
     groups,
     isLoading,
     error,
-    
+
     // Getters
     activeStudents,
     groupedByDepartment,
-    
+
     // Actions
     fetchStudentsList,
     createStudent,

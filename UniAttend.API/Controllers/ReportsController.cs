@@ -8,6 +8,7 @@ using UniAttend.Application.Features.Reports.Queries.GetDepartmentReport;
 using UniAttend.Application.Features.Reports.Queries.GetAttendanceReport;
 using UniAttend.Application.Features.Reports.Queries.GetAcademicYearReport;
 using UniAttend.Application.Features.Reports.Queries.ExportAttendanceReport;
+using UniAttend.API.Extensions;
 
 namespace UniAttend.API.Controllers
 {
@@ -34,6 +35,24 @@ namespace UniAttend.API.Controllers
             var query = new GetStudentReportQuery
             {
                 StudentId = id,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("my-report")]
+        [Authorize(Roles = "Student")]
+        public async Task<ActionResult<StudentReportDto>> GetMyReport(
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate,
+            CancellationToken cancellationToken)
+        {
+            var currentUserId = User.GetUserId();
+            var query = new GetStudentReportQuery
+            {
+                StudentId = currentUserId,
                 StartDate = startDate,
                 EndDate = endDate
             };
@@ -76,7 +95,7 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet("attendance")]
-        [Authorize(Roles = "Admin,Secretary")]
+        [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<AttendanceReportDto>> GetAttendanceReport(
             [FromQuery] DateTime startDate,
             [FromQuery] DateTime endDate,

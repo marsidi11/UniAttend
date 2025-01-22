@@ -38,6 +38,23 @@ export const useReportStore = defineStore('report', () => {
     }
   }
 
+  async function getMyReport(startDate?: Date, endDate?: Date) {
+    isLoading.value = true;
+    try {
+      const { data } = await reportApi.reportsMyReportList({
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString()
+      });
+      studentReport.value = data;
+      return data;
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function getGroupReport(id: number, startDate?: Date, endDate?: Date) {
     isLoading.value = true;
     try {
@@ -137,10 +154,11 @@ export const useReportStore = defineStore('report', () => {
 
     // Actions
     getStudentReport,
+    getMyReport,
     getGroupReport,
     getDepartmentReport,
     getAttendanceReport,
     getAcademicYearReport,
-    exportAttendanceReport
+    exportAttendanceReport    
   };
 });
