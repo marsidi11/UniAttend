@@ -7,7 +7,7 @@ import type {
 } from '@/api/generated/data-contracts';
 import { scheduleApi } from '@/api/apiInstances';
 import { handleError } from '@/utils/errorHandler';
-import { useToast, POSITION } from 'vue-toastification';
+import { useToast } from 'vue-toastification';
 
 export const useScheduleStore = defineStore('schedule', () => {
   // State
@@ -31,12 +31,37 @@ export const useScheduleStore = defineStore('schedule', () => {
   });
 
   // Actions
-  async function fetchSchedules(studyGroupId?: number, classroomId?: number) {
+  async function fetchAllSchedules() {
+    isLoading.value = true
+    try {
+      const { data } = await scheduleApi.scheduleList()
+      schedules.value = data
+      return data
+    } catch (err) {
+      handleError(err, error)
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function fetchSchedules(
+    studyGroupId?: number, 
+    classroomId?: number, 
+    professorId?: number
+  ) {
     isLoading.value = true;
     try {
-      const { data } = classroomId
-        ? await scheduleApi.scheduleClassroomDetail(classroomId)
-        : await scheduleApi.scheduleGroupDetail(studyGroupId!);
+      let data;
+      if (professorId) {
+        ({ data } = await scheduleApi.scheduleProfessorDetail(professorId));
+      } else if (classroomId) {
+        ({ data } = await scheduleApi.scheduleClassroomDetail(classroomId));
+      } else if (studyGroupId) {
+        ({ data } = await scheduleApi.scheduleGroupDetail(studyGroupId));
+      } else {
+        ({ data } = await scheduleApi.scheduleList());
+      }
       schedules.value = data;
       return data;
     } catch (err) {
@@ -104,6 +129,7 @@ export const useScheduleStore = defineStore('schedule', () => {
     schedulesByDay,
 
     // Actions
+    fetchAllSchedules,
     fetchSchedules,
     createSchedule,
     updateSchedule,

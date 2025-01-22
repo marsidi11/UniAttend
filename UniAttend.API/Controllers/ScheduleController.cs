@@ -1,11 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UniAttend.Application.Features.Schedule.Queries.GetAllSchedules;
 using UniAttend.Application.Features.Schedule.Commands.CreateSchedule;
 using UniAttend.Application.Features.Schedule.Commands.UpdateSchedule;
 using UniAttend.Application.Features.Schedule.Commands.DeleteSchedule;
 using UniAttend.Application.Features.Schedule.Queries.GetClassroomSchedule;
 using UniAttend.Application.Features.Schedule.Queries.GetGroupSchedule;
+using UniAttend.Application.Features.Schedule.Queries.GetProfessorSchedule;
 using UniAttend.Application.Features.Schedule.DTOs;
 
 namespace UniAttend.API.Controllers
@@ -20,6 +22,26 @@ namespace UniAttend.API.Controllers
         public ScheduleController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Secretary")]
+        public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetAll(CancellationToken cancellationToken)
+        {
+            var query = new GetAllSchedulesQuery();
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("professor/{professorId}")]
+        [Authorize(Roles = "Admin,Secretary,Professor")]
+        public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetByProfessor(
+    int professorId,
+    CancellationToken cancellationToken)
+        {
+            var query = new GetProfessorScheduleQuery { ProfessorId = professorId };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
         }
 
         [HttpGet("classroom/{classroomId}")]

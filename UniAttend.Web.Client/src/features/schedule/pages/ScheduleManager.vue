@@ -6,10 +6,11 @@
       <Button @click="openCreateModal">Add Schedule</Button>
     </div>
 
-    <!-- Filters -->
+    <!-- Enhanced Filters -->
     <div class="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow">
-      <div class="w-full sm:w-64">
-        <label class="block text-sm font-medium text-gray-700">Group</label>
+      <!-- Study Group Filter -->
+      <div class="w-full sm:w-1/4">
+        <label class="block text-sm font-medium text-gray-700">Study Group</label>
         <select v-model="selectedGroup"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
           <option value="">All Groups</option>
@@ -18,7 +19,9 @@
           </option>
         </select>
       </div>
-      <div class="w-full sm:w-64">
+
+      <!-- Classroom Filter -->
+      <div class="w-full sm:w-1/4">
         <label class="block text-sm font-medium text-gray-700">Classroom</label>
         <select v-model="selectedClassroom"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
@@ -28,28 +31,34 @@
           </option>
         </select>
       </div>
+
+      <!-- Professor Filter -->
+      <div class="w-full sm:w-1/4">
+        <label class="block text-sm font-medium text-gray-700">Professor</label>
+        <select v-model="selectedProfessor"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+          <option value="">All Professors</option>
+          <option v-for="professor in professors" :key="professor.id" :value="professor.id">
+            {{ professor.fullName }}
+          </option>
+        </select>
+      </div>
     </div>
 
     <!-- Schedule Grid -->
     <div class="bg-white shadow rounded-lg p-4 sm:p-6 overflow-x-auto">
-      <div v-if="!selectedGroup && !selectedClassroom" 
-           class="text-center py-12 text-gray-500">
-        Please select a group or classroom to view schedules
-      </div>
-      <div v-else-if="isLoading" 
-           class="text-center py-12">
+      <div v-if="isLoading" class="text-center py-12">
         <Spinner />
       </div>
-      
+
       <!-- Schedule Grid Container -->
-      <div class="min-w-[768px]"> <!-- Minimum width to prevent squishing -->
+      <div v-else class="min-w-[768px]">
         <div class="grid grid-cols-6 gap-2 sm:gap-4">
           <!-- Time Column -->
           <div class="col-span-1 relative">
             <div class="h-14 sm:h-16"></div> <!-- Taller header space -->
-            <div v-for="time in timeSlots" 
-                 :key="time" 
-                 class="h-24 sm:h-28 flex items-center justify-end pr-4 text-sm font-medium text-gray-500">
+            <div v-for="time in timeSlots" :key="time"
+              class="h-24 sm:h-28 flex items-center justify-end pr-4 text-sm font-medium text-gray-500">
               <div class="bg-gray-50 px-2 py-1 rounded">
                 {{ time }}
               </div>
@@ -57,21 +66,16 @@
           </div>
 
           <!-- Days Columns -->
-          <div v-for="day in days" 
-               :key="day.value" 
-               class="col-span-1">
-            <div class="h-14 sm:h-16 flex items-center justify-center font-medium bg-indigo-50 rounded-t text-indigo-700">
+          <div v-for="day in days" :key="day.value" class="col-span-1">
+            <div
+              class="h-14 sm:h-16 flex items-center justify-center font-medium bg-indigo-50 rounded-t text-indigo-700">
               <span class="hidden sm:inline">{{ day.label }}</span>
               <span class="sm:hidden">{{ day.label.substr(0, 3) }}</span>
             </div>
-            <div v-for="time in timeSlots" 
-                 :key="`${day.value}-${time}`" 
-                 class="h-24 sm:h-28 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1 sm:p-2 rounded">
-              <ScheduleSlot 
-                :schedules="getSchedulesForSlot(day.value, time)" 
-                @click="slot => handleSlotClick(slot)" 
-                @delete="handleDelete"
-              />
+            <div v-for="time in timeSlots" :key="`${day.value}-${time}`"
+              class="h-24 sm:h-28 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1 sm:p-2 rounded">
+              <ScheduleSlot :schedules="getSchedulesForSlot(day.value, time)" :current-time="`${time}:00`"
+                @click="slot => handleSlotClick(slot)" @delete="handleDelete" />
             </div>
           </div>
         </div>
@@ -80,14 +84,8 @@
 
     <!-- Create/Edit Schedule Modal -->
     <Modal v-model="showModal" :title="modalTitle">
-      <ScheduleForm 
-        v-if="showModal" 
-        :schedule="selectedSchedule" 
-        :groups="groups" 
-        :classrooms="classrooms"
-        @submit="handleSubmit" 
-        @cancel="showModal = false" 
-      />
+      <ScheduleForm v-if="showModal" :schedule="selectedSchedule" :groups="groups" :classrooms="classrooms"
+        @submit="handleSubmit" @cancel="showModal = false" />
     </Modal>
   </div>
 </template>
@@ -98,6 +96,7 @@ import { storeToRefs } from 'pinia'
 import { useScheduleStore } from '@/stores/schedule.store'
 import { useGroupStore } from '@/stores/studyGroup.store'
 import { useClassroomStore } from '@/stores/classroom.store'
+import { useProfessorStore } from '@/stores/professor.store'
 import type {
   ScheduleDto,
   CreateScheduleCommand,
@@ -113,17 +112,20 @@ import ScheduleSlot from '../components/ScheduleSlot.vue'
 const scheduleStore = useScheduleStore()
 const groupStore = useGroupStore()
 const classroomStore = useClassroomStore()
+const professorStore = useProfessorStore()
 
 // Get store refs
 const { schedules, isLoading } = storeToRefs(scheduleStore)
 const { groups } = storeToRefs(groupStore)
 const { classrooms } = storeToRefs(classroomStore)
+const { professors } = storeToRefs(professorStore)
 
 // Component state
 const showModal = ref(false)
 const selectedSchedule = ref<ScheduleDto | null>(null)
 const selectedGroup = ref('')
 const selectedClassroom = ref('')
+const selectedProfessor = ref('')
 
 // Constants
 const days = [
@@ -155,15 +157,44 @@ const filteredSchedules = computed(() => {
     filtered = filtered.filter(s => s.classroomId === Number(selectedClassroom.value))
   }
 
+  if (selectedProfessor.value) {
+    // Filter by professor using the professor name from group info
+    filtered = filtered.filter(s => {
+      const professorName = s.professorName?.toLowerCase() || ''
+      const selectedProf = professors.value.find(p => p.id === Number(selectedProfessor.value))
+      return professorName.includes(selectedProf?.fullName?.toLowerCase() || '')
+    })
+  }
+
   return filtered
 })
 
 // Methods
 function getSchedulesForSlot(day: string, time: string) {
-  return filteredSchedules.value.filter(schedule => {
-    return schedule.dayOfWeek === getDayNumber(day) &&
-      schedule.startTime === `${time}:00`
+  const schedules = filteredSchedules.value.filter(schedule => {
+    if (schedule.dayOfWeek !== getDayNumber(day)) return false
+    const slotMinutes = timeToMinutes(time)
+    const startMinutes = timeToMinutes(schedule.startTime?.toString() || '00:00')
+    const endMinutes = timeToMinutes(schedule.endTime?.toString() || '00:00')
+    return slotMinutes >= startMinutes && slotMinutes < endMinutes
   })
+
+  // Sort schedules by type for consistent display order
+  return schedules.sort((a, b) => {
+    // Prioritize display order: groups -> classrooms -> professors
+    const getTypeOrder = (s: ScheduleDto) => {
+      if (s.studyGroupId) return 1
+      if (s.classroomId) return 2
+      return 3
+    }
+    return getTypeOrder(a) - getTypeOrder(b)
+  })
+}
+
+// Helper function to convert time string to minutes
+function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return (hours * 60) + (minutes || 0);
 }
 
 // Add helper function to convert day string to number
@@ -195,11 +226,11 @@ async function handleDelete(schedule: ScheduleDto) {
   }
 
   if (!confirm('Are you sure you want to delete this schedule?')) return
-  
+
   try {
     await scheduleStore.deleteSchedule(
-      schedule.id, 
-      schedule.studyGroupId 
+      schedule.id,
+      schedule.studyGroupId
     )
   } catch (err) {
     console.error('Failed to delete schedule:', err)
@@ -223,46 +254,35 @@ async function handleSubmit(scheduleData: CreateScheduleCommand | UpdateSchedule
 }
 
 // Watch for filter changes
-watch(selectedGroup, async (newValue) => {
+watch([selectedGroup, selectedClassroom, selectedProfessor], async ([group, classroom, professor]) => {
   try {
-    if (newValue) {
-      // Group selected
-      await scheduleStore.fetchSchedules(Number(newValue))
-    } else if (selectedClassroom.value) {
-      // Group deselected but classroom is selected
-      await scheduleStore.fetchSchedules(undefined, Number(selectedClassroom.value))
+    if (professor) {
+      // Use the updated fetchSchedules method that supports professor filtering
+      await scheduleStore.fetchSchedules(undefined, undefined, Number(professor))
+    } else if (classroom) {
+      await scheduleStore.fetchSchedules(undefined, Number(classroom))
+    } else if (group) {
+      await scheduleStore.fetchSchedules(Number(group))
     } else {
-      // Both filters cleared
-      schedules.value = []
+      await scheduleStore.fetchAllSchedules()
     }
   } catch (err) {
-    console.error('Failed to fetch group schedules:', err)
-  }
-})
-
-watch(selectedClassroom, async (newValue) => {
-  try {
-    if (newValue) {
-      // Classroom selected
-      await scheduleStore.fetchSchedules(undefined, Number(newValue))
-    } else if (selectedGroup.value) {
-      // Classroom deselected but group is selected
-      await scheduleStore.fetchSchedules(Number(selectedGroup.value))
-    } else {
-      // Both filters cleared
-      schedules.value = []
-    }
-  } catch (err) {
-    console.error('Failed to fetch classroom schedules:', err)
+    console.error('Failed to fetch schedules:', err)
   }
 })
 
 // Modify onMounted to only fetch groups and classrooms
 onMounted(async () => {
-  await Promise.all([
-    groupStore.fetchGroups(),
-    classroomStore.fetchClassrooms()
-  ])
+  try {
+    await Promise.all([
+      scheduleStore.fetchAllSchedules(),
+      groupStore.fetchGroups(),
+      classroomStore.fetchClassrooms(),
+      professorStore.fetchProfessors()
+    ])
+  } catch (err) {
+    console.error('Failed to fetch initial data:', err)
+  }
 })
 </script>
 

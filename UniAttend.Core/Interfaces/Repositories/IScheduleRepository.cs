@@ -4,7 +4,13 @@ namespace UniAttend.Core.Interfaces.Repositories
 {
     public interface IScheduleRepository : IRepository<Schedule>
     {
+        Task<IEnumerable<Schedule>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
+
         Task<IEnumerable<Schedule>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<Schedule>> GetByProfessorIdAsync(
+        int professorId, 
+        CancellationToken cancellationToken = default);
 
         Task<IEnumerable<Schedule>> GetByClassroomIdAsync(int classroomId, CancellationToken cancellationToken = default);
 

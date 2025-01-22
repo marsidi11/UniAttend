@@ -17,6 +17,56 @@ export class Schedule<SecurityDataType = unknown> extends HttpClient<SecurityDat
    * No description
    *
    * @tags Schedule
+   * @name ScheduleList
+   * @request GET:/api/Schedule
+   * @secure
+   */
+  scheduleList = (params: RequestParams = {}) =>
+    this.request<ScheduleDto[], any>({
+      path: `/api/Schedule`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Schedule
+   * @name ScheduleCreate
+   * @request POST:/api/Schedule
+   * @secure
+   */
+  scheduleCreate = (data: CreateScheduleCommand, params: RequestParams = {}) =>
+    this.request<number, any>({
+      path: `/api/Schedule`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Schedule
+   * @name ScheduleProfessorDetail
+   * @request GET:/api/Schedule/professor/{professorId}
+   * @secure
+   */
+  scheduleProfessorDetail = (professorId: number, params: RequestParams = {}) =>
+    this.request<ScheduleDto[], any>({
+      path: `/api/Schedule/professor/${professorId}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Schedule
    * @name ScheduleClassroomDetail
    * @request GET:/api/Schedule/classroom/{classroomId}
    * @secure
@@ -42,24 +92,6 @@ export class Schedule<SecurityDataType = unknown> extends HttpClient<SecurityDat
       path: `/api/Schedule/group/${studyGroupId}`,
       method: "GET",
       secure: true,
-      format: "json",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags Schedule
-   * @name ScheduleCreate
-   * @request POST:/api/Schedule
-   * @secure
-   */
-  scheduleCreate = (data: CreateScheduleCommand, params: RequestParams = {}) =>
-    this.request<number, any>({
-      path: `/api/Schedule`,
-      method: "POST",
-      body: data,
-      secure: true,
-      type: ContentType.Json,
       format: "json",
       ...params,
     });

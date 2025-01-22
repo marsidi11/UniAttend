@@ -18,11 +18,42 @@ namespace UniAttend.Infrastructure.Data.Repositories
     {
         public ScheduleRepository(ApplicationDbContext context) : base(context) { }
 
+        public async Task<IEnumerable<Schedule>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(s => s.StudyGroup)
+                    .ThenInclude(g => g.Subject)
+                .Include(s => s.StudyGroup)
+                    .ThenInclude(g => g.Professor)
+                        .ThenInclude(p => p.User)
+                .Include(s => s.Classroom)
+                .OrderBy(s => s.DayOfWeek)
+                .ThenBy(s => s.StartTime)
+                .ToListAsync(cancellationToken);
+        }
+
         public override async Task<Schedule?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(s => s.StudyGroup)
                 .Include(s => s.Classroom)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+
+        public async Task<IEnumerable<Schedule>> GetByProfessorIdAsync(
+            int professorId,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(s => s.StudyGroup)
+                    .ThenInclude(g => g.Subject)
+                .Include(s => s.StudyGroup)
+                    .ThenInclude(g => g.Professor)
+                        .ThenInclude(p => p.User)
+                .Include(s => s.Classroom)
+                .Where(s => s.StudyGroup.ProfessorId == professorId)
+                .OrderBy(s => s.DayOfWeek)
+                .ThenBy(s => s.StartTime)
+                .ToListAsync(cancellationToken);
+        }
 
         public async Task<IEnumerable<Schedule>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default)
         {
