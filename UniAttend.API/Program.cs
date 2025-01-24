@@ -43,6 +43,9 @@ builder.Host.UseSerilog((context, services, configuration) => {
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
 
+// Add Distributed Cache
+builder.Services.AddDistributedMemoryCache(); // For development environment
+
 // Infrastructure & Application services
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();

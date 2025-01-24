@@ -13,7 +13,6 @@ namespace UniAttend.Core.Interfaces.Repositories
         ISubjectRepository Subjects { get; }
         IReportRepository Reports { get; }
         IStudyGroupRepository StudyGroups { get; }
-        IOtpCodeRepository OtpCodes { get; }
         ICourseSessionRepository CourseSessions { get; }
         IClassroomRepository Classrooms { get; }
         IAbsenceAlertRepository AbsenceAlerts { get; }

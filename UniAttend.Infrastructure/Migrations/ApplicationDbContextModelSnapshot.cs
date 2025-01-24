@@ -119,10 +119,13 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<DateTime>("CheckInTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CourseSessionId")
+                    b.Property<int>("CourseSessionId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -145,6 +148,8 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnName("UpdatedAt");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("CourseId");
 
@@ -209,56 +214,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.HasIndex("StudyGroupId");
 
                     b.ToTable("CourseSessions", (string)null);
-                });
-
-            modelBuilder.Entity("UniAttend.Core.Entities.Attendance.OtpCode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("varchar(6)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime>("ExpiryTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsUsed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("UpdatedAt");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId", "ExpiryTime");
-
-                    b.HasIndex("Code", "ClassId", "StudentId")
-                        .IsUnique();
-
-                    b.ToTable("OtpCodes", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_OtpCode_Format", "LENGTH(Code) = 6 AND Code REGEXP '^[0-9]+$'");
-                        });
                 });
 
             modelBuilder.Entity("UniAttend.Core.Entities.Audit.AuditLog", b =>
@@ -521,6 +476,9 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<string>("TotpSecret")
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime")
                         .HasColumnName("UpdatedAt");
@@ -761,6 +719,12 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.Attendance.AttendanceRecord", b =>
                 {
+                    b.HasOne("UniAttend.Core.Entities.Attendance.CourseSession", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("UniAttend.Core.Entities.Course", "Course")
                         .WithMany("AttendanceRecords")
                         .HasForeignKey("CourseId")
@@ -770,7 +734,8 @@ namespace UniAttend.Infrastructure.Migrations
                     b.HasOne("UniAttend.Core.Entities.Attendance.CourseSession", null)
                         .WithMany("AttendanceRecords")
                         .HasForeignKey("CourseSessionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("UniAttend.Core.Entities.Student", "Student")
                         .WithMany()
@@ -781,6 +746,8 @@ namespace UniAttend.Infrastructure.Migrations
                     b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
                         .WithMany("AttendanceRecords")
                         .HasForeignKey("StudyGroupId");
+
+                    b.Navigation("Class");
 
                     b.Navigation("Course");
 

@@ -91,7 +91,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useOtpStore } from '@/stores/otp.store'
+// import { useOtpStore } from '@/stores/otp.store'
 import Button from '@/shared/components/ui/Button.vue'
 
 const router = useRouter()

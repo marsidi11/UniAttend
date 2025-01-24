@@ -62,7 +62,7 @@ export interface AttendanceRecordDto {
   checkInMethod?: string | null;
   isConfirmed?: boolean;
   courseName?: string | null;
-  professor?: string | null;
+  professorName?: string | null;
 }
 
 export interface AttendanceReportDto {
@@ -236,13 +236,6 @@ export interface EnrollStudentsCommand {
   studentIds?: number[] | null;
 }
 
-export interface GenerateOtpRequest {
-  /** @format int32 */
-  classId?: number;
-  /** @format int32 */
-  studentId?: number;
-}
-
 export interface GroupReportDto {
   /** @format int32 */
   studyGroupId?: number;
@@ -297,29 +290,6 @@ export interface OpenClassCommand {
   endTime?: TimeSpan;
 }
 
-export interface OtpCode {
-  /** @format int32 */
-  id?: number;
-  /** @format date-time */
-  createdAt?: string;
-  /** @format date-time */
-  updatedAt?: string | null;
-  /** @format int32 */
-  studentId?: number;
-  /** @format int32 */
-  classId?: number;
-  code?: string | null;
-  /** @format date-time */
-  expiryTime?: string;
-  isUsed?: boolean;
-}
-
-export interface OtpValidationResponse {
-  isValid?: boolean;
-  message?: string | null;
-  attendanceRecord?: AttendanceRecordDto;
-}
-
 export interface ProblemDetails {
   type?: string | null;
   title?: string | null;
@@ -356,6 +326,7 @@ export interface RecordOtpAttendanceCommand {
   studentId?: number;
   /** @format int32 */
   classId?: number;
+  verificationType?: VerificationType;
 }
 
 export interface RefreshTokenCommand {
@@ -508,6 +479,11 @@ export interface TimeSpan {
   totalMinutes?: number;
   /** @format double */
   totalSeconds?: number;
+}
+
+export interface TotpSetupDto {
+  secretKey?: string | null;
+  qrCodeUri?: string | null;
 }
 
 export interface TransferStudentCommand {
@@ -672,8 +648,8 @@ export enum UserRole {
   Value4 = 4,
 }
 
-export interface ValidateOtpRequest {
-  code?: string | null;
-  /** @format int32 */
-  classId?: number;
+/** @format int32 */
+export enum VerificationType {
+  Value0 = 0,
+  Value1 = 1,
 }

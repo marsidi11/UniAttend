@@ -58,5 +58,12 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(s => s.Department)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
+
+        public async Task<Student?> GetByIdWithUserAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+        }
     }
 }

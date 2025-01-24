@@ -24,7 +24,7 @@ namespace UniAttend.Core.Interfaces.Repositories
 
         Task<bool> HasClassroomConflictAsync(int classroomId, int dayOfWeek, TimeSpan startTime, TimeSpan endTime, int? excludeScheduleId = null, CancellationToken cancellationToken = default);
 
-        Task<bool> HasGroupConflictAsync(int groupId, int dayOfWeek, TimeSpan startTime, TimeSpan endTime, int? excludeScheduleId = null, CancellationToken cancellationToken = default);
+        Task<bool> HasGroupConflictAsync(int studyGroupId, int dayOfWeek, TimeSpan startTime, TimeSpan endTime, int? excludeScheduleId = null, CancellationToken cancellationToken = default);
     }
 
 

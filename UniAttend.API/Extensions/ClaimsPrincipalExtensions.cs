@@ -17,5 +17,15 @@ namespace UniAttend.API.Extensions
 
             return userId;
         }
+
+        public static string GetEmail(this ClaimsPrincipal principal)
+        {
+            var claim = principal.FindFirst(ClaimTypes.Email);
+
+            if (claim == null)
+                throw new InvalidOperationException("Email claim not found");
+
+            return claim.Value;
+        }
     }
 }

@@ -25,6 +25,7 @@ namespace UniAttend.Core.Entities.Attendance
     
         // Navigation properties - nullable for EF Core
         public Course? Course { get; private set; }
+        public CourseSession Class { get; set; } = null!;
         public Student? Student { get; private set; }
     
         // Domain methods

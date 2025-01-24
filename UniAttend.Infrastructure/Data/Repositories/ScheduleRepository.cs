@@ -130,7 +130,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
         }
 
         public async Task<bool> HasGroupConflictAsync(
-            int groupId,
+            int studyGroupId,
             int dayOfWeek,
             TimeSpan startTime,
             TimeSpan endTime,
@@ -138,7 +138,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
             CancellationToken cancellationToken = default)
         {
             var query = DbSet.Where(s => 
-                s.StudyGroupId == groupId && 
+                s.StudyGroupId == studyGroupId && 
                 s.DayOfWeek == dayOfWeek);
 
             if (excludeScheduleId.HasValue)

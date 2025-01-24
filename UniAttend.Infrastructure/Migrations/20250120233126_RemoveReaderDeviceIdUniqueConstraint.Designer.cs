@@ -48,7 +48,7 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("StudyGroupId")
                         .HasColumnType("int");
 
                     b.Property<int>("StudentId")
@@ -62,9 +62,9 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("EmailSent");
 
-                    b.HasIndex("GroupId");
+                    b.HasIndex("StudyGroupId");
 
-                    b.HasIndex("StudentId", "GroupId");
+                    b.HasIndex("StudentId", "StudyGroupId");
 
                     b.ToTable("AbsenceAlerts", (string)null);
                 });
@@ -186,7 +186,7 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time(6)");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("StudyGroupId")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("StartTime")
@@ -209,7 +209,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("Date");
 
-                    b.HasIndex("GroupId");
+                    b.HasIndex("StudyGroupId");
 
                     b.ToTable("CourseSessions", (string)null);
                 });
@@ -456,7 +456,7 @@ namespace UniAttend.Infrastructure.Migrations
                         .HasColumnName("CreatedAt")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("StudyGroupId")
                         .HasColumnType("int");
 
                     b.Property<int>("StudentId")
@@ -470,7 +470,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.HasIndex("GroupId", "StudentId")
+                    b.HasIndex("StudyGroupId", "StudentId")
                         .IsUnique();
 
                     b.ToTable("GroupStudents", (string)null);
@@ -594,7 +594,7 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time(6)");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("StudyGroupId")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("StartTime")
@@ -609,7 +609,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GroupId");
+                    b.HasIndex("StudyGroupId");
 
                     b.HasIndex("StudyGroupId");
 
@@ -756,7 +756,7 @@ namespace UniAttend.Infrastructure.Migrations
                 {
                     b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
                         .WithMany()
-                        .HasForeignKey("GroupId")
+                        .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -811,7 +811,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasOne("UniAttend.Core.Entities.StudyGroup", "Group")
                         .WithMany()
-                        .HasForeignKey("GroupId")
+                        .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -841,7 +841,7 @@ namespace UniAttend.Infrastructure.Migrations
                 {
                     b.HasOne("UniAttend.Core.Entities.StudyGroup", "Group")
                         .WithMany("Students")
-                        .HasForeignKey("GroupId")
+                        .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -894,7 +894,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
                         .WithMany()
-                        .HasForeignKey("GroupId")
+                        .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

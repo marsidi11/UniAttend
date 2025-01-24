@@ -38,6 +38,7 @@ namespace UniAttend.Core.Entities.Identity
         public string LastName { get; private set; } = string.Empty;
         public string? RefreshToken { get; private set; }
         public DateTime? RefreshTokenExpiryTime { get; private set; }
+        public string? TotpSecret { get; private set; }
         
         public virtual Professor? Professor { get; private set; }
         public virtual Student? Student { get; private set; }
@@ -64,6 +65,14 @@ namespace UniAttend.Core.Entities.Identity
         {
             RefreshToken = refreshToken;
             RefreshTokenExpiryTime = expiryTime;
+        }
+
+        public void SetupTwoFactor(string secretKey)
+        {
+            if (string.IsNullOrWhiteSpace(secretKey))
+                throw new ArgumentException("Secret key cannot be empty", nameof(secretKey));
+
+            TotpSecret = secretKey;
         }
 
         private static void ValidateUsername(string username)

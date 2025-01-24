@@ -26,7 +26,6 @@ namespace UniAttend.Infrastructure.Data
         public DbSet<StudyGroup> StudyGroups { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<CourseSession> CourseSession { get; set; }
-        public DbSet<OtpCode> OtpCodes { get; set; }
         public DbSet<GroupStudent> GroupStudents { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
 

@@ -47,14 +47,12 @@ namespace UniAttend.Infrastructure
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<IClassroomRepository, ClassroomRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-            services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
             services.AddScoped<IAbsenceAlertRepository, AbsenceAlertRepository>();
             services.AddScoped<ICourseSessionRepository, CourseSessionRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IAcademicYearRepository, AcademicYearRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
-
 
             // Register Core Services
             services.AddSingleton<IExceptionHandler, ExceptionHandler>();
@@ -63,13 +61,13 @@ namespace UniAttend.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<IOtpService, OtpService>();
             services.AddScoped<ICardReaderService, CardReaderService>();
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IPrintService, PdfPrintService>();
-            services.AddScoped<INetworkValidationService, NetworkValidationService>();
+            services.AddScoped<ITotpService, TotpService>();
+            services.AddScoped<IRateLimiter, RateLimiter>();
 
             // Add AutoMapper for Infrastructure layer
             services.AddAutoMapper(Assembly.GetExecutingAssembly());

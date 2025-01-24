@@ -8,6 +8,8 @@ using UniAttend.Application.Features.Attendance.Queries.GetClassAttendance;
 using UniAttend.Application.Features.Attendance.Queries.GetStudentAttendance;
 using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.API.Extensions;
+using UniAttend.Core.Enums;
+using UniAttend.Application.Features.Attendance.Commands.SetupTotp;
 
 namespace UniAttend.API.Controllers
 {
@@ -23,6 +25,19 @@ namespace UniAttend.API.Controllers
             _mediator = mediator;
         }
 
+        [Authorize(Roles = "Student")]
+        [HttpPost("setup-totp")]
+        public async Task<ActionResult<TotpSetupDto>> SetupTotpAttendance()
+        {
+            var command = new SetupTotpCommand
+            {
+                StudentId = User.GetUserId(),
+                Email = User.GetEmail()
+            };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
         [HttpPost("card")]
         public async Task<IActionResult> RecordCardAttendance(RecordCardAttendanceCommand command)
         {
@@ -34,6 +49,7 @@ namespace UniAttend.API.Controllers
         public async Task<IActionResult> RecordOtpAttendance(RecordOtpAttendanceCommand command)
         {
             command.StudentId = User.GetUserId();
+            command.VerificationType = VerificationType.Totp;
             var result = await _mediator.Send(command);
             return Ok(result);
         }

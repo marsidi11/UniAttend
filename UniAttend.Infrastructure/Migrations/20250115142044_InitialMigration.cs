@@ -129,7 +129,7 @@ namespace UniAttend.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     StudentId = table.Column<int>(type: "int", nullable: false),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    StudyGroupId = table.Column<int>(type: "int", nullable: false),
                     AbsencePercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
                     EmailSent = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -196,7 +196,7 @@ namespace UniAttend.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    StudyGroupId = table.Column<int>(type: "int", nullable: false),
                     ClassroomId = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -231,7 +231,6 @@ namespace UniAttend.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
                     StudentId = table.Column<int>(type: "int", nullable: false),
                     StudyGroupId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -346,7 +345,6 @@ namespace UniAttend.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
                     ClassroomId = table.Column<int>(type: "int", nullable: false),
                     DayOfWeek = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "time(6)", nullable: false),
@@ -366,7 +364,7 @@ namespace UniAttend.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Schedules_StudyGroups_GroupId",
-                        column: x => x.GroupId,
+                        column: x => x.StudyGroupId,
                         principalTable: "StudyGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -417,12 +415,12 @@ namespace UniAttend.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AbsenceAlerts_GroupId",
                 table: "AbsenceAlerts",
-                column: "GroupId");
+                column: "StudyGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbsenceAlerts_StudentId_GroupId",
                 table: "AbsenceAlerts",
-                columns: new[] { "StudentId", "GroupId" });
+                columns: new[] { "StudentId", "StudyGroupId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AttendanceRecords_CourseId",
@@ -490,12 +488,12 @@ namespace UniAttend.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_CourseSessions_GroupId",
                 table: "CourseSessions",
-                column: "GroupId");
+                column: "StudyGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupStudents_GroupId_StudentId",
                 table: "GroupStudents",
-                columns: new[] { "GroupId", "StudentId" },
+                columns: new[] { "StudyGroupId", "StudentId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -532,7 +530,7 @@ namespace UniAttend.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Schedules_GroupId",
                 table: "Schedules",
-                column: "GroupId");
+                column: "StudyGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Schedules_StudyGroupId",
@@ -605,7 +603,7 @@ namespace UniAttend.Infrastructure.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_AbsenceAlerts_StudyGroups_GroupId",
                 table: "AbsenceAlerts",
-                column: "GroupId",
+                column: "StudyGroupId",
                 principalTable: "StudyGroups",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
@@ -660,7 +658,7 @@ namespace UniAttend.Infrastructure.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_CourseSessions_StudyGroups_GroupId",
                 table: "CourseSessions",
-                column: "GroupId",
+                column: "StudyGroupId",
                 principalTable: "StudyGroups",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
@@ -676,7 +674,7 @@ namespace UniAttend.Infrastructure.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_GroupStudents_StudyGroups_GroupId",
                 table: "GroupStudents",
-                column: "GroupId",
+                column: "StudyGroupId",
                 principalTable: "StudyGroups",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);

@@ -11,7 +11,6 @@ import { Subjects } from './generated/Subjects';
 import { Schedule } from './generated/Schedule';
 import { AcademicYear } from './generated/AcademicYear';
 import { Attendance } from './generated/Attendance';
-import { Otp } from './generated/Otp';
 import { Reports } from './generated/Reports';
 // import { Cards } from './generated/Cards';
 
@@ -31,6 +30,5 @@ export const subjectApi = new Subjects(config);
 export const scheduleApi = new Schedule(config);
 export const academicYearApi = new AcademicYear(config);
 export const attendanceApi = new Attendance(config);
-export const otpApi = new Otp(config);
 export const reportApi = new Reports(config);
 // export const cardApi = new Cards(config);

@@ -1,5 +1,6 @@
 using MediatR;
 using UniAttend.Application.Features.Attendance.DTOs;
+using UniAttend.Core.Enums;
 
 namespace UniAttend.Application.Features.Attendance.Commands.RecordOtpAttendance
 {
@@ -8,5 +9,6 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordOtpAttendance
         public string OtpCode { get; set; } = string.Empty;
         public int StudentId { get; set; }
         public int ClassId { get; set; }
+        public VerificationType VerificationType { get; set; }
     }
 }

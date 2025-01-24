@@ -22,7 +22,6 @@ namespace UniAttend.Infrastructure.Data
         private ISubjectRepository? _subjects;
         private IReportRepository? _reports;
         private IStudyGroupRepository? _studyGroups;
-        private IOtpCodeRepository? _otpCodes;
         private ICourseSessionRepository? _courseSessions;
         private IClassroomRepository? _classrooms;
         private IAbsenceAlertRepository? _absenceAlerts;
@@ -66,9 +65,6 @@ namespace UniAttend.Infrastructure.Data
 
         public IReportRepository Reports =>
             _reports ??= new ReportRepository(_context);
-
-        public IOtpCodeRepository OtpCodes =>
-            _otpCodes ??= new OtpCodeRepository(_context);
         
         public ICourseSessionRepository CourseSessions =>
             _courseSessions ??= new CourseSessionRepository(_context);

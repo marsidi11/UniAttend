@@ -73,10 +73,14 @@
               <span class="sm:hidden">{{ day.label.substr(0, 3) }}</span>
             </div>
             <div v-for="time in timeSlots" :key="`${day.value}-${time}`"
-              class="h-24 sm:h-28 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1 sm:p-2 rounded">
-              <ScheduleSlot :schedules="getSchedulesForSlot(day.value, time)" :current-time="`${time}:00`"
-                @click="slot => handleSlotClick(slot)" @delete="handleDelete" />
-            </div>
+  class="h-32 sm:h-40 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1.5 sm:p-3 rounded">
+  <ScheduleSlot 
+    :schedules="getSchedulesForSlot(day.value, time)" 
+    :current-time="`${time}:00`"
+    @click="slot => handleSlotClick(slot)" 
+    @delete="handleDelete" 
+  />
+</div>
           </div>
         </div>
       </div>
