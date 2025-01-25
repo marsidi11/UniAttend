@@ -32,7 +32,7 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Commands.GenerateAbsenceA
             var student = await _unitOfWork.Students.GetByIdWithDetailsAsync(request.StudentId, cancellationToken)
                 ?? throw new NotFoundException($"Student with ID {request.StudentId} not found");
         
-            var group = await _unitOfWork.StudyGroups.GetByIdWithDetailsAsync(request.StudyGroupId, cancellationToken)
+            var studyGroup = await _unitOfWork.StudyGroups.GetByIdWithDetailsAsync(request.StudyGroupId, cancellationToken)
                 ?? throw new NotFoundException($"StudyGroup with ID {request.StudyGroupId} not found");
         
             if (student.User?.Email == null)
@@ -48,7 +48,7 @@ namespace UniAttend.Application.Features.AbsenceAlerts.Commands.GenerateAbsenceA
             await _emailService.SendAbsenceAlertAsync(
                 student.User.Email,
                 $"{student.User.FirstName} {student.User.LastName}",
-                group.Subject?.Name ?? "Unknown Subject",
+                studyGroup.Subject?.Name ?? "Unknown Subject",
                 request.AbsencePercentage,
                 cancellationToken);
         

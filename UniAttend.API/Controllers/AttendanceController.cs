@@ -4,7 +4,7 @@ using MediatR;
 using UniAttend.Application.Features.Attendance.Commands.ConfirmAttendance;
 using UniAttend.Application.Features.Attendance.Commands.RecordCardAttendance;
 using UniAttend.Application.Features.Attendance.Commands.RecordOtpAttendance;
-using UniAttend.Application.Features.Attendance.Queries.GetClassAttendance;
+using UniAttend.Application.Features.Attendance.Queries.GetCourseSessionAttendance;
 using UniAttend.Application.Features.Attendance.Queries.GetStudentAttendance;
 using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.API.Extensions;
@@ -55,12 +55,12 @@ namespace UniAttend.API.Controllers
         }
 
         [Authorize(Roles = "Professor")]
-        [HttpPost("classes/{classId}/confirm")]
-        public async Task<IActionResult> ConfirmAttendance(int classId)
+        [HttpPost("courseSessions/{courseSessionId}/confirm")]
+        public async Task<IActionResult> ConfirmAttendance(int courseSessionId)
         {
             var command = new ConfirmAttendanceCommand
             {
-                ClassId = classId,
+                CourseSessionId = courseSessionId,
                 ProfessorId = User.GetUserId()
             };
             await _mediator.Send(command);
@@ -70,16 +70,16 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets attendance records for a specific class
         /// </summary>
-        [HttpGet("classes/{classId}")]
+        [HttpGet("courseSessions/{courseSessionId}")]
         [Authorize(Roles = "Professor")]
-        public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetClassAttendance(
-            int classId,
+        public async Task<ActionResult<IEnumerable<AttendanceRecordDto>>> GetCourseSessionAttendance(
+            int courseSessionId,
             [FromQuery] DateTime? date,
             CancellationToken cancellationToken)
         {
-            var query = new GetClassAttendanceQuery
+            var query = new GetCourseSessionAttendanceQuery
             {
-                ClassId = classId,
+                CourseSessionId = courseSessionId,
                 Date = date
             };
             var result = await _mediator.Send(query, cancellationToken);

@@ -32,12 +32,12 @@ export const rolePermissions: RolePermissions = {
     'generateAttendanceLists', // Generate group attendance lists
     'viewOwnSchedule',      // View assigned schedule
     'viewOwnGroups',        // View assigned groups
-    'manageOwnClasses'      // Manage own class sessions
+    'manageOwncourseSessions'      // Manage own class sessions
   ],
   
   Student: [
     'viewAttendance',       // View personal attendance records
-    'checkIn',              // Check-in to classes (card/OTP)
+    'checkIn',              // Check-in to courseSessions (card/OTP)
     'viewSchedule',         // View personal schedule
     'viewAbsenceStatus',    // View absence percentages
     'useOtpSystem',         // Use OTP for attendance

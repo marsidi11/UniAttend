@@ -2,8 +2,8 @@ namespace UniAttend.Core.Entities.Stats
 {
     public class AttendanceStats
     {
-        public int TotalClasses { get; set; }
-        public int AttendedClasses { get; set; }
+        public int TotalCourseSessions { get; set; }
+        public int AttendedcourseSessions { get; set; }
         public decimal AverageAttendance { get; set; }
         public decimal AttendanceRate { get; set; }
         public int? AbsentStudents { get; set; }

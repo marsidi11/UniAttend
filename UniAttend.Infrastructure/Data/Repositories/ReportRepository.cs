@@ -23,7 +23,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
             CancellationToken cancellationToken = default)
         {
             var query = _context.Set<AttendanceRecord>()
-                .Include(ar => ar.Course!)
+                .Include(ar => ar.CourseSession!)
                     .ThenInclude(c => c.StudyGroup!)
                         .ThenInclude(sg => sg.Subject!)
                             .ThenInclude(s => s.Department)
@@ -32,23 +32,23 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
             if (departmentId.HasValue)
             {
-                query = query.Where(ar => ar.Course != null && 
-                                        ar.Course.StudyGroup != null && 
-                                        ar.Course.StudyGroup.Subject != null && 
-                                        ar.Course.StudyGroup.Subject.DepartmentId == departmentId.Value);
+                query = query.Where(ar => ar.CourseSession != null && 
+                                        ar.CourseSession.StudyGroup != null && 
+                                        ar.CourseSession.StudyGroup.Subject != null && 
+                                        ar.CourseSession.StudyGroup.Subject.DepartmentId == departmentId.Value);
             }
 
             if (subjectId.HasValue)
             {
-                query = query.Where(ar => ar.Course != null && 
-                                        ar.Course.StudyGroup != null && 
-                                        ar.Course.StudyGroup.SubjectId == subjectId.Value);
+                query = query.Where(ar => ar.CourseSession != null && 
+                                        ar.CourseSession.StudyGroup != null && 
+                                        ar.CourseSession.StudyGroup.SubjectId == subjectId.Value);
             }
 
             if (studyGroupId.HasValue)
             {
-                query = query.Where(ar => ar.Course != null && 
-                                        ar.Course.StudyGroupId == studyGroupId.Value);
+                query = query.Where(ar => ar.CourseSession != null && 
+                                        ar.CourseSession.StudyGroupId == studyGroupId.Value);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -63,12 +63,12 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Where(sg => sg.IsActive)
                 .ToListAsync(cancellationToken);
 
-            foreach (var group in activeGroups)
+            foreach (var studyGroup in activeGroups)
             {
                 var enrolledStudents = await _context.Set<GroupStudent>()
                     .Include(gs => gs.Student!)
                         .ThenInclude(s => s.User)
-                    .Where(gs => gs.StudyGroupId == group.Id && gs.Student != null)
+                    .Where(gs => gs.StudyGroupId == studyGroup.Id && gs.Student != null)
                     .ToListAsync(cancellationToken);
 
                 foreach (var enrollment in enrolledStudents)
@@ -77,7 +77,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
                     
                     var attendancePercentage = await CalculateStudentAttendancePercentage(
                         enrollment.StudentId,
-                        group.Id,
+                        studyGroup.Id,
                         cancellationToken);
 
                     if ((100 - attendancePercentage) >= absenceThreshold &&
@@ -96,23 +96,23 @@ namespace UniAttend.Infrastructure.Data.Repositories
             int studyGroupId,
             CancellationToken cancellationToken)
         {
-            var totalClasses = await _context.Set<Course>()
+            var totalCourseSessions = await _context.Set<CourseSession>()
                 .CountAsync(c => c.StudyGroupId == studyGroupId && c.IsActive, cancellationToken);
 
-            if (totalClasses == 0)
+            if (totalCourseSessions == 0)
             {
-                return 100; // No classes held yet
+                return 100; // No courseSessions held yet
             }
 
-            var attendedClasses = await _context.Set<AttendanceRecord>()
+            var attendedCourseSessions = await _context.Set<AttendanceRecord>()
                 .CountAsync(ar =>
                     ar.StudentId == studentId &&
-                    ar.Course != null &&
-                    ar.Course.StudyGroupId == studyGroupId &&
+                    ar.CourseSession != null &&
+                    ar.CourseSession.StudyGroupId == studyGroupId &&
                     ar.IsConfirmed,
                     cancellationToken);
 
-            return (double)attendedClasses / totalClasses * 100;
+            return (double)attendedCourseSessions / totalCourseSessions * 100;
         }
     }
 }

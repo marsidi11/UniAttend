@@ -77,7 +77,7 @@
       label: 'Group',
       render: (value: any) => {
         const group = value as ExtendedAlert['group']
-        return group?.name ?? ''
+        return studyGroup?.name ?? ''
       }
     },
     { 

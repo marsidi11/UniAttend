@@ -4,8 +4,8 @@ namespace UniAttend.Application.Features.Users.DTOs
 {
     public record AttendanceStatsDto
     {
-        public int TotalClasses { get; init; }
-        public int AttendedClasses { get; init; }
+        public int TotalCourseSessions { get; init; }
+        public int AttendedcourseSessions { get; init; }
         public decimal AttendanceRate { get; init; }
     }
 }

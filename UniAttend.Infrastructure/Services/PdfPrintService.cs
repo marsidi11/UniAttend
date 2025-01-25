@@ -54,11 +54,11 @@ namespace UniAttend.Infrastructure.Services
                 table.AddHeaderCell("Time");
 
                 foreach (var record in records.Where(r => r.Student?.User != null &&
-                                                        r.Course?.StudyGroup?.Subject != null))
+                                                        r.CourseSession?.StudyGroup?.Subject != null))
                 {
                     table.AddCell(record.CheckInTime.ToString("d"));
                     table.AddCell($"{record.Student!.User!.FirstName} {record.Student.User.LastName}");
-                    table.AddCell(record.Course!.StudyGroup!.Subject!.Name);
+                    table.AddCell(record.CourseSession!.StudyGroup!.Subject!.Name);
                     table.AddCell(record.IsConfirmed ? "Present" : "Pending");
                     table.AddCell(record.CheckInTime.ToString("t"));
                 }
@@ -96,8 +96,8 @@ namespace UniAttend.Infrastructure.Services
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetFontSize(20));
 
-                document.Add(new Paragraph($"Class: {session.Course?.Name ?? "N/A"}")
-                    .SetTextAlignment(TextAlignment.CENTER));
+                // document.Add(new Paragraph($"Class: {session.Course?.Name ?? "N/A"}")
+                    // .SetTextAlignment(TextAlignment.CENTER));
                 document.Add(new Paragraph($"Date: {session.Date:d}")
                     .SetTextAlignment(TextAlignment.CENTER));
 

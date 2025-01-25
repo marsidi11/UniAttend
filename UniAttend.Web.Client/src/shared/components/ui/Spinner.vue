@@ -3,7 +3,7 @@
     :class="[
       'inline-block animate-spin rounded-full border-4 border-solid',
       `h-${size} w-${size}`,
-      colorClasses[color]
+      colorcourseSessions[color]
     ]"
     role="status"
   >
@@ -25,7 +25,7 @@ withDefaults(defineProps<Props>(), {
   color: 'primary'
 })
 
-const colorClasses: Record<Color, string> = {
+const colorcourseSessions: Record<Color, string> = {
   primary: 'border-indigo-600 border-r-transparent',
   white: 'border-white border-r-transparent'
 } as const

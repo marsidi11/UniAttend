@@ -1,7 +1,7 @@
 namespace UniAttend.Application.Features.Students.DTOs
 {
     /// <summary>
-    /// Data transfer object representing a study group.
+    /// Data transfer object representing a study studyGroup.
     /// </summary>
     public record GroupDto(
         int Id,

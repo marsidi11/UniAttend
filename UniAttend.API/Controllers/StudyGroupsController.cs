@@ -1,13 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniAttend.Application.Features.StudyGroups.Commands.CreateGroup;
-using UniAttend.Application.Features.StudyGroups.Commands.UpdateGroup;
+using UniAttend.Application.Features.StudyGroups.Commands.CreateStudyGroup;
+using UniAttend.Application.Features.StudyGroups.Commands.UpdateStudyGroup;
 using UniAttend.Application.Features.StudyGroups.Commands.EnrollStudents;
-using UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromGroup;
+using UniAttend.Application.Features.StudyGroups.Commands.RemoveStudentFromStudyGroup;
 using UniAttend.Application.Features.StudyGroups.Commands.TransferStudent;
-using UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents;
-using UniAttend.Application.Features.StudyGroups.Queries.GetProfessorGroups;
+using UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroupStudents;
+using UniAttend.Application.Features.StudyGroups.Queries.GetProfessorStudyGroups;
 using UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroups;
 using UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroupById;
 using UniAttend.Application.Features.StudyGroups.DTOs;
@@ -27,36 +27,36 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet]
-[Authorize(Roles = "Admin,Secretary,Professor")] 
-public async Task<ActionResult<IEnumerable<StudyGroupDto>>> GetAll(
+        [Authorize(Roles = "Admin,Secretary,Professor")]
+        public async Task<ActionResult<IEnumerable<StudyGroupDto>>> GetAll(
     [FromQuery] int? academicYearId,
     CancellationToken cancellationToken)
-{
-    var query = new GetStudyGroupsQuery { AcademicYearId = academicYearId };
-    var result = await _mediator.Send(query, cancellationToken);
-    return Ok(result);
-}
+        {
+            var query = new GetStudyGroupsQuery { AcademicYearId = academicYearId };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
 
         [HttpGet("{id}")]
-[Authorize(Roles = "Admin,Secretary,Professor")]
-public async Task<ActionResult<StudyGroupDto>> GetById(
+        [Authorize(Roles = "Admin,Secretary,Professor")]
+        public async Task<ActionResult<StudyGroupDto>> GetById(
     int id,
     CancellationToken cancellationToken)
-{
-    var query = new GetStudyGroupByIdQuery { Id = id };
-    var result = await _mediator.Send(query, cancellationToken);
-    return result != null ? Ok(result) : NotFound();
-}
+        {
+            var query = new GetStudyGroupByIdQuery { Id = id };
+            var result = await _mediator.Send(query, cancellationToken);
+            return result != null ? Ok(result) : NotFound();
+        }
 
         [HttpGet("professor/{professorId}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
-        public async Task<ActionResult<IEnumerable<StudyGroupDto>>> GetProfessorGroups(
+        public async Task<ActionResult<IEnumerable<StudyGroupDto>>> GetProfessorStudyGroups(
             int professorId,
             [FromQuery] int? academicYearId,
             CancellationToken cancellationToken)
         {
-            var query = new GetProfessorGroupsQuery 
-            { 
+            var query = new GetProfessorStudyGroupsQuery
+            {
                 ProfessorId = professorId,
                 AcademicYearId = academicYearId
             };
@@ -66,10 +66,10 @@ public async Task<ActionResult<StudyGroupDto>> GetById(
 
         [HttpGet("{id}/students")]
         public async Task<ActionResult<IEnumerable<GroupStudentDto>>> GetStudents(
-            int id, 
+            int id,
             CancellationToken cancellationToken)
         {
-            var query = new GetGroupStudentsQuery { StudyGroupId = id };
+            var query = new GetStudyGroupStudentsQuery { StudyGroupId = id };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
@@ -77,7 +77,7 @@ public async Task<ActionResult<StudyGroupDto>> GetById(
         [HttpPost]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<ActionResult<StudyGroupDto>> Create(
-            [FromBody] CreateGroupCommand command,
+            [FromBody] CreateStudyGroupCommand command,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
@@ -88,7 +88,7 @@ public async Task<ActionResult<StudyGroupDto>> GetById(
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<IActionResult> Update(
             int id,
-            [FromBody] UpdateGroupCommand command,
+            [FromBody] UpdateStudyGroupCommand command,
             CancellationToken cancellationToken)
         {
             if (id != command.Id)
@@ -101,7 +101,7 @@ public async Task<ActionResult<StudyGroupDto>> GetById(
         [HttpPost("{id}/students/enroll")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<IActionResult> EnrollStudents(
-            int id, 
+            int id,
             [FromBody] EnrollStudentsCommand command,
             CancellationToken cancellationToken)
         {
@@ -119,8 +119,8 @@ public async Task<ActionResult<StudyGroupDto>> GetById(
             int studentId,
             CancellationToken cancellationToken)
         {
-            var command = new RemoveStudentFromGroupCommand 
-            { 
+            var command = new RemoveStudentFromStudyGroupCommand
+            {
                 StudyGroupId = studyGroupId,
                 StudentId = studentId
             };

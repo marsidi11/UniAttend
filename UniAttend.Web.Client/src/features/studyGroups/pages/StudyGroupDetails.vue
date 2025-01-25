@@ -28,21 +28,21 @@
         <dl class="space-y-4">
           <div>
             <dt class="text-sm font-medium text-gray-500">Name</dt>
-            <dd class="mt-1 text-sm text-gray-900">{{ group?.name }}</dd>
+            <dd class="mt-1 text-sm text-gray-900">{{ studyGroup?.name }}</dd>
           </div>
           <div>
             <dt class="text-sm font-medium text-gray-500">Subject</dt>
-            <dd class="mt-1 text-sm text-gray-900">{{ group?.subjectName }}</dd>
+            <dd class="mt-1 text-sm text-gray-900">{{ studyGroup?.subjectName }}</dd>
           </div>
           <div>
             <dt class="text-sm font-medium text-gray-500">Professor</dt>
-            <dd class="mt-1 text-sm text-gray-900">{{ group?.professorName }}</dd>
+            <dd class="mt-1 text-sm text-gray-900">{{ studyGroup?.professorName }}</dd>
           </div>
           <div>
             <dt class="text-sm font-medium text-gray-500">Status</dt>
             <dd class="mt-1">
-              <Badge :status="group?.isActive ? 'success' : 'error'">
-                {{ group?.isActive ? 'Active' : 'Inactive' }}
+              <Badge :status="studyGroup?.isActive ? 'success' : 'error'">
+                {{ studyGroup?.isActive ? 'Active' : 'Inactive' }}
               </Badge>
             </dd>
           </div>
@@ -53,9 +53,9 @@
       <div class="col-span-2 space-y-6">
         <!-- Stats Cards -->
         <div class="grid grid-cols-3 gap-4">
-          <StatCard title="Total Students" :value="group?.totalStudents || 0" />
-          <StatCard title="Average Attendance" :value="`${group?.averageAttendance || 0}%`" />
-          <StatCard title="Total Classes" :value="group?.totalClasses || 0" />
+          <StatCard title="Total Students" :value="studyGroup?.totalStudents || 0" />
+          <StatCard title="Average Attendance" :value="`${studyGroup?.averageAttendance || 0}%`" />
+          <StatCard title="Total courseSessions" :value="studyGroup?.totalCourseSessions || 0" />
         </div>
 
         <!-- Students List -->
@@ -74,7 +74,7 @@
 
     <!-- Modals -->
     <Modal v-model="showEditModal" title="Edit Group">
-      <StudyGroupForm v-if="showEditModal" :group="group" :subjects="subjects" @submit="handleUpdateGroup"
+      <StudyGroupForm v-if="showEditModal" :group="group" :subjects="subjects" @submit="handleUpdateStudyGroup"
         @cancel="showEditModal = false" />
     </Modal>
 
@@ -109,7 +109,7 @@ import EnrollStudentsForm from '../components/EnrollStudentsForm.vue'
 
 interface ExtendedGroupStats {
   averageAttendance: number
-  totalClasses: number
+  totalCourseSessions: number
   totalStudents: number
 }
 
@@ -118,7 +118,7 @@ export interface GroupStudent extends GroupStudentDto, TableItem {
   id: number
   fullName: string
   studentNumber: string 
-  attendedClasses: number
+  attendedCourseSessions: number
   attendanceRate: number 
 }
 
@@ -139,7 +139,7 @@ const group = computed<StudyGroup | null>(() => {
   return {
     ...baseGroup.value,
     averageAttendance: 0,
-    totalClasses: 0,
+    totalCourseSessions: 0,
     totalStudents: students.value.length
   }
 })
@@ -163,8 +163,8 @@ const studentColumns = [
     render: (value: number) => `${value}%`
   },
   {
-    key: 'attendedClasses',
-    label: 'Classes Attended'
+    key: 'attendedCourseSessions',
+    label: 'courseSessions Attended'
   }
 ]
 
@@ -204,7 +204,7 @@ async function loadStudents(studyGroupId: number) {
         id: student.studentId,
         fullName: student.studentName || '',
         studentNumber: student.studentNumber || '',
-        attendedClasses: 0,
+        attendedCourseSessions: 0,
         attendanceRate: 0
       })) as GroupStudent[]
     }
@@ -222,7 +222,7 @@ async function loadGroupStats(studyGroupId: number) {
       const updatedGroup: StudyGroup = {
         ...baseGroup.value,
         averageAttendance: report.averageAttendance ?? 0,
-        totalClasses: report.totalClasses ?? 0,
+        totalCourseSessions: report.totalCourseSessions ?? 0,
         totalStudents: students.value.length
       }
       baseGroup.value = updatedGroup
@@ -233,7 +233,7 @@ async function loadGroupStats(studyGroupId: number) {
           const studentStats = report.students?.find(s => s.studentId === student.studentId)
           return {
             ...student,
-            attendedClasses: studentStats?.attendedClasses ?? 0,
+            attendedCourseSessions: studentStats?.attendedCourseSessions ?? 0,
             attendanceRate: studentStats?.attendanceRate ?? 0
           }
         })
@@ -244,10 +244,10 @@ async function loadGroupStats(studyGroupId: number) {
   }
 }
 
-async function handleUpdateGroup(groupData: Partial<StudyGroup>) {
+async function handleUpdateStudyGroup(groupData: Partial<StudyGroup>) {
   try {
-    if (group.value?.id) {
-      await groupStore.updateGroup(group.value.id, groupData)
+    if (studyGroup.value?.id) {
+      await groupStore.updateGroup(studyGroup.value.id, groupData)
       await loadGroupData()
       showEditModal.value = false
     }
@@ -286,7 +286,7 @@ async function handleRemoveStudent(student: TableItem) {
     return
   }
 
-  if (confirm('Are you sure you want to remove this student from the group?')) {
+  if (confirm('Are you sure you want to remove this student from the studyGroup?')) {
     try {
       await groupStore.removeStudent(studyGroupId, groupStudent.studentId)
       await loadStudents(studyGroupId)

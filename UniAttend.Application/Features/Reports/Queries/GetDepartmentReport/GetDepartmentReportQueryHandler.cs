@@ -9,18 +9,18 @@ namespace UniAttend.Application.Features.Reports.Queries.GetDepartmentReport
     public class GetDepartmentReportQueryHandler : IRequestHandler<GetDepartmentReportQuery, DepartmentReportDto>
     {
         private readonly IDepartmentRepository _departmentRepository;
-        private readonly IStudyGroupRepository _groupRepository;
+        private readonly IStudyGroupRepository _studyGroupRepository;
         private readonly IAttendanceRecordRepository _attendanceRepository;
         private readonly ILogger<GetDepartmentReportQueryHandler> _logger;
 
         public GetDepartmentReportQueryHandler(
             IDepartmentRepository departmentRepository,
-            IStudyGroupRepository groupRepository,
+            IStudyGroupRepository studyGroupRepository,
             IAttendanceRecordRepository attendanceRepository,
             ILogger<GetDepartmentReportQueryHandler> logger)
         {
             _departmentRepository = departmentRepository;
-            _groupRepository = groupRepository;
+            _studyGroupRepository = studyGroupRepository;
             _attendanceRepository = attendanceRepository;
             _logger = logger;
         }
@@ -30,32 +30,32 @@ namespace UniAttend.Application.Features.Reports.Queries.GetDepartmentReport
             var department = await _departmentRepository.GetByIdAsync(request.DepartmentId, cancellationToken)
                 ?? throw new NotFoundException($"Department with ID {request.DepartmentId} not found");
 
-            var groups = await _groupRepository.GetByDepartmentIdAsync(
+            var studyGroups = await _studyGroupRepository.GetByDepartmentIdAsync(
                 request.DepartmentId,
                 request.AcademicYearId,
                 cancellationToken);
 
-            var groupSummaries = new List<GroupSummaryDto>();
+            var studyGroupSummaries = new List<StudyGroupSummaryDto>();
             var totalStudents = 0;
             decimal totalAttendance = 0;
 
-            foreach (var group in groups)
+            foreach (var studyGroup in studyGroups)
             {
                 var stats = await _attendanceRepository.GetGroupAttendanceReportAsync(
-                    group.Id,
+                    studyGroup.Id,
                     null,
                     null,
                     cancellationToken);
 
-                totalStudents += group.Students.Count;
+                totalStudents += studyGroup.Students.Count;
                 totalAttendance += stats.OverallAttendance;
 
-                groupSummaries.Add(new GroupSummaryDto
+                studyGroupSummaries.Add(new StudyGroupSummaryDto
                 {
-                    StudyGroupId = group.Id,
-                    GroupName = group.Name,
-                    SubjectName = group.Subject?.Name ?? "Unknown",
-                    EnrolledStudents = group.Students.Count,
+                    StudyGroupId = studyGroup.Id,
+                    StudyGroupName = studyGroup.Name,
+                    SubjectName = studyGroup.Subject?.Name ?? "Unknown",
+                    EnrolledStudents = studyGroup.Students.Count,
                     AttendanceRate = stats.OverallAttendance
                 });
             }
@@ -64,11 +64,11 @@ namespace UniAttend.Application.Features.Reports.Queries.GetDepartmentReport
             {
                 DepartmentId = department.Id,
                 DepartmentName = department.Name,
-                TotalGroups = groups.Count(),
+                TotalGroups = studyGroups.Count(),
                 TotalStudents = totalStudents,
-                TotalSubjects = groups.Select(g => g.SubjectId).Distinct().Count(),
-                AverageAttendance = groups.Any() ? totalAttendance / groups.Count() : 0,
-                Groups = groupSummaries
+                TotalSubjects = studyGroups.Select(g => g.SubjectId).Distinct().Count(),
+                AverageAttendance = studyGroups.Any() ? totalAttendance / studyGroups.Count() : 0,
+                Groups = studyGroupSummaries
             };
         }
     }

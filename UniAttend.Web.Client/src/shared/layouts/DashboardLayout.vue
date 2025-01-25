@@ -232,7 +232,7 @@ const navigationSections: NavigationSections = {
   ],
   Professor: [
     { to: '/dashboard/professor', icon: 'dashboard', text: 'Dashboard' },
-    { to: '/dashboard/attendance/manage', icon: 'how_to_reg', text: 'Manage Classes' },
+    { to: '/dashboard/attendance/manage', icon: 'how_to_reg', text: 'Manage courseSessions' },
     { to: '/dashboard/attendance/records', icon: 'fact_check', text: 'Attendance' },
     { to: '/dashboard/groups', icon: 'groups', text: 'My Groups' },
     { to: '/dashboard/reports', icon: 'analytics', text: 'Reports' }

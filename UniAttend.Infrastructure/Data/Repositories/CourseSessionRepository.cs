@@ -92,5 +92,17 @@ namespace UniAttend.Infrastructure.Data.Repositories
             if (conflictingSession)
                 throw new InvalidOperationException("There is a conflicting session in this classroom at the specified time.");
         }
+
+        public async Task<CourseSession?> GetActiveByDeviceIdAsync(string deviceId, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(cs => cs.StudyGroup)
+                .Include(cs => cs.Classroom)
+                .FirstOrDefaultAsync(cs =>
+                    cs.Classroom.ReaderDeviceId == deviceId &&
+                    cs.IsActive &&
+                    cs.Date.Date == DateTime.Today,
+                    cancellationToken);
+        }
     }
 }

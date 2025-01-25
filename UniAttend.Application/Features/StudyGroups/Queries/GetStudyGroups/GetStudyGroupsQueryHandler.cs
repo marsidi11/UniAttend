@@ -6,18 +6,18 @@ namespace UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroups
 {
     public class GetStudyGroupsQueryHandler : IRequestHandler<GetStudyGroupsQuery, IEnumerable<StudyGroupDto>>
     {
-        private readonly IStudyGroupRepository _groupRepository;
+        private readonly IStudyGroupRepository _studyGroupRepository;
 
-        public GetStudyGroupsQueryHandler(IStudyGroupRepository groupRepository)
+        public GetStudyGroupsQueryHandler(IStudyGroupRepository studyGroupRepository)
         {
-            _groupRepository = groupRepository;
+            _studyGroupRepository = studyGroupRepository;
         }
 
         public async Task<IEnumerable<StudyGroupDto>> Handle(GetStudyGroupsQuery request, CancellationToken cancellationToken)
         {
-            var groups = await _groupRepository.GetAllWithDetailsAsync(request.AcademicYearId, cancellationToken);
+            var studyGroups = await _studyGroupRepository.GetAllWithDetailsAsync(request.AcademicYearId, cancellationToken);
 
-            return groups.Select(g => new StudyGroupDto
+            return studyGroups.Select(g => new StudyGroupDto
             {
                 Id = g.Id,
                 Name = g.Name,

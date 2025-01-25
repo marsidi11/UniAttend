@@ -8,23 +8,23 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
 {
     public class GetGroupReportQueryHandler : IRequestHandler<GetGroupReportQuery, GroupReportDto>
     {
-        private readonly IStudyGroupRepository _groupRepository;
+        private readonly IStudyGroupRepository _studyGroupRepository;
         private readonly IAttendanceRecordRepository _attendanceRepository;
         private readonly ILogger<GetGroupReportQueryHandler> _logger;
 
         public GetGroupReportQueryHandler(
-            IStudyGroupRepository groupRepository,
+            IStudyGroupRepository studyGroupRepository,
             IAttendanceRecordRepository attendanceRepository,
             ILogger<GetGroupReportQueryHandler> logger)
         {
-            _groupRepository = groupRepository;
+            _studyGroupRepository = studyGroupRepository;
             _attendanceRepository = attendanceRepository;
             _logger = logger;
         }
 
         public async Task<GroupReportDto> Handle(GetGroupReportQuery request, CancellationToken cancellationToken)
         {
-            var group = await _groupRepository.GetByIdWithDetailsAsync(request.StudyGroupId, cancellationToken)
+            var studyGroup = await _studyGroupRepository.GetByIdWithDetailsAsync(request.StudyGroupId, cancellationToken)
                 ?? throw new NotFoundException($"StudyGroup with ID {request.StudyGroupId} not found");
 
             var attendanceStats = await _attendanceRepository.GetGroupAttendanceReportAsync(
@@ -34,7 +34,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
                 cancellationToken);
 
             var studentAttendance = new List<StudentAttendanceDto>();
-            foreach (var student in group.Students)
+            foreach (var student in studyGroup.Students)
             {
                 var stats = await _attendanceRepository.GetStudentGroupAttendanceAsync(
                     student.StudentId,
@@ -48,21 +48,21 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
                     StudentId = student.StudentId,
                     StudentNumber = student.Student?.StudentId ?? "Unknown",
                     FullName = $"{student.Student?.User?.FirstName} {student.Student?.User?.LastName}",
-                    AttendedClasses = stats.AttendedClasses,
-                    AttendanceRate = stats.TotalClasses > 0
-                        ? (decimal)stats.AttendedClasses / stats.TotalClasses * 100
+                    AttendedcourseSessions = stats.AttendedCourseSessions,
+                    AttendanceRate = stats.TotalCourseSessions > 0
+                        ? (decimal)stats.AttendedCourseSessions / stats.TotalCourseSessions * 100
                         : 0
                 });
             }
 
             return new GroupReportDto
             {
-                StudyGroupId = group.Id,
-                GroupName = group.Name,
-                SubjectName = group.Subject?.Name ?? "Unknown",
-                ProfessorName = $"{group.Professor?.User?.FirstName} {group.Professor?.User?.LastName}",
-                TotalStudents = group.Students.Count,
-                TotalClasses = attendanceStats.TotalClasses,
+                StudyGroupId = studyGroup.Id,
+                StudyGroupName = studyGroup.Name,
+                SubjectName = studyGroup.Subject?.Name ?? "Unknown",
+                ProfessorName = $"{studyGroup.Professor?.User?.FirstName} {studyGroup.Professor?.User?.LastName}",
+                TotalStudents = studyGroup.Students.Count,
+                TotalCourseSessions = attendanceStats.TotalCourseSessions,
                 AverageAttendance = attendanceStats.OverallAttendance,
                 Students = studentAttendance
             };

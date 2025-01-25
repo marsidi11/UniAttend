@@ -9,19 +9,19 @@
  * ---------------------------------------------------------------
  */
 
-import { ClassDto, OpenClassCommand, ProblemDetails } from "./data-contracts";
+import { CourseSessionDto, OpenCourseSessionCommand, ProblemDetails } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class courseSessions<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
-   * @tags Classes
-   * @name ClassesList
-   * @request GET:/api/Classes
+   * @tags courseSessions
+   * @name courseSessionsList
+   * @request GET:/api/courseSessions
    * @secure
    */
-  classesList = (
+  courseSessionsList = (
     query?: {
       /** @format int32 */
       studyGroupId?: number;
@@ -32,8 +32,8 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
     },
     params: RequestParams = {},
   ) =>
-    this.request<ClassDto[], any>({
-      path: `/api/Classes`,
+    this.request<CourseSessionDto[], any>({
+      path: `/api/courseSessions`,
       method: "GET",
       query: query,
       secure: true,
@@ -43,14 +43,14 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
   /**
    * No description
    *
-   * @tags Classes
-   * @name ClassesCreate
-   * @request POST:/api/Classes
+   * @tags courseSessions
+   * @name courseSessionsCreate
+   * @request POST:/api/courseSessions
    * @secure
    */
-  classesCreate = (data: OpenClassCommand, params: RequestParams = {}) =>
-    this.request<ClassDto, ProblemDetails>({
-      path: `/api/Classes`,
+  courseSessionsCreate = (data: OpenCourseSessionCommand, params: RequestParams = {}) =>
+    this.request<CourseSessionDto, ProblemDetails>({
+      path: `/api/courseSessions`,
       method: "POST",
       body: data,
       secure: true,
@@ -61,14 +61,14 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
   /**
    * No description
    *
-   * @tags Classes
-   * @name ClassesCloseCreate
-   * @request POST:/api/Classes/{id}/close
+   * @tags courseSessions
+   * @name courseSessionsCloseCreate
+   * @request POST:/api/courseSessions/{id}/close
    * @secure
    */
-  classesCloseCreate = (id: number, params: RequestParams = {}) =>
+  courseSessionsCloseCreate = (id: number, params: RequestParams = {}) =>
     this.request<void, ProblemDetails>({
-      path: `/api/Classes/${id}/close`,
+      path: `/api/courseSessions/${id}/close`,
       method: "POST",
       secure: true,
       ...params,
@@ -76,14 +76,14 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
   /**
    * No description
    *
-   * @tags Classes
-   * @name ClassesDetail
-   * @request GET:/api/Classes/{id}
+   * @tags courseSessions
+   * @name courseSessionsDetail
+   * @request GET:/api/courseSessions/{id}
    * @secure
    */
-  classesDetail = (id: number, params: RequestParams = {}) =>
-    this.request<ClassDto, ProblemDetails>({
-      path: `/api/Classes/${id}`,
+  courseSessionsDetail = (id: number, params: RequestParams = {}) =>
+    this.request<CourseSessionDto, ProblemDetails>({
+      path: `/api/courseSessions/${id}`,
       method: "GET",
       secure: true,
       format: "json",
@@ -92,14 +92,14 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
   /**
    * No description
    *
-   * @tags Classes
-   * @name ClassesGroupDetail
-   * @request GET:/api/Classes/group/{studyGroupId}
+   * @tags courseSessions
+   * @name courseSessionsGroupDetail
+   * @request GET:/api/courseSessions/group/{studyGroupId}
    * @secure
    */
-  classesGroupDetail = (studyGroupId: number, params: RequestParams = {}) =>
-    this.request<ClassDto[], any>({
-      path: `/api/Classes/group/${studyGroupId}`,
+  courseSessionsGroupDetail = (studyGroupId: number, params: RequestParams = {}) =>
+    this.request<CourseSessionDto[], any>({
+      path: `/api/courseSessions/group/${studyGroupId}`,
       method: "GET",
       secure: true,
       format: "json",
@@ -108,14 +108,14 @@ export class Classes<SecurityDataType = unknown> extends HttpClient<SecurityData
   /**
    * No description
    *
-   * @tags Classes
-   * @name ClassesClassroomDetail
-   * @request GET:/api/Classes/classroom/{classroomId}
+   * @tags courseSessions
+   * @name courseSessionsClassroomDetail
+   * @request GET:/api/courseSessions/classroom/{classroomId}
    * @secure
    */
-  classesClassroomDetail = (classroomId: number, params: RequestParams = {}) =>
-    this.request<ClassDto[], any>({
-      path: `/api/Classes/classroom/${classroomId}`,
+  courseSessionsClassroomDetail = (classroomId: number, params: RequestParams = {}) =>
+    this.request<CourseSessionDto[], any>({
+      path: `/api/courseSessions/classroom/${classroomId}`,
       method: "GET",
       secure: true,
       format: "json",

@@ -18,7 +18,7 @@ namespace UniAttend.Application.Features.Students.Queries.GetStudentGroups
             GetStudentGroupsQuery request, 
             CancellationToken cancellationToken)
         {
-            var groups = request.AcademicYearId.HasValue
+            var studyGroups = request.AcademicYearId.HasValue
                 ? await _groupStudentRepository.GetActiveGroupsByStudentIdAsync(
                     request.StudentId, 
                     request.AcademicYearId.Value, 
@@ -27,12 +27,12 @@ namespace UniAttend.Application.Features.Students.Queries.GetStudentGroups
                     request.StudentId, 
                     cancellationToken);
         
-            return groups
+            return studyGroups
                 .Where(g => g.StudyGroup != null) // Filter out records with null StudyGroup
                 .Select(g => new StudentGroupDto
                 {
                     StudyGroupId = g.StudyGroupId,
-                    GroupName = g.StudyGroup!.Name,
+                    StudyGroupName = g.StudyGroup!.Name,
                     SubjectName = g.StudyGroup.Subject?.Name ?? "Unknown Subject",
                     AcademicYear = g.StudyGroup.AcademicYear?.Name ?? "Unknown Year",
                     ProfessorName = g.StudyGroup.Professor?.User != null 

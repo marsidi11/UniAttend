@@ -8,6 +8,7 @@ namespace UniAttend.Core.Entities
     {
         private readonly List<GroupStudent> _students = new();
         private readonly List<Schedule> _schedules = new();
+        private readonly List<CourseSession> _courseSessions = new();
         private readonly List<AttendanceRecord> _attendanceRecords = new();
         private string _name;
         private int _subjectId;
@@ -39,6 +40,7 @@ namespace UniAttend.Core.Entities
         // Collections as readonly
         public IReadOnlyCollection<GroupStudent> Students => _students.AsReadOnly();
         public IReadOnlyCollection<Schedule> Schedules => _schedules.AsReadOnly();
+        public IReadOnlyCollection<CourseSession> CourseSessions => _courseSessions.AsReadOnly();
         public IReadOnlyCollection<AttendanceRecord> AttendanceRecords => _attendanceRecords.AsReadOnly();
 
         // Domain methods
@@ -66,6 +68,14 @@ namespace UniAttend.Core.Entities
         internal void AddSchedule(Schedule schedule)
         {
             _schedules.Add(schedule);
+        }
+
+        public void AddCourseSession(CourseSession courseSession)
+        {
+            if (courseSession == null)
+                throw new ArgumentNullException(nameof(courseSession));
+
+            _courseSessions.Add(courseSession);
         }
 
         private void ValidateName(string name)

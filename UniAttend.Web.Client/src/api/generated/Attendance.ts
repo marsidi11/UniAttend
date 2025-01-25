@@ -72,13 +72,13 @@ export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityD
    * No description
    *
    * @tags Attendance
-   * @name AttendanceClassesConfirmCreate
-   * @request POST:/api/Attendance/classes/{classId}/confirm
+   * @name AttendancecourseSessionsConfirmCreate
+   * @request POST:/api/Attendance/courseSessions/{courseSessionId}/confirm
    * @secure
    */
-  attendanceClassesConfirmCreate = (classId: number, params: RequestParams = {}) =>
+  attendancecourseSessionsConfirmCreate = (courseSessionId: number, params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/Attendance/classes/${classId}/confirm`,
+      path: `/api/Attendance/courseSessions/${courseSessionId}/confirm`,
       method: "POST",
       secure: true,
       ...params,
@@ -87,12 +87,12 @@ export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityD
    * No description
    *
    * @tags Attendance
-   * @name AttendanceClassesDetail
-   * @request GET:/api/Attendance/classes/{classId}
+   * @name AttendancecourseSessionsDetail
+   * @request GET:/api/Attendance/courseSessions/{courseSessionId}
    * @secure
    */
-  attendanceClassesDetail = (
-    classId: number,
+  attendancecourseSessionsDetail = (
+    courseSessionId: number,
     query?: {
       /** @format date-time */
       date?: string;
@@ -100,7 +100,7 @@ export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityD
     params: RequestParams = {},
   ) =>
     this.request<AttendanceRecordDto[], any>({
-      path: `/api/Attendance/classes/${classId}`,
+      path: `/api/Attendance/courseSessions/${courseSessionId}`,
       method: "GET",
       query: query,
       secure: true,

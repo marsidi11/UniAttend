@@ -13,7 +13,6 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.ToTable("CourseSessions");
                         
             // Properties
-            builder.Property(x => x.CourseId).IsRequired();
             builder.Property(x => x.StudyGroupId).IsRequired();
             builder.Property(x => x.ClassroomId).IsRequired();
             builder.Property(x => x.Date).IsRequired();
@@ -22,11 +21,6 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.Property(x => x.Status).IsRequired().HasMaxLength(50);
 
             // Relationships
-            builder.HasOne(x => x.Course)
-                .WithMany()
-                .HasForeignKey(x => x.CourseId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.HasOne(x => x.StudyGroup)
                 .WithMany()
                 .HasForeignKey(x => x.StudyGroupId)
@@ -37,13 +31,7 @@ namespace UniAttend.Infrastructure.Data.Configurations
                 .HasForeignKey(x => x.ClassroomId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany(x => x.AttendanceRecords)
-                .WithOne()
-                .HasForeignKey("CourseSessionId")
-                .OnDelete(DeleteBehavior.Cascade);
-
             // Indexes
-            builder.HasIndex(x => x.CourseId);
             builder.HasIndex(x => x.StudyGroupId);
             builder.HasIndex(x => x.ClassroomId);
             builder.HasIndex(x => x.Date);

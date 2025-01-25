@@ -87,13 +87,13 @@ import { useAcademicYearStore } from '@/stores/academicYear.store'
 import Button from '@/shared/components/ui/Button.vue'
 import type { 
   StudyGroupDto,
-  CreateGroupCommand,
-  UpdateGroupCommand,
+  CreateStudyGroupCommand,
+  UpdateStudyGroupCommand,
   SubjectDto
 } from '@/api/generated/data-contracts'
 
 interface Props {
-  group?: StudyGroupDto | null
+  studyGroup?: StudyGroupDto | null
   subjects: SubjectDto[]
 }
 
@@ -107,7 +107,7 @@ interface FormData {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'submit', data: CreateGroupCommand | UpdateGroupCommand): void
+  (e: 'submit', data: CreateStudyGroupCommand | UpdateStudyGroupCommand): void
   (e: 'cancel'): void
 }>()
 
@@ -133,7 +133,7 @@ const availableProfessors = computed(() =>
 )
 
 // Watch for changes in props.group and update form
-watch(() => props.group, (newGroup) => {
+watch(() => props.studyGroup, (newGroup) => {
   if (newGroup) {
     form.value = {
       name: newGroup.name ?? '', // Use nullish coalescing
@@ -178,13 +178,13 @@ async function handleSubmit() {
       isActive: form.value.isActive
     }
 
-    if (props.group?.id) {
+    if (props.studyGroup?.id) {
       emit('submit', { 
-        id: props.group.id,
+        id: props.studyGroup.id,
         ...formData 
-      } as UpdateGroupCommand)
+      } as UpdateStudyGroupCommand)
     } else {
-      emit('submit', formData as CreateGroupCommand)
+      emit('submit', formData as CreateStudyGroupCommand)
     }
   } finally {
     isLoading.value = false

@@ -16,7 +16,7 @@ namespace UniAttend.Core.Enums
         Secretary = 2,
 
         /// <summary>
-        /// Manages classes and attendance for assigned courses
+        /// Manages courseSessions and attendance for assigned courses
         /// </summary>
         Professor = 3,
 

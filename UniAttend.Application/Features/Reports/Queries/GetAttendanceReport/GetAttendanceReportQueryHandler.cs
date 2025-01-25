@@ -35,7 +35,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
                 .Select(g => new DailyAttendanceDto
                 {
                     Date = g.Key,
-                    TotalClasses = g.Select(r => r.CourseId).Distinct().Count(),
+                    TotalCourseSessions = g.Select(r => r.CourseSessionId).Distinct().Count(),
                     PresentStudents = g.Count(r => r.IsConfirmed),
                     AbsentStudents = g.Count(r => !r.IsConfirmed),
                     AttendanceRate = g.Any() ? 
@@ -49,7 +49,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 TotalStudents = records.Select(r => r.StudentId).Distinct().Count(),
-                TotalClasses = records.Select(r => r.CourseId).Distinct().Count(),
+                TotalCourseSessions = records.Select(r => r.CourseSessionId).Distinct().Count(),
                 OverallAttendance = records.Any() ? 
                     (decimal)records.Count(r => r.IsConfirmed) / records.Count() * 100 : 0,
                 DailyRecords = dailyRecords

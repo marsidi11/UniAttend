@@ -8,7 +8,7 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordOtpAttendance
     {
         public string OtpCode { get; set; } = string.Empty;
         public int StudentId { get; set; }
-        public int ClassId { get; set; }
+        public int CourseSessionId { get; set; }
         public VerificationType VerificationType { get; set; }
     }
 }

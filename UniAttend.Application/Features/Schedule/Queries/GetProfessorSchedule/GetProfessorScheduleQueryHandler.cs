@@ -39,7 +39,7 @@ namespace UniAttend.Application.Features.Schedule.Queries.GetProfessorSchedule
             {
                 Id = s.Id,
                 StudyGroupId = s.StudyGroupId,
-                GroupName = s.StudyGroup?.Name ?? string.Empty,
+                StudyGroupName = s.StudyGroup?.Name ?? string.Empty,
                 ClassroomId = s.ClassroomId,
                 ClassroomName = s.Classroom?.Name ?? string.Empty,
                 DayOfWeek = s.DayOfWeek,

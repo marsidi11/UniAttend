@@ -8,13 +8,13 @@ namespace UniAttend.Application.Features.Reports.DTOs
         public int TotalGroups { get; init; }
         public int TotalSubjects { get; init; }
         public decimal AverageAttendance { get; init; }
-        public List<GroupSummaryDto> Groups { get; init; } = new();
+        public List<StudyGroupSummaryDto> Groups { get; init; } = new();
     }
 
-    public record GroupSummaryDto
+    public record StudyGroupSummaryDto
     {
         public int StudyGroupId { get; init; }
-        public string GroupName { get; init; } = string.Empty;
+        public string StudyGroupName { get; init; } = string.Empty;
         public string SubjectName { get; init; } = string.Empty;
         public int EnrolledStudents { get; init; }
         public decimal AttendanceRate { get; init; }

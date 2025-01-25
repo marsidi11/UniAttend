@@ -6,7 +6,7 @@
            class="schedule-card"
            :style="{ zIndex: schedules.length - index }"
            :class="[
-             getCardClasses(schedule),
+             getCardcourseSessions(schedule),
              {'is-expanded': expandedId === (schedule.id ?? -1)},
              {'stacked-card': schedules.length > 1 && index > 0}
            ]"
@@ -92,17 +92,17 @@ function toggleExpand(id: number) {
   expandedId.value = expandedId.value === id ? null : id
 }
 
-function getCardClasses(schedule: ScheduleDto) {
+function getCardcourseSessions(schedule: ScheduleDto) {
   const baseClass = 'bg-gradient-to-br'
-  const colorClasses = [
+  const colorcourseSessions = [
     'from-blue-50 to-blue-100 border-blue-200',
     'from-emerald-50 to-emerald-100 border-emerald-200',
     'from-violet-50 to-violet-100 border-violet-200',
     'from-amber-50 to-amber-100 border-amber-200',
     'from-rose-50 to-rose-100 border-rose-200'
   ]
-  const index = (schedule.studyGroupId ?? 0) % colorClasses.length
-  return `${baseClass} ${colorClasses[index]}`
+  const index = (schedule.studyGroupId ?? 0) % colorcourseSessions.length
+  return `${baseClass} ${colorcourseSessions[index]}`
 }
 
 function formatTimeString(time: string | TimeObject | unknown): string {

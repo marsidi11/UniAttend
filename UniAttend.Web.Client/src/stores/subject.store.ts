@@ -25,7 +25,7 @@ export const useSubjectStore = defineStore('subject', () => {
       }
       const group = grouped.get(dept);
       if (group) {
-        group.push(subject);
+        studyGroup.push(subject);
       }
     });
     return grouped;

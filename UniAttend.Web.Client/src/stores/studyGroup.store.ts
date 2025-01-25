@@ -3,8 +3,8 @@ import { ref, computed } from 'vue';
 import type { 
   StudyGroupDto,
   GroupStudentDto,
-  CreateGroupCommand,
-  UpdateGroupCommand,
+  CreateStudyGroupCommand,
+  UpdateStudyGroupCommand,
   TransferStudentCommand 
 } from '@/api/generated/data-contracts';
 import { studyGroupApi } from '@/api/apiInstances';
@@ -26,7 +26,7 @@ export const useGroupStore = defineStore('group', () => {
   const groupsBySubject = computed(() => {
     const grouped = new Map<string, StudyGroupDto[]>();
     groups.value.forEach(group => {
-      const subject = group.subjectName || 'Unassigned';
+      const subject = studyGroup.subjectName || 'Unassigned';
       if (!grouped.has(subject)) {
         grouped.set(subject, []);
       }
@@ -66,7 +66,7 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function createGroup(group: CreateGroupCommand) {
+  async function createGroup(group: CreateStudyGroupCommand) {
     isLoading.value = true;
     try {
       const { data } = await studyGroupApi.studyGroupsCreate(group);
@@ -80,7 +80,7 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function updateGroup(id: number, group: UpdateGroupCommand) {
+  async function updateGroup(id: number, group: UpdateStudyGroupCommand) {
     isLoading.value = true;
     try {
       await studyGroupApi.studyGroupsUpdate(id, { id, ...group });

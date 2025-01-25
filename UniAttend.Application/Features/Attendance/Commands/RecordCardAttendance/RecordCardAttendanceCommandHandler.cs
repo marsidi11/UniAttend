@@ -21,11 +21,19 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordCardAttendanc
                 cancellationToken);
 
             return new AttendanceRecordDto(
+                record.Id,
+                record.CourseSessionId,
+                record.StudentId,
+                $"{record.Student?.User?.FirstName} {record.Student?.User?.LastName}",
                 record.CheckInTime,
                 record.CheckInMethod,
                 record.IsConfirmed,
-                "Course Name",
-                "Professor Name"
+                record.ConfirmationTime,
+                record.ConfirmedByProfessorId,
+                record.CourseSession.StudyGroup.Name,
+                record.CourseSession.Classroom.Name,
+                record.CourseSession.StartTime,
+                record.CourseSession.EndTime
             );
         }
     }

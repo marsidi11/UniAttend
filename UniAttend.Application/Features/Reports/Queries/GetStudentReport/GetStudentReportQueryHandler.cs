@@ -33,7 +33,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetStudentReport
 
             var enrollments = await _groupStudentRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
             var subjects = new List<SubjectAttendanceDto>();
-            int totalClasses = 0;
+            int totalCourseSessions = 0;
             int totalAttendance = 0;
 
             foreach (var enrollment in enrollments)
@@ -46,18 +46,18 @@ namespace UniAttend.Application.Features.Reports.Queries.GetStudentReport
                         request.EndDate, 
                         cancellationToken);
 
-                totalClasses += attendance.TotalClasses;
-                totalAttendance += attendance.AttendedClasses;
+                totalCourseSessions += attendance.TotalCourseSessions;
+                totalAttendance += attendance.AttendedCourseSessions;
 
                 subjects.Add(new SubjectAttendanceDto
                 {
                     SubjectId = enrollment.StudyGroup?.SubjectId ?? 0,
                     SubjectName = enrollment.StudyGroup?.Subject?.Name ?? "Unknown",
-                    GroupName = enrollment.StudyGroup?.Name ?? "Unknown",
-                    AttendedClasses = attendance.AttendedClasses,
-                    TotalClasses = attendance.TotalClasses,
-                    AttendanceRate = attendance.TotalClasses > 0 
-                        ? (decimal)attendance.AttendedClasses / attendance.TotalClasses * 100 
+                    StudyGroupName = enrollment.StudyGroup?.Name ?? "Unknown",
+                    AttendedcourseSessions = attendance.AttendedCourseSessions,
+                    TotalCourseSessions = attendance.TotalCourseSessions,
+                    AttendanceRate = attendance.TotalCourseSessions > 0 
+                        ? (decimal)attendance.AttendedCourseSessions / attendance.TotalCourseSessions * 100 
                         : 0
                 });
             }
@@ -70,8 +70,8 @@ namespace UniAttend.Application.Features.Reports.Queries.GetStudentReport
                 DepartmentName = student.Department?.Name ?? "Unknown",
                 CardId = student.CardId ?? "Not Assigned",
                 TotalAttendance = totalAttendance,
-                TotalClasses = totalClasses,
-                AttendanceRate = totalClasses > 0 ? (decimal)totalAttendance / totalClasses * 100 : 0,
+                TotalCourseSessions = totalCourseSessions,
+                AttendanceRate = totalCourseSessions > 0 ? (decimal)totalAttendance / totalCourseSessions * 100 : 0,
                 Subjects = subjects
             };
         }

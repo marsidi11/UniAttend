@@ -5,7 +5,7 @@ namespace UniAttend.Core.Entities.Attendance
         public decimal OverallAttendance { get; init; }
         public int PendingConfirmations { get; init; }
         public int TotalRecords { get; init; }
-        public int TotalClasses { get; init; }
+        public int TotalCourseSessions { get; init; }
         public decimal AverageAttendance { get; init; }
     }
 }

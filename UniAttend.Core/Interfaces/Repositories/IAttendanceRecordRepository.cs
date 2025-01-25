@@ -9,24 +9,29 @@ namespace UniAttend.Core.Interfaces.Repositories
     /// </summary>
     public interface IAttendanceRecordRepository : IRepository<AttendanceRecord>
     {
-        Task<IEnumerable<AttendanceRecord>> GetByCourseIdAsync(int courseId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AttendanceRecord>> GetByCourseSessionIdAsync(int courseSessionId, CancellationToken cancellationToken = default);
+
         Task<IEnumerable<AttendanceRecord>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default);
+
+        Task<AttendanceRecord?> GetStudentAttendanceForSessionAsync(int studentId, int courseSessionId, CancellationToken cancellationToken = default);
+
         Task<IEnumerable<AttendanceRecord>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
-        Task<AttendanceRecord?> GetStudentAttendanceForCourseAsync(int studentId, int courseId, CancellationToken cancellationToken = default);
+
+        Task<AttendanceRecord?> GetStudentAttendanceForCourseSessionAsync(int studentId, int courseId, CancellationToken cancellationToken = default);
+
         Task<double> GetStudentAttendancePercentageAsync(int studentId, int studyGroupId, CancellationToken cancellationToken = default);
+
         Task<IEnumerable<AttendanceRecord>> GetUnconfirmedRecordsAsync(int courseId, CancellationToken cancellationToken = default);
-        Task ConfirmAttendanceRecordsAsync(int courseId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<AttendanceRecord>> GetGroupAttendanceAsync(
-            int studyGroupId,
-            DateTime startDate,
-            DateTime endDate,
-            CancellationToken cancellationToken = default);
+
+        Task ConfirmAttendanceRecordsAsync(int courseSessionId, CancellationToken cancellationToken = default);
+
+        Task ConfirmAttendanceRecordsAsync(int courseSessionId, int professorId, CancellationToken cancellationToken = default);
 
         Task<CourseSession> GetSessionWithDetailsAsync(
             int sessionId,
             CancellationToken cancellationToken = default);
 
-        Task<(int TotalClasses, int AttendedClasses)> GetStudentGroupAttendanceAsync(
+        Task<(int TotalCourseSessions, int AttendedCourseSessions)> GetStudentGroupAttendanceAsync(
         int studentId,
         int studyGroupId,
         DateTime? startDate = null,
@@ -44,5 +49,21 @@ namespace UniAttend.Core.Interfaces.Repositories
             CancellationToken cancellationToken = default);
 
         Task<AttendanceStats> GetStudentStatsAsync(int studentId, CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<AttendanceRecord>> GetDetailedByCourseSessionIdAsync(
+        int courseSessionId,
+        CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<AttendanceRecord>> GetDetailedStudentAttendanceAsync(
+            int studentId,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<AttendanceRecord>> GetGroupAttendanceAsync(
+        int studyGroupId,
+        DateTime startDate,
+        DateTime endDate,
+        CancellationToken cancellationToken = default);
     }
 }

@@ -3,28 +3,28 @@ using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Application.Features.StudyGroups.DTOs;
 
-namespace UniAttend.Application.Features.StudyGroups.Queries.GetProfessorGroups
+namespace UniAttend.Application.Features.StudyGroups.Queries.GetProfessorStudyGroups
 {
-    public class GetProfessorGroupsQueryHandler 
-        : IRequestHandler<GetProfessorGroupsQuery, IEnumerable<StudyGroupDto>>
+    public class GetProfessorStudyGroupsQueryHandler 
+        : IRequestHandler<GetProfessorStudyGroupsQuery, IEnumerable<StudyGroupDto>>
     {
-        private readonly IStudyGroupRepository _groupRepository;
+        private readonly IStudyGroupRepository _studyGroupRepository;
 
-        public GetProfessorGroupsQueryHandler(IStudyGroupRepository groupRepository)
+        public GetProfessorStudyGroupsQueryHandler(IStudyGroupRepository studyGroupRepository)
         {
-            _groupRepository = groupRepository;
+            _studyGroupRepository = studyGroupRepository;
         }
 
         public async Task<IEnumerable<StudyGroupDto>> Handle(
-            GetProfessorGroupsQuery request, 
+            GetProfessorStudyGroupsQuery request, 
             CancellationToken cancellationToken)
         {
-            var groups = await _groupRepository.GetByProfessorIdAsync(
+            var studyGroups = await _studyGroupRepository.GetByProfessorIdAsync(
                 request.ProfessorId,
                 request.AcademicYearId,
                 cancellationToken);
 
-            return groups.Select(g => new StudyGroupDto
+            return studyGroups.Select(g => new StudyGroupDto
             {
                 Id = g.Id,
                 Name = g.Name,

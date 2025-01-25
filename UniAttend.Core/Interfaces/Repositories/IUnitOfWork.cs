@@ -6,7 +6,6 @@ namespace UniAttend.Core.Interfaces.Repositories
         IStudentRepository Students { get; }
         IProfessorRepository Professors { get; }
         IAttendanceRecordRepository AttendanceRecords { get; }
-        ICourseRepository Courses { get; }
         IDepartmentRepository Departments { get; }
         IScheduleRepository Schedules { get; }
         IAcademicYearRepository AcademicYears { get; }

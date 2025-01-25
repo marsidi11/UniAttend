@@ -2,7 +2,7 @@
 2025-01-20 23:32:58.299 +01:00 [WRN] Failed to determine the https port for redirect.
 2025-01-20 23:33:23.206 +01:00 [ERR] An unhandled exception occurred
 System.NullReferenceException: Object reference not set to an instance of an object.
-   at UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents.GetGroupStudentsQueryHandler.<>c.<Handle>b__2_0(GroupStudent gs) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\StudyGroups\Queries\GetGroupStudents\GetGroupStudentsQueryHandler.cs:line 24
+   at UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroupStudents.GetStudyGroupStudentsQueryHandler.<>c.<Handle>b__2_0(GroupStudent gs) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\StudyGroups\Queries\GetStudyGroupStudents\GetStudyGroupStudentsQueryHandler.cs:line 24
    at System.Linq.Enumerable.SelectListIterator`2.MoveNext()
    at System.Text.Json.Serialization.Converters.IEnumerableDefaultConverter`2.OnWriteResume(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options, WriteStack& state)
    at System.Text.Json.Serialization.JsonCollectionConverter`2.OnTryWrite(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options, WriteStack& state)
@@ -23,7 +23,7 @@ System.NullReferenceException: Object reference not set to an instance of an obj
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
 2025-01-20 23:33:27.980 +01:00 [ERR] An unhandled exception occurred
 System.NullReferenceException: Object reference not set to an instance of an object.
-   at UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents.GetGroupStudentsQueryHandler.<>c.<Handle>b__2_0(GroupStudent gs) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\StudyGroups\Queries\GetGroupStudents\GetGroupStudentsQueryHandler.cs:line 24
+   at UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroupStudents.GetStudyGroupStudentsQueryHandler.<>c.<Handle>b__2_0(GroupStudent gs) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\StudyGroups\Queries\GetStudyGroupStudents\GetStudyGroupStudentsQueryHandler.cs:line 24
    at System.Linq.Enumerable.SelectListIterator`2.MoveNext()
    at System.Text.Json.Serialization.Converters.IEnumerableDefaultConverter`2.OnWriteResume(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options, WriteStack& state)
    at System.Text.Json.Serialization.JsonCollectionConverter`2.OnTryWrite(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options, WriteStack& state)
@@ -44,7 +44,7 @@ System.NullReferenceException: Object reference not set to an instance of an obj
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
 2025-01-20 23:34:04.802 +01:00 [ERR] An unhandled exception occurred
 System.NullReferenceException: Object reference not set to an instance of an object.
-   at UniAttend.Application.Features.StudyGroups.Queries.GetGroupStudents.GetGroupStudentsQueryHandler.<>c.<Handle>b__2_0(GroupStudent gs) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\StudyGroups\Queries\GetGroupStudents\GetGroupStudentsQueryHandler.cs:line 24
+   at UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroupStudents.GetStudyGroupStudentsQueryHandler.<>c.<Handle>b__2_0(GroupStudent gs) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\StudyGroups\Queries\GetStudyGroupStudents\GetStudyGroupStudentsQueryHandler.cs:line 24
    at System.Linq.Enumerable.SelectListIterator`2.MoveNext()
    at System.Text.Json.Serialization.Converters.IEnumerableDefaultConverter`2.OnWriteResume(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options, WriteStack& state)
    at System.Text.Json.Serialization.JsonCollectionConverter`2.OnTryWrite(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options, WriteStack& state)

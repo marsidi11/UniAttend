@@ -15,10 +15,10 @@ namespace UniAttend.Infrastructure.Data.Repositories
     {
         public AttendanceRecordRepository(ApplicationDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<AttendanceRecord>> GetByCourseIdAsync(int courseId, CancellationToken cancellationToken = default)
-            => await DbSet
-                .Where(a => a.CourseId == courseId)
-                .ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AttendanceRecord>> GetByCourseSessionIdAsync(int courseSessionId, CancellationToken cancellationToken = default)
+        => await DbSet
+            .Where(a => a.CourseSessionId == courseSessionId)
+            .ToListAsync(cancellationToken);
 
         public async Task<IEnumerable<AttendanceRecord>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
             => await DbSet
@@ -30,34 +30,69 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Where(a => a.CheckInTime >= startDate && a.CheckInTime <= endDate)
                 .ToListAsync(cancellationToken);
 
-        public async Task<AttendanceRecord?> GetStudentAttendanceForCourseAsync(int studentId, int courseId, CancellationToken cancellationToken = default)
-            => await DbSet
-                .FirstOrDefaultAsync(a => a.StudentId == studentId && a.CourseId == courseId, cancellationToken);
+        public async Task<AttendanceRecord?> GetStudentAttendanceForSessionAsync(
+        int studentId,
+        int courseSessionId,
+        CancellationToken cancellationToken = default)
+        => await DbSet
+            .FirstOrDefaultAsync(a =>
+                a.StudentId == studentId &&
+                a.CourseSessionId == courseSessionId,
+                cancellationToken);
 
-        public async Task<double> GetStudentAttendancePercentageAsync(int studentId, int studyGroupId, CancellationToken cancellationToken = default)
+        public async Task<double> GetStudentAttendancePercentageAsync(
+        int studentId,
+        int studyGroupId,
+        CancellationToken cancellationToken = default)
         {
-            var totalClasses = await Context.Set<Course>()
-                .CountAsync(c => c.StudyGroupId == studyGroupId && c.IsActive, cancellationToken);
+            var totalSessions = await Context.Set<CourseSession>()
+                .CountAsync(cs =>
+                    cs.StudyGroupId == studyGroupId &&
+                    cs.IsActive,
+                    cancellationToken);
 
-            if (totalClasses == 0) return 0;
+            if (totalSessions == 0) return 0;
 
-            var attendedClasses = await DbSet
-                .CountAsync(a => a.StudentId == studentId && a.IsConfirmed, cancellationToken);
+            var attendedSessions = await DbSet
+                .CountAsync(a =>
+                    a.StudentId == studentId &&
+                    a.IsConfirmed &&
+                    a.CourseSession.StudyGroupId == studyGroupId,
+                    cancellationToken);
 
-            return (double)attendedClasses / totalClasses * 100;
+            return (double)attendedSessions / totalSessions * 100;
         }
 
-        public async Task<IEnumerable<AttendanceRecord>> GetUnconfirmedRecordsAsync(int courseId, CancellationToken cancellationToken = default)
-            => await DbSet
-                .Where(a => a.CourseId == courseId && !a.IsConfirmed)
-                .ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AttendanceRecord>> GetUnconfirmedRecordsAsync(
+        int courseSessionId,
+        CancellationToken cancellationToken = default)
+        => await DbSet
+            .Where(a =>
+                a.CourseSessionId == courseSessionId &&
+                !a.IsConfirmed)
+            .ToListAsync(cancellationToken);
 
-        public async Task ConfirmAttendanceRecordsAsync(int courseId, CancellationToken cancellationToken = default)
+        public async Task ConfirmAttendanceRecordsAsync(
+    int courseSessionId,
+    CancellationToken cancellationToken = default)
         {
-            var records = await GetUnconfirmedRecordsAsync(courseId, cancellationToken);
+            var records = await GetUnconfirmedRecordsAsync(courseSessionId, cancellationToken);
             foreach (var record in records)
             {
-                record.Confirm();
+                DbSet.Update(record);
+            }
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task ConfirmAttendanceRecordsAsync(
+        int courseSessionId,
+        int professorId,
+        CancellationToken cancellationToken = default)
+        {
+            var records = await GetUnconfirmedRecordsAsync(courseSessionId, cancellationToken);
+            foreach (var record in records)
+            {
+                record.Confirm(professorId);
                 DbSet.Update(record);
             }
             await Context.SaveChangesAsync(cancellationToken);
@@ -72,10 +107,10 @@ namespace UniAttend.Infrastructure.Data.Repositories
             return await DbSet
                 .Include(ar => ar.Student)
                     .ThenInclude(s => s.User)
-                .Include(ar => ar.Course)
-                    .ThenInclude(c => c.StudyGroup)
+                .Include(ar => ar.CourseSession)
+                    .ThenInclude(cs => cs.StudyGroup)
                 .Where(ar =>
-                    ar.Course.StudyGroupId == studyGroupId &&
+                    ar.CourseSession.StudyGroupId == studyGroupId &&
                     ar.CheckInTime >= startDate &&
                     ar.CheckInTime <= endDate)
                 .OrderByDescending(ar => ar.CheckInTime)
@@ -84,10 +119,23 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<CourseSession> GetSessionWithDetailsAsync(int sessionId, CancellationToken cancellationToken = default)
+        public async Task<AttendanceRecord?> GetStudentAttendanceForCourseSessionAsync(
+        int studentId,
+        int courseSessionId,
+        CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .FirstOrDefaultAsync(a =>
+                    a.StudentId == studentId &&
+                    a.CourseSessionId == courseSessionId,
+                    cancellationToken);
+        }
+
+        public async Task<CourseSession> GetSessionWithDetailsAsync(
+        int sessionId,
+        CancellationToken cancellationToken = default)
         {
             var session = await Context.Set<CourseSession>()
-                .Include(cs => cs.Course)
                 .Include(cs => cs.StudyGroup)
                     .ThenInclude(g => g.Students)
                         .ThenInclude(gs => gs.Student)
@@ -96,44 +144,42 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync(cs => cs.Id == sessionId, cancellationToken);
 
             if (session == null)
-            {
                 throw new KeyNotFoundException($"Course session with ID {sessionId} not found");
-            }
 
             return session;
         }
 
-        public async Task<(int TotalClasses, int AttendedClasses)> GetStudentGroupAttendanceAsync(
-        int studentId,
-        int studyGroupId,
-        DateTime? startDate = null,
-        DateTime? endDate = null,
-        CancellationToken cancellationToken = default)
+                public async Task<(int TotalCourseSessions, int AttendedCourseSessions)> GetStudentGroupAttendanceAsync(
+                int studentId,
+                int studyGroupId,
+                DateTime? startDate = null,
+                DateTime? endDate = null,
+                CancellationToken cancellationToken = default)
         {
             var query = DbSet
-                .Include(ar => ar.Course)
+                .Include(ar => ar.CourseSession)
                 .Where(ar =>
                     ar.StudentId == studentId &&
-                    ar.Course.StudyGroupId == studyGroupId);
-
+                    ar.CourseSession.StudyGroupId == studyGroupId);
+        
             if (startDate.HasValue)
                 query = query.Where(ar => ar.CheckInTime >= startDate.Value);
-
+        
             if (endDate.HasValue)
                 query = query.Where(ar => ar.CheckInTime <= endDate.Value);
-
+        
             var attendance = await query.ToListAsync(cancellationToken);
-
-            var totalClasses = await Context.Set<Course>()
+        
+            var totalCourseSessions = await Context.Set<CourseSession>()
                 .CountAsync(c =>
                     c.StudyGroupId == studyGroupId &&
-                    (!startDate.HasValue || c.StartTime >= startDate.Value) &&
-                    (!endDate.HasValue || c.EndTime <= endDate.Value),
+                    (!startDate.HasValue || c.Date >= startDate.Value.Date) &&
+                    (!endDate.HasValue || c.Date <= endDate.Value.Date),
                     cancellationToken);
-
-            var attendedClasses = attendance.Count(a => a.IsConfirmed);
-
-            return (totalClasses, attendedClasses);
+        
+            var attendedCourseSessions = attendance.Count(a => a.IsConfirmed);
+        
+            return (TotalCourseSessions: totalCourseSessions, AttendedCourseSessions: attendedCourseSessions);
         }
 
         public async Task<AttendanceReportResult> GetAcademicYearAttendanceReportAsync(
@@ -141,9 +187,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
             CancellationToken cancellationToken = default)
         {
             var records = await DbSet
-                .Include(ar => ar.Course)
+                .Include(ar => ar.CourseSession)
                     .ThenInclude(c => c.StudyGroup)
-                .Where(ar => ar.Course.StudyGroup.AcademicYearId == academicYearId)
+                .Where(ar => ar.CourseSession.StudyGroup.AcademicYearId == academicYearId)
                 .ToListAsync(cancellationToken);
 
             return new AttendanceReportResult
@@ -163,8 +209,8 @@ namespace UniAttend.Infrastructure.Data.Repositories
             CancellationToken cancellationToken = default)
         {
             var query = DbSet
-                .Include(ar => ar.Course)
-                .Where(ar => ar.Course.StudyGroupId == studyGroupId);
+                .Include(ar => ar.CourseSession)
+                .Where(ar => ar.CourseSession.StudyGroupId == studyGroupId);
 
             if (startDate.HasValue)
                 query = query.Where(ar => ar.CheckInTime >= startDate.Value);
@@ -187,26 +233,68 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public async Task<AttendanceStats> GetStudentStatsAsync(int studentId, CancellationToken cancellationToken = default)
         {
             var records = await DbSet
-                .Include(ar => ar.Course)
+                .Include(ar => ar.CourseSession)
                 .Where(ar => ar.StudentId == studentId)
                 .ToListAsync(cancellationToken);
 
-            var totalClasses = await Context.Set<Course>()
+            var totalCourseSessions = await Context.Set<CourseSession>()
                 .Include(c => c.StudyGroup)
                 .Where(c => c.StudyGroup.Students.Any(s => s.StudentId == studentId))
                 .CountAsync(cancellationToken);
 
-            var attendedClasses = records.Count(r => r.IsConfirmed);
-            var attendanceRate = totalClasses > 0
-                ? (decimal)attendedClasses / totalClasses * 100
+            var attendedCourseSessions = records.Count(r => r.IsConfirmed);
+            var attendanceRate = totalCourseSessions > 0
+                ? (decimal)attendedCourseSessions / totalCourseSessions * 100
                 : 0;
 
             return new AttendanceStats
             {
-                TotalClasses = totalClasses,
-                AttendedClasses = attendedClasses,
+                TotalCourseSessions = totalCourseSessions,
+                AttendedcourseSessions = attendedCourseSessions,
                 AttendanceRate = attendanceRate
             };
+        }
+
+        public async Task<IEnumerable<AttendanceRecord>> GetDetailedByCourseSessionIdAsync(
+        int courseSessionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(ar => ar.Student)
+                .ThenInclude(s => s.User)
+            .Include(ar => ar.CourseSession)
+                .ThenInclude(cs => cs.StudyGroup)
+            .Include(ar => ar.CourseSession)
+                .ThenInclude(cs => cs.Classroom)
+            .Where(ar => ar.CourseSessionId == courseSessionId)
+            .ToListAsync(cancellationToken);
+    }
+
+        public async Task<IEnumerable<AttendanceRecord>> GetDetailedStudentAttendanceAsync(
+        int studentId,
+        DateTime? startDate,
+        DateTime? endDate,
+        CancellationToken cancellationToken = default)
+        {
+            var query = DbSet
+                .Include(a => a.Student)
+                    .ThenInclude(s => s.User)
+                .Include(a => a.CourseSession)
+                    .ThenInclude(cs => cs.StudyGroup)
+                .Include(a => a.CourseSession)
+                    .ThenInclude(cs => cs.Classroom)
+                .Where(a => a.StudentId == studentId);
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                query = query.Where(r =>
+                    r.CheckInTime >= startDate.Value &&
+                    r.CheckInTime <= endDate.Value);
+            }
+
+            return await query
+                .OrderByDescending(a => a.CheckInTime)
+                .ToListAsync(cancellationToken);
         }
     }
 }

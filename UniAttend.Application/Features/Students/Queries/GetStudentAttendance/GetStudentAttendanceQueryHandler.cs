@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Application.Features.Students.DTOs;
 
@@ -8,43 +9,37 @@ namespace UniAttend.Application.Features.Students.Queries.GetStudentAttendance
         : IRequestHandler<GetStudentAttendanceQuery, IEnumerable<StudentAttendanceDto>>
     {
         private readonly IAttendanceRecordRepository _attendanceRepository;
-        private readonly ICourseRepository _courseRepository;
 
-        public GetStudentAttendanceQueryHandler(
-            IAttendanceRecordRepository attendanceRepository,
-            ICourseRepository courseRepository)
+        public GetStudentAttendanceQueryHandler(IAttendanceRecordRepository attendanceRepository)
         {
             _attendanceRepository = attendanceRepository;
-            _courseRepository = courseRepository;
         }
 
         public async Task<IEnumerable<StudentAttendanceDto>> Handle(
             GetStudentAttendanceQuery request, 
             CancellationToken cancellationToken)
         {
-            var records = await _attendanceRepository.GetByStudentIdAsync(
-                request.StudentId, 
+            // Get attendance records with included navigation properties
+            var records = await _attendanceRepository.GetDetailedStudentAttendanceAsync(
+                request.StudentId,
+                request.StartDate,
+                request.EndDate,
                 cancellationToken);
 
-            if (request.StartDate.HasValue && request.EndDate.HasValue)
+            // Map to DTOs
+            return records.Select(r => new StudentAttendanceDto
             {
-                records = records.Where(r => 
-                    r.CheckInTime >= request.StartDate.Value && 
-                    r.CheckInTime <= request.EndDate.Value);
-            }
-
-            return await Task.WhenAll(records.Select(async r =>
-            {
-                var course = await _courseRepository.GetByIdAsync(r.CourseId, cancellationToken);
-                return new StudentAttendanceDto
-                {
-                    CourseId = r.CourseId,
-                    CourseName = course?.Name ?? "Unknown",
-                    CheckInTime = r.CheckInTime,
-                    CheckInMethod = r.CheckInMethod,
-                    IsConfirmed = r.IsConfirmed
-                };
-            }));
+                CourseSessionId = r.CourseSessionId,
+                StudyGroupName = r.CourseSession?.StudyGroup?.Name ?? "Unknown Group",
+                SubjectName = r.CourseSession?.StudyGroup?.Subject?.Name ?? "Unknown Subject",
+                ClassroomName = r.CourseSession?.Classroom?.Name ?? "Unknown Classroom",
+                CheckInTime = r.CheckInTime,
+                CheckInMethod = r.CheckInMethod,
+                IsConfirmed = r.IsConfirmed,
+                ConfirmationTime = r.ConfirmationTime,
+                StartTime = r.CourseSession?.StartTime ?? TimeSpan.Zero,
+                EndTime = r.CourseSession?.EndTime ?? TimeSpan.Zero
+            });
         }
     }
 }

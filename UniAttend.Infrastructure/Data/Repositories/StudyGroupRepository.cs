@@ -45,19 +45,19 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
         public async Task<AttendanceStats> GetAttendanceStatsAsync(int studyGroupId, CancellationToken cancellationToken = default)
         {
-            var group = await DbSet
+            var studyGroup = await DbSet
                 .Include(g => g.Students)
                 .Include(g => g.AttendanceRecords)
                 .FirstOrDefaultAsync(g => g.Id == studyGroupId, cancellationToken);
 
-            if (group == null)
+            if (studyGroup == null)
                 throw new NotFoundException($"StudyGroup with ID {studyGroupId} not found");
 
             return new AttendanceStats
             {
-                TotalStudents = group.Students.Count,
-                AverageAttendance = group.AttendanceRecords.Count > 0
-                    ? (decimal)group.AttendanceRecords.Average(r => r.IsConfirmed ? 1 : 0) * 100m
+                TotalStudents = studyGroup.Students.Count,
+                AverageAttendance = studyGroup.AttendanceRecords.Count > 0
+                    ? (decimal)studyGroup.AttendanceRecords.Average(r => r.IsConfirmed ? 1 : 0) * 100m
                     : 0m
             };
         }
@@ -154,7 +154,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<StudyGroup>> GetProfessorGroupsAsync(
+        public async Task<IEnumerable<StudyGroup>> GetProfessorStudyGroupsAsync(
             int professorId,
             CancellationToken cancellationToken = default)
         {

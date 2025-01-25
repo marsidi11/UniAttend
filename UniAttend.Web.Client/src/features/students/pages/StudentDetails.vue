@@ -62,8 +62,8 @@
         <div class="bg-white shadow rounded-lg p-6">
           <h2 class="text-lg font-medium mb-4">Attendance Overview</h2>
           <div class="grid grid-cols-3 gap-4">
-            <StatCard title="Total Classes" :value="formattedStats.totalClasses" />
-            <StatCard title="Classes Attended" :value="formattedStats.attendedClasses" />
+            <StatCard title="Total courseSessions" :value="formattedStats.totalCourseSessions" />
+            <StatCard title="courseSessions Attended" :value="formattedStats.attendedCourseSessions" />
             <StatCard title="Absence Rate" :value="`${formattedStats.absenceRate}%`" />
           </div>
         </div>
@@ -152,15 +152,15 @@ const student = ref<ExtendedUserDetailsDto | null>(null)
 const groups = ref<ExtendedUserGroupDto[]>([])
 const attendance = ref<AttendanceRecordDto[]>([])
 const stats = ref<AttendanceStatsDto>({
-  totalClasses: 0,
-  attendedClasses: 0,
+  totalCourseSessions: 0,
+  attendedCourseSessions: 0,
   attendanceRate: 0
 })
 
 // Computed properties
 const formattedStats = computed(() => ({
-  totalClasses: stats.value.totalClasses || 0,
-  attendedClasses: stats.value.attendedClasses || 0,
+  totalCourseSessions: stats.value.totalCourseSessions || 0,
+  attendedCourseSessions: stats.value.attendedCourseSessions || 0,
   absenceRate: 100 - (stats.value.attendanceRate || 0)
 }))
 
@@ -204,8 +204,8 @@ async function loadStudentData(studentId: number) {
 
     if (reportData) {
       stats.value = {
-        totalClasses: reportData.totalClasses || 0,
-        attendedClasses: reportData.totalAttendance || 0,
+        totalCourseSessions: reportData.totalCourseSessions || 0,
+        attendedCourseSessions: reportData.totalAttendance || 0,
         attendanceRate: reportData.attendanceRate || 0
       }
     }

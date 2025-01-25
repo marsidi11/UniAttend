@@ -10,12 +10,12 @@
  */
 
 import {
-  CreateGroupCommand,
+  CreateStudyGroupCommand,
   EnrollStudentsCommand,
   GroupStudentDto,
   StudyGroupDto,
   TransferStudentCommand,
-  UpdateGroupCommand,
+  UpdateStudyGroupCommand,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -51,7 +51,7 @@ export class StudyGroups<SecurityDataType = unknown> extends HttpClient<Security
    * @request POST:/api/StudyGroups
    * @secure
    */
-  studyGroupsCreate = (data: CreateGroupCommand, params: RequestParams = {}) =>
+  studyGroupsCreate = (data: CreateStudyGroupCommand, params: RequestParams = {}) =>
     this.request<StudyGroupDto, any>({
       path: `/api/StudyGroups`,
       method: "POST",
@@ -85,7 +85,7 @@ export class StudyGroups<SecurityDataType = unknown> extends HttpClient<Security
    * @request PUT:/api/StudyGroups/{id}
    * @secure
    */
-  studyGroupsUpdate = (id: number, data: UpdateGroupCommand, params: RequestParams = {}) =>
+  studyGroupsUpdate = (id: number, data: UpdateStudyGroupCommand, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/StudyGroups/${id}`,
       method: "PUT",

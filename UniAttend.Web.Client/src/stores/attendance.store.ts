@@ -11,7 +11,7 @@ import { handleError } from '@/utils/errorHandler';
 export const useAttendanceStore = defineStore('attendance', () => {
   // State
   const records = ref<AttendanceRecordDto[]>([]);
-  const currentClass = ref<AttendanceRecordDto[] | null>(null);
+  const currentCourseSession = ref<AttendanceRecordDto[] | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -62,12 +62,12 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
-  async function confirmAttendance(classId: number) {
+  async function confirmAttendance(courseSessionId: number) {
     isLoading.value = true;
     try {
-      await attendanceApi.attendanceClassesConfirmCreate(classId);
-      if (currentClass.value) {
-        currentClass.value = currentClass.value.map(record => ({
+      await attendanceApi.attendancecourseSessionsConfirmCreate(courseSessionId);
+      if (currentCourseSession.value) {
+        currentCourseSession.value = currentCourseSession.value.map(record => ({
           ...record,
           isConfirmed: true
         }));
@@ -80,14 +80,14 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
-  async function fetchClassAttendance(classId: number, date?: Date) {
+  async function fetchClassAttendance(courseSessionId: number, date?: Date) {
     isLoading.value = true;
     try {
-      const { data } = await attendanceApi.attendanceClassesDetail(
-        classId,
+      const { data } = await attendanceApi.attendancecourseSessionsDetail(
+        courseSessionId,
         date ? { date: date.toISOString() } : undefined
       );
-      currentClass.value = data;
+      currentCourseSession.value = data;
       return data;
     } catch (err) {
       handleError(err);
@@ -100,7 +100,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
   return {
     // State
     records,
-    currentClass,
+    currentCourseSession,
     isLoading,
     error,
     

@@ -9,26 +9,34 @@ namespace UniAttend.Infrastructure.Data.Configurations
         public override void Configure(EntityTypeBuilder<AttendanceRecord> builder)
         {
             base.Configure(builder);
-            
-            builder.ToTable("AttendanceRecords");
-                        
-            // Use backing fields for immutable properties
-            builder.Property("CourseId").IsRequired();
-            builder.Property("StudentId").IsRequired();
-            builder.Property("CheckInTime").IsRequired();
-            builder.Property("CheckInMethod").IsRequired().HasMaxLength(50);
-            builder.Property("IsConfirmed").IsRequired();
 
-            // Configure relationships
-            builder.HasOne(x => x.Course)
-                .WithMany()
-                .HasForeignKey("CourseId")
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.ToTable("AttendanceRecords");
+
+            // Properties
+            builder.Property(x => x.CourseSessionId).IsRequired();
+        builder.Property(x => x.StudentId).IsRequired();
+        builder.Property(x => x.CheckInTime).IsRequired();
+        builder.Property(x => x.CheckInMethod)
+            .IsRequired()
+            .HasMaxLength(50)
+            .HasConversion<string>();
+
+            // Relationships
+            builder.HasOne(x => x.CourseSession)
+            .WithMany(cs => cs.AttendanceRecords)
+            .HasForeignKey(x => x.CourseSessionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Student)
-                .WithMany()
-                .HasForeignKey("StudentId")
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => x.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.ConfirmedByProfessor)
+            .WithMany()
+            .HasForeignKey(x => x.ConfirmedByProfessorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

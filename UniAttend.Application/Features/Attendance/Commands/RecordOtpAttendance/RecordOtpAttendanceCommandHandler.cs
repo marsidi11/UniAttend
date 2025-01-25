@@ -45,17 +45,26 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordOtpAttendance
             }
 
             var record = await _attendanceService.RecordOtpAttendanceAsync(
-        request.OtpCode,
-        request.StudentId,
-        request.ClassId,
-        cancellationToken);
+                request.OtpCode,
+                request.StudentId,
+                request.CourseSessionId,
+                cancellationToken);
 
             return new AttendanceRecordDto(
+                record.Id,
+                record.CourseSessionId,
+                record.StudentId,
+                $"{record.Student?.User?.FirstName} {record.Student?.User?.LastName}",
                 record.CheckInTime,
                 record.CheckInMethod,
                 record.IsConfirmed,
-                record.Course.Name,
-                $"{record.Course.Professor.User.FirstName} {record.Course.Professor.User.LastName}");
+                record.ConfirmationTime,
+                record.ConfirmedByProfessorId,
+                record.CourseSession.StudyGroup.Name,
+                record.CourseSession.Classroom.Name,
+                record.CourseSession.StartTime,
+                record.CourseSession.EndTime
+            );
         }
     }
 }

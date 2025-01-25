@@ -29,11 +29,11 @@ namespace UniAttend.Application.Features.Students.Queries.GetStudentAbsenceAlert
 
             return await Task.WhenAll(alerts.Select(async a =>
             {
-                var group = await _studyGroupRepository.GetByIdAsync(a.StudyGroupId, cancellationToken);
+                var studyGroup = await _studyGroupRepository.GetByIdAsync(a.StudyGroupId, cancellationToken);
                 return new StudentAbsenceAlertDto
                 {
                     StudyGroupId = a.StudyGroupId,
-                    SubjectName = group?.Subject.Name ?? "Unknown",
+                    SubjectName = studyGroup?.Subject.Name ?? "Unknown",
                     AbsencePercentage = a.AbsencePercentage,
                     EmailSent = a.EmailSent,
                     AlertDate = a.CreatedAt

@@ -17,7 +17,7 @@ namespace UniAttend.Application.Features.Attendance.Commands.ConfirmAttendance
 
         public async Task<Unit> Handle(ConfirmAttendanceCommand request, CancellationToken cancellationToken)
         {
-            await _attendanceRepository.ConfirmAttendanceRecordsAsync(request.ClassId, cancellationToken);
+            await _attendanceRepository.ConfirmAttendanceRecordsAsync(request.CourseSessionId, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             
             return Unit.Value;

@@ -12,7 +12,7 @@ import { handleError } from '@/utils/errorHandler';
 export const useClassroomStore = defineStore('classroom', () => {
   // State
   const classrooms = ref<ClassroomDto[]>([]);
-  const currentClassroom = ref<ClassroomDto | null>(null);
+  const currentCourseSessionroom = ref<ClassroomDto | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -44,7 +44,7 @@ export const useClassroomStore = defineStore('classroom', () => {
     isLoading.value = true;
     try {
       const { data } = await classroomApi.classroomsDetail(id);
-      currentClassroom.value = data;
+      currentCourseSessionroom.value = data;
       return data;
     } catch (err) {
       handleError(err, error);
@@ -78,8 +78,8 @@ export const useClassroomStore = defineStore('classroom', () => {
       if (index !== -1) {
         classrooms.value[index] = updatedClassroom;
       }
-      if (currentClassroom.value?.id === id) {
-        currentClassroom.value = updatedClassroom;
+      if (currentCourseSessionroom.value?.id === id) {
+        currentCourseSessionroom.value = updatedClassroom;
       }
       return updatedClassroom;
     } catch (err) {
@@ -137,7 +137,7 @@ export const useClassroomStore = defineStore('classroom', () => {
   return {
     // State
     classrooms,
-    currentClassroom,
+    currentCourseSessionroom,
     isLoading,
     error,
     

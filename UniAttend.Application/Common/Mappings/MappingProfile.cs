@@ -4,7 +4,7 @@ using UniAttend.Application.Features.Departments.DTOs;
 using UniAttend.Application.Features.AcademicYears.DTOs;
 using UniAttend.Application.Features.Subjects.DTOs;
 using UniAttend.Application.Features.StudyGroups.DTOs;
-using UniAttend.Application.Features.Classes.DTOs;
+using UniAttend.Application.Features.CourseSessions.DTOs;
 using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.Application.Features.Users.DTOs;
 using UniAttend.Application.Features.Classrooms.DTOs;
@@ -50,20 +50,21 @@ namespace UniAttend.Application.Common.Mappings
                 .ForMember(d => d.TotalStudents, opt =>
                     opt.MapFrom(src => src.StudyGroups.Sum(g => g.Students.Count)));
 
-                        CreateMap<Subject, SubjectDto>()
-                .ForMember(dest => dest.DepartmentName, 
-                    opt => opt.MapFrom(src => src.Department.Name))
-                .ForMember(dest => dest.GroupsCount,
-                    opt => opt.MapFrom(src => src.StudyGroups.Count))
-                .ForMember(dest => dest.StudentsCount,
-                    opt => opt.MapFrom(src => src.StudyGroups.SelectMany(g => g.Students).Count()))
-                .ForMember(dest => dest.AverageAttendance,
-                    opt => opt.MapFrom((src, dest, member, context) => {
-                        var records = src.StudyGroups.SelectMany(g => g.AttendanceRecords);
-                        if (!records.Any())
-                            return 0m;
-                        return records.Average(a => a.IsConfirmed ? 100m : 0m);
-                    }));
+            CreateMap<Subject, SubjectDto>()
+    .ForMember(dest => dest.DepartmentName,
+        opt => opt.MapFrom(src => src.Department.Name))
+    .ForMember(dest => dest.GroupsCount,
+        opt => opt.MapFrom(src => src.StudyGroups.Count))
+    .ForMember(dest => dest.StudentsCount,
+        opt => opt.MapFrom(src => src.StudyGroups.SelectMany(g => g.Students).Count()))
+    .ForMember(dest => dest.AverageAttendance,
+        opt => opt.MapFrom((src, dest, member, context) =>
+        {
+            var records = src.StudyGroups.SelectMany(g => g.AttendanceRecords);
+            if (!records.Any())
+                return 0m;
+            return records.Average(a => a.IsConfirmed ? 100m : 0m);
+        }));
 
             CreateMap<StudyGroup, StudyGroupDto>()
                 .ForMember(d => d.StudentsCount, opt => opt.MapFrom(src => src.Students.Count))
@@ -72,18 +73,26 @@ namespace UniAttend.Application.Common.Mappings
                 .ForMember(d => d.ProfessorName, opt =>
                     opt.MapFrom(src => $"{src.Professor.User.FirstName} {src.Professor.User.LastName}"));
 
-            CreateMap<CourseSession, ClassDto>()
-                .ForMember(d => d.GroupName, opt => opt.MapFrom(src => src.StudyGroup.Name))
+            CreateMap<CourseSession, CourseSessionDto>()
+                .ForMember(d => d.StudyGroupName, opt => opt.MapFrom(src => src.StudyGroup.Name))
                 .ForMember(d => d.ClassroomName, opt => opt.MapFrom(src => src.Classroom.Name));
 
             CreateMap<AttendanceRecord, AttendanceRecordDto>()
-                .ConstructUsing((src, ctx) => new AttendanceRecordDto(
-                    src.CheckInTime,
-                    src.CheckInMethod,
-                    src.IsConfirmed,
-                    src.Course.Name,
-                    $"{src.Course.Professor.User.FirstName} {src.Course.Professor.User.LastName}"
-                ));
+            .ConstructUsing((src, ctx) => new AttendanceRecordDto(
+                src.Id,
+                src.CourseSessionId,
+                src.StudentId,
+                $"{src.Student.User.FirstName} {src.Student.User.LastName}",
+                src.CheckInTime,
+                src.CheckInMethod,
+                src.IsConfirmed,
+                src.ConfirmationTime,
+                src.ConfirmedByProfessorId,
+                src.CourseSession.StudyGroup.Name,
+                src.CourseSession.Classroom.Name,
+                src.CourseSession.StartTime,
+                src.CourseSession.EndTime
+            ));
 
             CreateMap<User, UserDetailsDto>()
             .ForMember(d => d.Groups, opt => opt.Ignore())

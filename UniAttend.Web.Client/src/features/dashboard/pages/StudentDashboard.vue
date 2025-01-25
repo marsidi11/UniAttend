@@ -16,12 +16,12 @@
     <!-- Personal Stats -->
     <div class="grid grid-cols-3 gap-4">
       <StatCard
-        title="Total Classes"
-        :value="stats.totalClasses"
+        title="Total courseSessions"
+        :value="stats.totalCourseSessions"
       />
       <StatCard
-        title="Classes Attended"
-        :value="stats.attendedClasses"
+        title="courseSessions Attended"
+        :value="stats.attendedCourseSessions"
       />
       <StatCard
         title="Absence Rate"
@@ -39,12 +39,12 @@
           <div v-if="isLoadingSchedule" class="flex justify-center">
             <Spinner :size="6" />
           </div>
-          <div v-else-if="!todayClasses.length" class="text-gray-500 text-center">
-            No classes scheduled for today
+          <div v-else-if="!todaycourseSessions.length" class="text-gray-500 text-center">
+            No courseSessions scheduled for today
           </div>
           <div 
             v-else
-            v-for="class_ in todayClasses" 
+            v-for="class_ in todaycourseSessions" 
             :key="class_.id"
             class="flex justify-between items-center p-4 bg-gray-50 rounded-md"
           >
@@ -110,17 +110,17 @@ const attendanceStore = useAttendanceStore()
 const isLoadingSchedule = ref(false)
 const isLoadingAttendance = ref(false)
 const stats = ref<AttendanceStats>({
-  totalClasses: 0,
-  attendedClasses: 0,
+  totalCourseSessions: 0,
+  attendedCourseSessions: 0,
   attendanceRate: 0,
   pendingConfirmations: 0
 })
-const todayClasses = ref<ClassSession[]>([])
+const todaycourseSessions = ref<ClassSession[]>([])
 const recentAttendance = ref<AttendanceRecord[]>([])
 
 const absenceRate = computed(() => {
-  if (!stats.value.totalClasses) return 0
-  return Math.round(((stats.value.totalClasses - stats.value.attendedClasses) / stats.value.totalClasses) * 100)
+  if (!stats.value.totalCourseSessions) return 0
+  return Math.round(((stats.value.totalCourseSessions - stats.value.attendedCourseSessions) / stats.value.totalCourseSessions) * 100)
 })
 
 function getAbsenceStatus(rate: number): 'success' | 'warning' | 'error' {
@@ -142,7 +142,7 @@ async function loadTodaySchedule() {
   isLoadingSchedule.value = true
   try {
     const schedule = await attendanceStore.fetchTodaySessions()
-    todayClasses.value = schedule.map(session => ({
+    todaycourseSessions.value = schedule.map(session => ({
       ...session,
       absenceAlert: (session.absenceRate ?? 0) > 20
     }))

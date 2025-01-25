@@ -6,12 +6,12 @@
 
     <div class="grid grid-cols-3 gap-4">
       <StatCard
-        title="Total Classes"
-        :value="stats.totalClasses || 0"
+        title="Total courseSessions"
+        :value="stats.totalCourseSessions || 0"
       />
       <StatCard
-        title="Classes Attended"
-        :value="stats.attendedClasses || 0"
+        title="courseSessions Attended"
+        :value="stats.attendedCourseSessions || 0"
       />
       <StatCard
         title="Attendance Rate"
@@ -48,8 +48,8 @@ const { isLoading } = storeToRefs(attendanceStore)
 // Component state
 const attendanceRecords = ref<AttendanceRecordDto[]>([])
 const stats = ref<AttendanceStatsDto>({
-  totalClasses: 0,
-  attendedClasses: 0,
+  totalCourseSessions: 0,
+  attendedCourseSessions: 0,
   attendanceRate: 0
 })
 
@@ -63,8 +63,8 @@ async function loadAttendance() {
     const reportData = await reportStore.getMyReport()
     if (reportData) {
       stats.value = {
-        totalClasses: reportData.totalClasses || 0,
-        attendedClasses: reportData.totalAttendance || 0,
+        totalCourseSessions: reportData.totalCourseSessions || 0,
+        attendedCourseSessions: reportData.totalAttendance || 0,
         attendanceRate: reportData.attendanceRate || 0
       }
     }

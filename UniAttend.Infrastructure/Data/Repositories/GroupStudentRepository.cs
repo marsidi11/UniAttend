@@ -18,6 +18,38 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(gs => gs.StudyGroup)
                 .FirstOrDefaultAsync(gs => gs.Id == id, cancellationToken);
 
+        public async Task<bool> IsStudentEnrolledInClassAsync(
+            int studentId,
+            int courseSessionId,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .AnyAsync(gs =>
+                    gs.StudentId == studentId &&
+                    gs.StudyGroup.CourseSessions.Any(cs => cs.Id == courseSessionId),
+                    cancellationToken);
+        }
+
+        public async Task<IEnumerable<GroupStudent>> GetAllActiveGroupsAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(gs => gs.StudyGroup)
+                .Where(gs => gs.StudyGroup.IsActive)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<GroupStudent>> GetStudyGroupStudentsAsync(
+            int groupId,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(gs => gs.Student)
+                    .ThenInclude(s => s.User)
+                .Where(gs => gs.StudyGroupId == groupId)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<IEnumerable<GroupStudent>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Where(gs => gs.StudyGroupId == studyGroupId)
@@ -45,18 +77,18 @@ namespace UniAttend.Infrastructure.Data.Repositories
             await AddAsync(groupStudent, cancellationToken);
         }
 
-        public async Task RemoveStudentFromGroupAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default)
+        public async Task RemoveStudentFromStudyGroupAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default)
         {
             var groupStudent = await DbSet
                 .FirstOrDefaultAsync(gs => gs.StudyGroupId == studyGroupId && gs.StudentId == studentId, cancellationToken);
-            
+
             if (groupStudent != null)
             {
                 await DeleteAsync(groupStudent.Id, cancellationToken);
             }
         }
 
-        public async Task<IEnumerable<GroupStudent>> GetByGroupIdWithDetailsAsync( int studyGroupId,  CancellationToken cancellationToken)
+        public async Task<IEnumerable<GroupStudent>> GetByGroupIdWithDetailsAsync(int studyGroupId, CancellationToken cancellationToken)
         {
             return await DbSet
                 .Include(gs => gs.Student)

@@ -8,8 +8,8 @@
           class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         >
           <option value="">All Groups</option>
-          <option v-for="group in groups" :key="group.id" :value="group.id">
-            {{ group.name }}
+          <option v-for="group in groups" :key="studyGroup.id" :value="studyGroup.id">
+            {{ studyGroup.name }}
           </option>
         </select>
         <Button @click="exportAttendance">Export</Button>

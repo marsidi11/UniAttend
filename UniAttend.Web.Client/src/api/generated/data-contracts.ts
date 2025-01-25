@@ -73,7 +73,7 @@ export interface AttendanceReportDto {
   /** @format int32 */
   totalStudents?: number;
   /** @format int32 */
-  totalClasses?: number;
+  totalCourseSessions?: number;
   /** @format double */
   overallAttendance?: number;
   dailyRecords?: DailyAttendanceDto[] | null;
@@ -81,9 +81,9 @@ export interface AttendanceReportDto {
 
 export interface AttendanceStatsDto {
   /** @format int32 */
-  totalClasses?: number;
+  totalCourseSessions?: number;
   /** @format int32 */
-  attendedClasses?: number;
+  attendedCourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
 }
@@ -103,7 +103,7 @@ export interface ChangePasswordCommand {
   newPassword?: string | null;
 }
 
-export interface ClassDto {
+export interface CourseSessionDto {
   /** @format int32 */
   id?: number;
   /** @format int32 */
@@ -147,7 +147,7 @@ export interface CreateDepartmentCommand {
   name?: string | null;
 }
 
-export interface CreateGroupCommand {
+export interface CreateStudyGroupCommand {
   name?: string | null;
   /** @format int32 */
   subjectId?: number;
@@ -191,7 +191,7 @@ export interface DailyAttendanceDto {
   /** @format date-time */
   date?: string;
   /** @format int32 */
-  totalClasses?: number;
+  totalCourseSessions?: number;
   /** @format int32 */
   presentStudents?: number;
   /** @format int32 */
@@ -227,7 +227,7 @@ export interface DepartmentReportDto {
   totalSubjects?: number;
   /** @format double */
   averageAttendance?: number;
-  groups?: GroupSummaryDto[] | null;
+  groups?: StudyGroupSummaryDto[] | null;
 }
 
 export interface EnrollStudentsCommand {
@@ -245,7 +245,7 @@ export interface GroupReportDto {
   /** @format int32 */
   totalStudents?: number;
   /** @format int32 */
-  totalClasses?: number;
+  totalCourseSessions?: number;
   /** @format double */
   averageAttendance?: number;
   students?: StudentAttendanceDto[] | null;
@@ -261,7 +261,7 @@ export interface GroupStudentDto {
   isActive?: boolean;
 }
 
-export interface GroupSummaryDto {
+export interface StudyGroupSummaryDto {
   /** @format int32 */
   studyGroupId?: number;
   groupName?: string | null;
@@ -277,7 +277,7 @@ export interface LoginCommand {
   password?: string | null;
 }
 
-export interface OpenClassCommand {
+export interface OpenCourseSessionCommand {
   /** @format int32 */
   studyGroupId?: number;
   /** @format int32 */
@@ -317,7 +317,7 @@ export interface RecordCardAttendanceCommand {
   cardId?: string | null;
   deviceId?: string | null;
   /** @format int32 */
-  classId?: number;
+  courseSessionId?: number;
 }
 
 export interface RecordOtpAttendanceCommand {
@@ -325,7 +325,7 @@ export interface RecordOtpAttendanceCommand {
   /** @format int32 */
   studentId?: number;
   /** @format int32 */
-  classId?: number;
+  courseSessionId?: number;
   verificationType?: VerificationType;
 }
 
@@ -375,7 +375,7 @@ export interface StudentAttendanceDto {
   studentNumber?: string | null;
   fullName?: string | null;
   /** @format int32 */
-  attendedClasses?: number;
+  attendedCourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
 }
@@ -390,7 +390,7 @@ export interface StudentReportDto {
   /** @format int32 */
   totalAttendance?: number;
   /** @format int32 */
-  totalClasses?: number;
+  totalCourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
   subjects?: SubjectAttendanceDto[] | null;
@@ -422,9 +422,9 @@ export interface SubjectAttendanceDto {
   subjectName?: string | null;
   groupName?: string | null;
   /** @format int32 */
-  attendedClasses?: number;
+  attendedCourseSessions?: number;
   /** @format int32 */
-  totalClasses?: number;
+  totalCourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
 }
@@ -521,7 +521,7 @@ export interface UpdateDepartmentCommand {
   isActive?: boolean;
 }
 
-export interface UpdateGroupCommand {
+export interface UpdateStudyGroupCommand {
   /** @format int32 */
   id?: number;
   name?: string | null;

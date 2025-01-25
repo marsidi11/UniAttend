@@ -1,34 +1,39 @@
 using UniAttend.Core.Entities.Base;
-using System;
+using UniAttend.Core.Enums;
 
 namespace UniAttend.Core.Entities.Attendance
 {
-    public class AttendanceRecord : Entity  
+    public class AttendanceRecord : Entity
     {
-        private AttendanceRecord() { } // For reflection/serialization
-    
-        public AttendanceRecord(int courseId, int studentId, DateTime checkInTime, string checkInMethod)
+        private AttendanceRecord() { } // For EF Core
+
+        public AttendanceRecord(int courseSessionId, int studentId, DateTime checkInTime, CheckInMethod checkInMethod)
         {
-            CourseId = courseId;
+            CourseSessionId = courseSessionId;
             StudentId = studentId;
             CheckInTime = checkInTime;
-            CheckInMethod = checkInMethod ?? throw new ArgumentNullException(nameof(checkInMethod));
+            CheckInMethod = checkInMethod;
             IsConfirmed = false;
         }
-    
-        // Identity properties - immutable
-        public int CourseId { get; }
-        public int StudentId { get; }
-        public DateTime CheckInTime { get; }
-        public string CheckInMethod { get; }
+
+        public int CourseSessionId { get; private set; }
+        public int StudentId { get; private set; }
+        public DateTime CheckInTime { get; private set; }
+        public CheckInMethod CheckInMethod { get; private set; }
         public bool IsConfirmed { get; private set; }
-    
-        // Navigation properties - nullable for EF Core
-        public Course? Course { get; private set; }
-        public CourseSession Class { get; set; } = null!;
-        public Student? Student { get; private set; }
-    
-        // Domain methods
-        public void Confirm() => IsConfirmed = true;
+        public int? ConfirmedByProfessorId { get; private set; }
+        public DateTime? ConfirmationTime { get; private set; }
+
+        // Navigation properties
+        public virtual CourseSession CourseSession { get; private set; } = null!;
+        public virtual Student Student { get; private set; } = null!;
+        public virtual Professor? ConfirmedByProfessor { get; private set; }
+
+        public void Confirm(int professorId)
+        {
+            IsConfirmed = true;
+            ConfirmedByProfessorId = professorId;
+            ConfirmationTime = DateTime.UtcNow;
+        }
     }
 }

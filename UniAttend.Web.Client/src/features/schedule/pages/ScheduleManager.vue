@@ -14,8 +14,8 @@
         <select v-model="selectedGroup"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
           <option value="">All Groups</option>
-          <option v-for="group in groups" :key="group.id" :value="group.id">
-            {{ group.name }}
+          <option v-for="group in groups" :key="studyGroup.id" :value="studyGroup.id">
+            {{ studyGroup.name }}
           </option>
         </select>
       </div>
@@ -258,7 +258,7 @@ async function handleSubmit(scheduleData: CreateScheduleCommand | UpdateSchedule
 }
 
 // Watch for filter changes
-watch([selectedGroup, selectedClassroom, selectedProfessor], async ([group, classroom, professor]) => {
+watch([selectedGroup, selectedClassroom, selectedProfessor], async ([studyGroup, classroom, professor]) => {
   try {
     if (professor) {
       // Use the updated fetchSchedules method that supports professor filtering

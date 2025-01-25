@@ -6,32 +6,32 @@ namespace UniAttend.Application.Features.StudyGroups.Queries.GetStudyGroupById
 {
     public class GetStudyGroupByIdQueryHandler : IRequestHandler<GetStudyGroupByIdQuery, StudyGroupDto?>
     {
-        private readonly IStudyGroupRepository _groupRepository;
+        private readonly IStudyGroupRepository _studyGroupRepository;
 
-        public GetStudyGroupByIdQueryHandler(IStudyGroupRepository groupRepository)
+        public GetStudyGroupByIdQueryHandler(IStudyGroupRepository studyGroupRepository)
         {
-            _groupRepository = groupRepository;
+            _studyGroupRepository = studyGroupRepository;
         }
 
         public async Task<StudyGroupDto?> Handle(GetStudyGroupByIdQuery request, CancellationToken cancellationToken)
         {
-            var group = await _groupRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
+            var studyGroup = await _studyGroupRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
             
-            if (group == null) return null;
+            if (studyGroup == null) return null;
 
             return new StudyGroupDto
             {
-                Id = group.Id,
-                Name = group.Name,
-                SubjectId = group.SubjectId,
-                SubjectName = group.Subject?.Name ?? string.Empty,
-                AcademicYearId = group.AcademicYearId,
-                AcademicYearName = group.AcademicYear?.Name ?? string.Empty,
-                ProfessorId = group.ProfessorId,
-                ProfessorName = $"{group.Professor?.User?.FirstName} {group.Professor?.User?.LastName}".Trim(),
-                StudentsCount = group.Students.Count,
+                Id = studyGroup.Id,
+                Name = studyGroup.Name,
+                SubjectId = studyGroup.SubjectId,
+                SubjectName = studyGroup.Subject?.Name ?? string.Empty,
+                AcademicYearId = studyGroup.AcademicYearId,
+                AcademicYearName = studyGroup.AcademicYear?.Name ?? string.Empty,
+                ProfessorId = studyGroup.ProfessorId,
+                ProfessorName = $"{studyGroup.Professor?.User?.FirstName} {studyGroup.Professor?.User?.LastName}".Trim(),
+                StudentsCount = studyGroup.Students.Count,
                 AttendanceRate = 0,
-                IsActive = group.IsActive
+                IsActive = studyGroup.IsActive
             };
         }
     }

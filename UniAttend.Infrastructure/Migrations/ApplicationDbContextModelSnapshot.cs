@@ -119,10 +119,10 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<DateTime>("CheckInTime")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("ConfirmationTime")
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<int>("CourseId")
+                    b.Property<int?>("ConfirmedByProfessorId")
                         .HasColumnType("int");
 
                     b.Property<int>("CourseSessionId")
@@ -149,9 +149,7 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("CourseId");
+                    b.HasIndex("ConfirmedByProfessorId");
 
                     b.HasIndex("CourseSessionId");
 
@@ -173,9 +171,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Property<int>("ClassroomId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
@@ -187,6 +182,9 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time(6)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time(6)");
@@ -206,8 +204,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClassroomId");
-
-                    b.HasIndex("CourseId");
 
                     b.HasIndex("Date");
 
@@ -298,67 +294,6 @@ namespace UniAttend.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Classrooms", (string)null);
-                });
-
-            modelBuilder.Entity("UniAttend.Core.Entities.Course", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<int>("ProfessorId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("StudyGroupId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("UpdatedAt");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudyGroupId");
-
-                    b.HasIndex("ProfessorId", "StudyGroupId");
-
-                    b.HasIndex("StartTime", "EndTime");
-
-                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("UniAttend.Core.Entities.Department", b =>
@@ -719,19 +654,12 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.Attendance.AttendanceRecord", b =>
                 {
-                    b.HasOne("UniAttend.Core.Entities.Attendance.CourseSession", "Class")
+                    b.HasOne("UniAttend.Core.Entities.Professor", "ConfirmedByProfessor")
                         .WithMany()
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ConfirmedByProfessorId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("UniAttend.Core.Entities.Course", "Course")
-                        .WithMany("AttendanceRecords")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UniAttend.Core.Entities.Attendance.CourseSession", null)
+                    b.HasOne("UniAttend.Core.Entities.Attendance.CourseSession", "CourseSession")
                         .WithMany("AttendanceRecords")
                         .HasForeignKey("CourseSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -747,9 +675,9 @@ namespace UniAttend.Infrastructure.Migrations
                         .WithMany("AttendanceRecords")
                         .HasForeignKey("StudyGroupId");
 
-                    b.Navigation("Class");
+                    b.Navigation("ConfirmedByProfessor");
 
-                    b.Navigation("Course");
+                    b.Navigation("CourseSession");
 
                     b.Navigation("Student");
                 });
@@ -762,38 +690,15 @@ namespace UniAttend.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("UniAttend.Core.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("UniAttend.Core.Entities.StudyGroup", "StudyGroup")
-                        .WithMany()
+                        .WithMany("CourseSessions")
                         .HasForeignKey("StudyGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Classroom");
 
-                    b.Navigation("Course");
-
                     b.Navigation("StudyGroup");
-                });
-
-            modelBuilder.Entity("UniAttend.Core.Entities.Course", b =>
-                {
-                    b.HasOne("UniAttend.Core.Entities.Professor", null)
-                        .WithMany()
-                        .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("UniAttend.Core.Entities.StudyGroup", null)
-                        .WithMany()
-                        .HasForeignKey("StudyGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("UniAttend.Core.Entities.GroupStudent", b =>
@@ -929,11 +834,6 @@ namespace UniAttend.Infrastructure.Migrations
                     b.Navigation("AttendanceRecords");
                 });
 
-            modelBuilder.Entity("UniAttend.Core.Entities.Course", b =>
-                {
-                    b.Navigation("AttendanceRecords");
-                });
-
             modelBuilder.Entity("UniAttend.Core.Entities.Department", b =>
                 {
                     b.Navigation("Professors");
@@ -951,6 +851,8 @@ namespace UniAttend.Infrastructure.Migrations
             modelBuilder.Entity("UniAttend.Core.Entities.StudyGroup", b =>
                 {
                     b.Navigation("AttendanceRecords");
+
+                    b.Navigation("CourseSessions");
 
                     b.Navigation("Schedules");
 

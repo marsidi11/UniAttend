@@ -8,7 +8,7 @@ namespace UniAttend.Application.Features.Reports.DTOs
         public string DepartmentName { get; init; } = string.Empty;
         public string CardId { get; init; } = string.Empty;
         public int TotalAttendance { get; init; }
-        public int TotalClasses { get; init; }
+        public int TotalCourseSessions { get; init; }
         public decimal AttendanceRate { get; init; }
         public List<SubjectAttendanceDto> Subjects { get; init; } = new();
     }
@@ -17,9 +17,9 @@ namespace UniAttend.Application.Features.Reports.DTOs
     {
         public int SubjectId { get; init; }
         public string SubjectName { get; init; } = string.Empty;
-        public string GroupName { get; init; } = string.Empty;
-        public int AttendedClasses { get; init; }
-        public int TotalClasses { get; init; }
+        public string StudyGroupName { get; init; } = string.Empty;
+        public int AttendedcourseSessions { get; init; }
+        public int TotalCourseSessions { get; init; }
         public decimal AttendanceRate { get; init; }
     }
 }

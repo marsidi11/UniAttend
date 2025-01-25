@@ -54,7 +54,7 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
                                 {
                                     DepartmentId = professor.DepartmentId,
                                     DepartmentName = professor.Department?.Name,
-                                    Groups = await GetProfessorGroups(professor.Id, cancellationToken)
+                                    Groups = await GetProfessorStudyGroups(professor.Id, cancellationToken)
                                 };
                             }
                             break;
@@ -65,13 +65,13 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
 
         private async Task<IEnumerable<UserGroupDto>> GetStudentGroups(int studentId, CancellationToken cancellationToken)
         {
-            var groups = await _unitOfWork.StudyGroups
+            var studyGroups = await _unitOfWork.StudyGroups
                 .GetStudentGroupsAsync(studentId, cancellationToken);
 
-            return groups.Select(g => new UserGroupDto
+            return studyGroups.Select(g => new UserGroupDto
             {
                 StudyGroupId = g.Id,
-                GroupName = g.Name,
+                StudyGroupName = g.Name,
                 SubjectName = g.Subject.Name,
                 AcademicYearName = g.AcademicYear.Name
             });
@@ -84,21 +84,21 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
 
             return new AttendanceStatsDto
             {
-                TotalClasses = stats.TotalClasses,
-                AttendedClasses = stats.AttendedClasses,
+                TotalCourseSessions = stats.TotalCourseSessions,
+                AttendedcourseSessions = stats.AttendedcourseSessions,
                 AttendanceRate = stats.AttendanceRate
             };
         }
 
-        private async Task<IEnumerable<UserGroupDto>> GetProfessorGroups(int professorId, CancellationToken cancellationToken)
+        private async Task<IEnumerable<UserGroupDto>> GetProfessorStudyGroups(int professorId, CancellationToken cancellationToken)
         {
-            var groups = await _unitOfWork.StudyGroups
-                .GetProfessorGroupsAsync(professorId, cancellationToken);
+            var studyGroups = await _unitOfWork.StudyGroups
+                .GetProfessorStudyGroupsAsync(professorId, cancellationToken);
 
-            return groups.Select(g => new UserGroupDto
+            return studyGroups.Select(g => new UserGroupDto
             {
                 StudyGroupId = g.Id,
-                GroupName = g.Name,
+                StudyGroupName = g.Name,
                 SubjectName = g.Subject.Name,
                 AcademicYearName = g.AcademicYear.Name
             });

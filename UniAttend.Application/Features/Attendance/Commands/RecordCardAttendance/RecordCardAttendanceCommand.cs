@@ -7,6 +7,6 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordCardAttendanc
     {
         public string CardId { get; set; } = string.Empty;
         public string DeviceId { get; set; } = string.Empty;
-        public int ClassId { get; set; }
+        public int CourseSessionId { get; set; }
     }
 }

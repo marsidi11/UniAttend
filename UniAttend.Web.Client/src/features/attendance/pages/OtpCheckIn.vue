@@ -28,12 +28,12 @@
         <form @submit.prevent="handleSubmit" class="space-y-6">
           <!-- Class ID -->
           <div>
-            <label for="classId" class="block text-sm font-medium text-gray-700">
+            <label for="courseSessionId" class="block text-sm font-medium text-gray-700">
               Class ID
             </label>
             <input
-              id="classId"
-              v-model="form.classId"
+              id="courseSessionId"
+              v-model="form.courseSessionId"
               type="number"
               required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -102,12 +102,12 @@ const error = ref('')
 const isSuccess = ref(false)
 
 const form = ref({
-  classId: '',
+  courseSessionId: '',
   otpCode: ''
 })
 
 const isFormValid = computed(() => {
-  return form.value.classId && 
+  return form.value.courseSessionId && 
          form.value.otpCode && 
          form.value.otpCode.length === 6
 })
@@ -127,7 +127,7 @@ async function handleSubmit() {
   isSuccess.value = false
 
   try {
-    await otpStore.validateOtp(form.value.otpCode, Number(form.value.classId))
+    await otpStore.validateOtp(form.value.otpCode, Number(form.value.courseSessionId))
     isSuccess.value = true
     
     // Redirect after successful check-in

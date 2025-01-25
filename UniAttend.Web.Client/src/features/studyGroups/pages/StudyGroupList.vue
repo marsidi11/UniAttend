@@ -127,8 +127,8 @@ const modalTitle = computed(() =>
 
 const filteredGroups = computed(() => {
   let filtered = groups.value.map(group => ({
-    ...group,
-    id: group.id ?? 0 // Use nullish coalescing
+    ...studyGroup,
+    id: studyGroup.id ?? 0 // Use nullish coalescing
   })) as ExtendedStudyGroup[]
   
   if (selectedSubject.value) {
@@ -149,7 +149,7 @@ function openCreateModal() {
 }
 
 function handleViewDetails(group: StudyGroupDto) {
-  router.push(`/dashboard/groups/${group.id}`)
+  router.push(`/dashboard/groups/${studyGroup.id}`)
 }
 
 function handleEdit(group: StudyGroupDto) {
