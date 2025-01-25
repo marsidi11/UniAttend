@@ -17,7 +17,7 @@
           <div class="flex justify-between items-start w-full">
             <div class="flex flex-col min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <span class="font-medium text-sm truncate">{{ schedule.groupName }}</span>
+                <span class="font-medium text-sm truncate">{{ schedule.studyGroupName }}</span>
                 <span class="text-xs bg-white bg-opacity-50 px-2 py-0.5 rounded-full">
                   {{ schedule.classroomName }}
                 </span>

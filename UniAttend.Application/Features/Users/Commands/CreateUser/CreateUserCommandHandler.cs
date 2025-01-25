@@ -63,14 +63,15 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
             try
             {
                 await _unitOfWork.Users.AddAsync(user, cancellationToken);
-        
+
                 // Only create Professor entity if role is Professor
                 if (request.Role == UserRole.Professor && department != null)
                 {
-                    var professor = new Professor(department.Id, user);
+                    var professor = new Professor(user); // Use the public constructor
+                    professor.AddDepartment(department); // Use public method to add department
                     await _unitOfWork.Professors.AddAsync(professor, cancellationToken);
                 }
-        
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);
         

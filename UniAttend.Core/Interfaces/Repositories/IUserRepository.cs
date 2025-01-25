@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UniAttend.Core.Entities.Identity;
@@ -10,6 +11,8 @@ namespace UniAttend.Core.Interfaces.Repositories
     /// </summary>
     public interface IUserRepository : IRepository<User>
     {
+        Task<bool> AnyAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default);
+        
         /// <summary>
         /// Retrieves a user by their unique username
         /// </summary>

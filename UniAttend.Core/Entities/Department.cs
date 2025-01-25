@@ -92,7 +92,11 @@ namespace UniAttend.Core.Entities
             if (professor == null)
                 throw new ArgumentNullException(nameof(professor));
 
-            _professors.Add(professor);
+            if (!_professors.Contains(professor))
+            {
+                _professors.Add(professor);
+                professor.AddDepartment(this);
+            }
         }
 
         /// <summary>

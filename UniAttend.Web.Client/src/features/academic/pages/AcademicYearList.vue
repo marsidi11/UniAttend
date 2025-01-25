@@ -1,93 +1,133 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-6">
-    <div>
-      <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-      <input
-        id="name"
-        v-model="form.name"
-        type="text"
-        required
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-semibold">Academic Years</h1>
+      <Button @click="showCreateModal = true" variant="primary">
+        Create Academic Year
+      </Button>
+    </div>
+
+    <!-- Academic Years List -->
+    <div class="bg-white shadow rounded-lg">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Period
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Groups
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Students
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="year in sortedYears" :key="year.id">
+              <td class="px-6 py-4 whitespace-nowrap">{{ year.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {{ formatDateString(year.startDate) }} - {{ formatDateString(year.endDate) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <Badge :status="year.isActive ? 'success' : 'error'">
+                  {{ year.isActive ? 'Active' : 'Closed' }}
+                </Badge>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {{ year.totalGroups || 0 }} groups
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {{ year.totalStudents || 0 }} students
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <Button 
+                  v-if="year.isActive"
+                  @click="handleCloseYear(year)" 
+                  variant="danger" 
+                  size="sm"
+                >
+                  Close Year
+                </Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Create Modal -->
+    <Modal v-model="showCreateModal" title="Create Academic Year">
+      <AcademicYearForm 
+        @submit="handleCreateYear"
+        @cancel="showCreateModal = false"
       />
-    </div>
-
-    <div>
-      <label for="departmentId" class="block text-sm font-medium text-gray-700">Department</label>
-      <select
-        id="departmentId"
-        v-model="form.departmentId"
-        required
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-      >
-        <option v-for="dept in departments" :key="dept.id" :value="dept.id">
-          {{ dept.name }}
-        </option>
-      </select>
-    </div>
-
-    <div>
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          v-model="form.isActive"
-          class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-        />
-        <span class="ml-2 text-sm text-gray-600">Active</span>
-      </label>
-    </div>
-
-    <div class="flex justify-end space-x-3">
-      <Button type="button" variant="secondary" @click="$emit('cancel')">Cancel</Button>
-      <Button type="submit" :loading="isLoading">Save</Button>
-    </div>
-  </form>
+    </Modal>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAcademicYearStore } from '@/stores/academicYear.store'
+import { formatDate } from '@/utils/dateUtils'
+import type { AcademicYearDto, CreateAcademicYearCommand } from '@/api/generated/data-contracts'
+import Modal from '@/shared/components/ui/Modal.vue'
 import Button from '@/shared/components/ui/Button.vue'
-import type { DepartmentDto, SubjectDto } from '@/api/generated/data-contracts'
+import Badge from '@/shared/components/ui/Badge.vue'
+import AcademicYearForm from '../components/AcademicYearForm.vue'
 
-interface FormData {
-  name: string;
-  departmentId: number;
-  isActive: boolean;
+const academicYearStore = useAcademicYearStore()
+const { academicYears } = storeToRefs(academicYearStore)
+const showCreateModal = ref(false)
+
+// Helper function to safely format dates
+function formatDateString(date: string | undefined): string {
+  if (!date) return ''
+  return formatDate(new Date(date))
 }
 
-interface Props {
-  subject?: SubjectDto | null;
-  departments: DepartmentDto[];
-}
+// Sort years by start date (newest first)
+const sortedYears = computed(() => 
+  [...academicYears.value].sort((a, b) => {
+    const dateA = a.startDate ? new Date(a.startDate).getTime() : 0
+    const dateB = b.startDate ? new Date(b.startDate).getTime() : 0
+    return dateB - dateA
+  })
+)
 
-const props = defineProps<Props>()
-const emit = defineEmits<{
-  (e: 'submit', data: FormData): void;
-  (e: 'cancel'): void;
-}>()
-
-const isLoading = ref(false)
-const form = ref<FormData>({
-  name: '',
-  departmentId: 0,
-  isActive: true,
-})
-
-watch(() => props.subject, (newSubject) => {
-  if (newSubject) {
-    form.value = {
-      name: newSubject.name ?? '',
-      departmentId: newSubject.departmentId ?? 0,
-      isActive: newSubject.isActive ?? true,
-    }
-  }
-}, { immediate: true })
-
-async function handleSubmit() {
+async function handleCreateYear(data: CreateAcademicYearCommand) {
   try {
-    isLoading.value = true
-    emit('submit', form.value)
-  } finally {
-    isLoading.value = false
+    await academicYearStore.createAcademicYear(data)
+    showCreateModal.value = false
+  } catch (error) {
+    console.error('Failed to create academic year:', error)
   }
 }
+
+async function handleCloseYear(year: AcademicYearDto) {
+  if (!year.id) return
+  
+  try {
+    await academicYearStore.closeAcademicYear(year.id)
+  } catch (error) {
+    console.error('Failed to close academic year:', error)
+  }
+}
+
+// Load academic years on component mount
+onMounted(() => {
+  academicYearStore.fetchAcademicYears()
+})
 </script>

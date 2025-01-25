@@ -22,6 +22,21 @@ namespace UniAttend.Infrastructure.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("DepartmentProfessor", b =>
+                {
+                    b.Property<int>("DepartmentsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfessorsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DepartmentsId", "ProfessorsId");
+
+                    b.HasIndex("ProfessorsId");
+
+                    b.ToTable("ProfessorDepartments", (string)null);
+                });
+
             modelBuilder.Entity("UniAttend.Core.Entities.AbsenceAlert", b =>
                 {
                     b.Property<int>("Id")
@@ -456,8 +471,6 @@ namespace UniAttend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartmentId");
-
                     b.ToTable("Professors", (string)null);
                 });
 
@@ -637,6 +650,21 @@ namespace UniAttend.Infrastructure.Migrations
                     b.ToTable("Subjects", (string)null);
                 });
 
+            modelBuilder.Entity("DepartmentProfessor", b =>
+                {
+                    b.HasOne("UniAttend.Core.Entities.Department", null)
+                        .WithMany()
+                        .HasForeignKey("DepartmentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("UniAttend.Core.Entities.Professor", null)
+                        .WithMany()
+                        .HasForeignKey("ProfessorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("UniAttend.Core.Entities.AbsenceAlert", b =>
                 {
                     b.HasOne("UniAttend.Core.Entities.Student", null)
@@ -731,19 +759,11 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.Professor", b =>
                 {
-                    b.HasOne("UniAttend.Core.Entities.Department", "Department")
-                        .WithMany("Professors")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("UniAttend.Core.Entities.Identity.User", "User")
                         .WithOne()
                         .HasForeignKey("UniAttend.Core.Entities.Professor", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Department");
 
                     b.Navigation("User");
                 });
@@ -836,8 +856,6 @@ namespace UniAttend.Infrastructure.Migrations
 
             modelBuilder.Entity("UniAttend.Core.Entities.Department", b =>
                 {
-                    b.Navigation("Professors");
-
                     b.Navigation("Students");
 
                     b.Navigation("Subjects");

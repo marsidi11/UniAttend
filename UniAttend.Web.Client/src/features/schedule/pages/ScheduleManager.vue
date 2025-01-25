@@ -14,7 +14,7 @@
         <select v-model="selectedGroup"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
           <option value="">All Groups</option>
-          <option v-for="group in groups" :key="studyGroup.id" :value="studyGroup.id">
+          <option v-for="studyGroup in studyGroups" :key="studyGroup.id" :value="studyGroup.id">
             {{ studyGroup.name }}
           </option>
         </select>
@@ -88,7 +88,7 @@
 
     <!-- Create/Edit Schedule Modal -->
     <Modal v-model="showModal" :title="modalTitle">
-      <ScheduleForm v-if="showModal" :schedule="selectedSchedule" :groups="groups" :classrooms="classrooms"
+      <ScheduleForm v-if="showModal" :schedule="selectedSchedule" :groups="studyGroups" :classrooms="classrooms"
         @submit="handleSubmit" @cancel="showModal = false" />
     </Modal>
   </div>
@@ -120,7 +120,7 @@ const professorStore = useProfessorStore()
 
 // Get store refs
 const { schedules, isLoading } = storeToRefs(scheduleStore)
-const { groups } = storeToRefs(groupStore)
+const { studyGroups } = storeToRefs(groupStore)
 const { classrooms } = storeToRefs(classroomStore)
 const { professors } = storeToRefs(professorStore)
 
@@ -265,8 +265,8 @@ watch([selectedGroup, selectedClassroom, selectedProfessor], async ([studyGroup,
       await scheduleStore.fetchSchedules(undefined, undefined, Number(professor))
     } else if (classroom) {
       await scheduleStore.fetchSchedules(undefined, Number(classroom))
-    } else if (group) {
-      await scheduleStore.fetchSchedules(Number(group))
+    } else if (studyGroup) {
+      await scheduleStore.fetchSchedules(Number(studyGroup))
     } else {
       await scheduleStore.fetchAllSchedules()
     }
@@ -280,7 +280,7 @@ onMounted(async () => {
   try {
     await Promise.all([
       scheduleStore.fetchAllSchedules(),
-      groupStore.fetchGroups(),
+      groupStore.fetchStudyGroups(),
       classroomStore.fetchClassrooms(),
       professorStore.fetchProfessors()
     ])

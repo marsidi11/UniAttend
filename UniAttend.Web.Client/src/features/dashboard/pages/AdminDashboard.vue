@@ -225,7 +225,8 @@ async function handleAcademicYearSubmit(data: Partial<CreateAcademicYearCommand>
     const createRequest: CreateAcademicYearCommand = {
       name: data.name || '',
       startDate: data.startDate || new Date().toISOString(),
-      endDate: data.endDate || new Date().toISOString()
+      endDate: data.endDate || new Date().toISOString(),
+      isActive: data.isActive ?? true 
     }
     await academicYearStore.createAcademicYear(createRequest)
     showAcademicYearModal.value = false

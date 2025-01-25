@@ -12,37 +12,37 @@ import { handleError } from '@/utils/errorHandler';
 
 export const useGroupStore = defineStore('group', () => {
   // State
-  const groups = ref<StudyGroupDto[]>([]);
-  const currentGroup = ref<StudyGroupDto | null>(null);
+  const studyGroups = ref<StudyGroupDto[]>([]);
+  const currentStudyGroup = ref<StudyGroupDto | null>(null);
   const groupStudents = ref<GroupStudentDto[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   // Getters
-  const activeGroups = computed(() => 
-    groups.value.filter(g => g.isActive)
+  const activeStudyGroups = computed(() => 
+    studyGroups.value.filter(g => g.isActive)
   );
 
-  const groupsBySubject = computed(() => {
+  const studyGroupsBySubject = computed(() => {
     const grouped = new Map<string, StudyGroupDto[]>();
-    groups.value.forEach(group => {
+    studyGroups.value.forEach(studyGroup => {
       const subject = studyGroup.subjectName || 'Unassigned';
       if (!grouped.has(subject)) {
         grouped.set(subject, []);
       }
-      grouped.get(subject)?.push(group);
+      grouped.get(subject)?.push(studyGroup);
     });
     return grouped;
   });
 
   // Actions
-  async function fetchGroups(academicYearId?: number) {
+  async function fetchStudyGroups(academicYearId?: number) {
     isLoading.value = true;
     try {
       const { data } = await studyGroupApi.studyGroupsList(
         { academicYearId }
       );
-      groups.value = data;
+      studyGroups.value = data;
       return data;
     } catch (err) {
       handleError(err, error);
@@ -52,11 +52,11 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function fetchGroupById(id: number) {
+  async function fetchStudyGroupById(id: number) {
     isLoading.value = true;
     try {
       const { data } = await studyGroupApi.studyGroupsDetail(id);
-      currentGroup.value = data;
+      currentStudyGroup.value = data;
       return data;
     } catch (err) {
       handleError(err, error);
@@ -66,11 +66,11 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
-  async function createGroup(group: CreateStudyGroupCommand) {
+  async function createStudyGroup(group: CreateStudyGroupCommand) {
     isLoading.value = true;
     try {
       const { data } = await studyGroupApi.studyGroupsCreate(group);
-      groups.value.push(data);
+      studyGroups.value.push(data);
       return data;
     } catch (err) {
       handleError(err, error);
@@ -84,10 +84,10 @@ export const useGroupStore = defineStore('group', () => {
     isLoading.value = true;
     try {
       await studyGroupApi.studyGroupsUpdate(id, { id, ...group });
-      const updatedGroup = await fetchGroupById(id);
-      const index = groups.value.findIndex(g => g.id === id);
+      const updatedGroup = await fetchStudyGroupById(id);
+      const index = studyGroups.value.findIndex(g => g.id === id);
       if (index !== -1) {
-        groups.value[index] = updatedGroup;
+        studyGroups.value[index] = updatedGroup;
       }
       return updatedGroup;
     } catch (err) {
@@ -144,8 +144,8 @@ export const useGroupStore = defineStore('group', () => {
     isLoading.value = true;
     try {
       await studyGroupApi.studyGroupsTransferStudentCreate(data);
-      if (currentGroup.value?.id) {
-        await fetchGroupStudents(currentGroup.value.id);
+      if (currentStudyGroup.value?.id) {
+        await fetchGroupStudents(currentStudyGroup.value.id);
       }
     } catch (err) {
       handleError(err, error);
@@ -157,20 +157,20 @@ export const useGroupStore = defineStore('group', () => {
 
   return {
     // State
-    groups,
-    currentGroup,
+    studyGroups,
+    currentStudyGroup,
     groupStudents,
     isLoading,
     error,
 
     // Getters
-    activeGroups,
-    groupsBySubject,
+    activeStudyGroups,
+    studyGroupsBySubject,
 
     // Actions
-    fetchGroups,
-    fetchGroupById,
-    createGroup,
+    fetchStudyGroups,
+    fetchStudyGroupById,
+    createStudyGroup,
     updateGroup,
     fetchGroupStudents,
     enrollStudents,

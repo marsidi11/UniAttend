@@ -13,7 +13,7 @@
       />
       <StatCard
         title="Active Groups"
-        :value="stats.activeGroups"
+        :value="stats.activeStudyGroups"
       />
       <StatCard
         title="Unassigned Cards"
@@ -113,12 +113,12 @@ const groupStore = useGroupStore()
 
 // Get store refs
 const { students } = storeToRefs(studentStore)
-const { groups } = storeToRefs(groupStore)
+const { studyGroups } = storeToRefs(groupStore)
 
 const isLoading = ref(false)
 const stats = ref({
   studentCount: 0,
-  activeGroups: 0,
+  activeStudyGroups: 0,
   unassignedCards: 0,
   scheduleConflicts: 0
 })
@@ -134,12 +134,12 @@ async function loadDashboardData() {
   try {
     await Promise.all([
       studentStore.fetchStudentsList(),
-      groupStore.fetchGroups()
+      groupStore.fetchStudyGroups()
     ])
     
     stats.value = {
       studentCount: students.value.length,
-      activeGroups: groups.value.filter(g => g.isActive).length,
+      activeStudyGroups: studyGroups.value.filter(g => g.isActive).length,
       unassignedCards: unassignedCardsCount.value,
       scheduleConflicts: 0 // This would come from a schedule validation service
     }

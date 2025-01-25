@@ -21,14 +21,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
     
         public async Task<AcademicYear?> GetCurrentAsync(CancellationToken cancellationToken = default)
         {
-            var currentDate = DateTime.UtcNow.Date;
             return await DbSet
                 .Include(ay => ay.StudyGroups)
-                .FirstOrDefaultAsync(ay => 
-                    ay.StartDate <= currentDate && 
-                    ay.EndDate >= currentDate && 
-                    ay.IsActive, 
-                    cancellationToken);
+                .FirstOrDefaultAsync(ay => ay.IsActive, cancellationToken);
         }
     
         public async Task<bool> HasOverlappingDatesAsync(

@@ -32,11 +32,16 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpGet("active")]
-        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AcademicYearDto>> GetActive(CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetActiveAcademicYearQuery(), cancellationToken);
-            return result != null ? Ok(result) : NotFound();
+            
+            if (result == null)
+                return NotFound(new { message = "No active academic year has been set up yet." });
+                
+            return Ok(result);
         }
 
         [HttpPost]

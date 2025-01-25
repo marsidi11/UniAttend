@@ -22,11 +22,11 @@ export const useCourseSessiontore = defineStore('class', () => {
   const courseSessionsByGroup = computed(() => {
     const grouped = new Map<string, CourseSessionDto[]>();
     courseSessions.value.forEach(cls => {
-      const groupName = cls.groupName || 'Unassigned';
-      if (!grouped.has(groupName)) {
-        grouped.set(groupName, []);
+      const studyGroupName = cls.studyGroupName || 'Unassigned';
+      if (!grouped.has(studyGroupName)) {
+        grouped.set(studyGroupName, []);
       }
-      grouped.get(groupName)?.push(cls);
+      grouped.get(studyGroupName)?.push(cls);
     });
     return grouped;
   });

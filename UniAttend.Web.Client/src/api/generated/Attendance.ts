@@ -72,11 +72,11 @@ export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityD
    * No description
    *
    * @tags Attendance
-   * @name AttendancecourseSessionsConfirmCreate
+   * @name AttendanceCourseSessionsConfirmCreate
    * @request POST:/api/Attendance/courseSessions/{courseSessionId}/confirm
    * @secure
    */
-  attendancecourseSessionsConfirmCreate = (courseSessionId: number, params: RequestParams = {}) =>
+  attendanceCourseSessionsConfirmCreate = (courseSessionId: number, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/Attendance/courseSessions/${courseSessionId}/confirm`,
       method: "POST",
@@ -87,11 +87,11 @@ export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityD
    * No description
    *
    * @tags Attendance
-   * @name AttendancecourseSessionsDetail
+   * @name AttendanceCourseSessionsDetail
    * @request GET:/api/Attendance/courseSessions/{courseSessionId}
    * @secure
    */
-  attendancecourseSessionsDetail = (
+  attendanceCourseSessionsDetail = (
     courseSessionId: number,
     query?: {
       /** @format date-time */

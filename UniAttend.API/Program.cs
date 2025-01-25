@@ -129,10 +129,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection")),
         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
-// Add Email configuration
+// Email configuration
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+// Admin Configuration
+builder.Services.Configure<AdminSettings>(
+    builder.Configuration.GetSection("AdminSettings"));
+builder.Services.AddScoped<AdminSetupService>();
 
 // Build app
 var app = builder.Build();
@@ -155,6 +160,12 @@ app.UseAuthorization();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var adminSetup = scope.ServiceProvider.GetRequiredService<AdminSetupService>();
+    await adminSetup.EnsureAdminCreatedAsync();
+}
 
 try
 {

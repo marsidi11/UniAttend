@@ -23,8 +23,8 @@ export const useSubjectStore = defineStore('subject', () => {
       if (!grouped.has(dept)) {
         grouped.set(dept, []);
       }
-      const group = grouped.get(dept);
-      if (group) {
+      const studyGroup = grouped.get(dept);
+      if (studyGroup) {
         studyGroup.push(subject);
       }
     });

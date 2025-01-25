@@ -8,7 +8,7 @@
           class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         >
           <option value="">All Groups</option>
-          <option v-for="group in groups" :key="studyGroup.id" :value="studyGroup.id">
+          <option v-for="studyGroup in studyGroups" :key="studyGroup.id" :value="studyGroup.id">
             {{ studyGroup.name }}
           </option>
         </select>
@@ -44,7 +44,7 @@ const reportStore = useReportStore()
 
 // Store refs
 const { records, isLoading } = storeToRefs(attendanceStore)
-const { groups } = storeToRefs(groupStore)
+const { studyGroups } = storeToRefs(groupStore)
 
 // Component state
 const selectedGroup = ref('')
@@ -52,7 +52,7 @@ const selectedGroup = ref('')
 // Table columns
 const columns = [
   { key: 'studentName', label: 'Student' },
-  { key: 'groupName', label: 'Group' },
+  { key: 'studyGroupName', label: 'Group' },
   { key: 'checkInTime', label: 'Check-in Time',
     render: (value: string) => new Date(value).toLocaleString()
   },
@@ -83,7 +83,7 @@ async function loadData() {
   try {
     await Promise.all([
       attendanceStore.fetchAttendance(),
-      groupStore.fetchGroups()
+      groupStore.fetchStudyGroups()
     ])
   } catch (err) {
     console.error('Failed to load data:', err)

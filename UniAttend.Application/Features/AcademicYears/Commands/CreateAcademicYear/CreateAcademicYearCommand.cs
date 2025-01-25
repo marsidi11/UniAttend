@@ -8,5 +8,6 @@ namespace UniAttend.Application.Features.AcademicYears.Commands.CreateAcademicYe
         public string Name { get; init; } = string.Empty;
         public DateTime StartDate { get; init; }
         public DateTime EndDate { get; init; }
+        public bool IsActive { get; init; } = true;
     }
 }

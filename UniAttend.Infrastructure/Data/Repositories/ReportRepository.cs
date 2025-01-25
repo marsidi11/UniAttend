@@ -59,11 +59,11 @@ namespace UniAttend.Infrastructure.Data.Repositories
             CancellationToken cancellationToken = default)
         {
             var studentsWithHighAbsence = new List<Student>();
-            var activeGroups = await _context.Set<StudyGroup>()
+            var activeStudyGroups = await _context.Set<StudyGroup>()
                 .Where(sg => sg.IsActive)
                 .ToListAsync(cancellationToken);
 
-            foreach (var studyGroup in activeGroups)
+            foreach (var studyGroup in activeStudyGroups)
             {
                 var enrolledStudents = await _context.Set<GroupStudent>()
                     .Include(gs => gs.Student!)

@@ -33,10 +33,9 @@ namespace UniAttend.Infrastructure.Data.Configurations
                 .HasForeignKey(s => s.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configure many-to-many relationship with Professors
             builder.HasMany(d => d.Professors)
-                .WithOne(p => p.Department)
-                .HasForeignKey(p => p.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(p => p.Departments);
         }
     }
 }

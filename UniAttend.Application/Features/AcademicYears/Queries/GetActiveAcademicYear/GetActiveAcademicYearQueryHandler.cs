@@ -2,6 +2,7 @@ using AutoMapper;
 using MediatR;
 using UniAttend.Application.Features.AcademicYears.DTOs;
 using UniAttend.Core.Interfaces.Repositories;
+using UniAttend.Shared.Exceptions;
 
 namespace UniAttend.Application.Features.AcademicYears.Queries.GetActiveAcademicYear
 {

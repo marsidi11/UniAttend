@@ -31,7 +31,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAcademicYearReport
                 cancellationToken) ?? throw new NotFoundException($"Academic year {request.AcademicYearId} not found");
 
             var totalStudents = academicYear.StudyGroups.Sum(g => g.Students.Count);
-            var activeGroups = academicYear.StudyGroups.Count(g => g.IsActive);
+            var activeStudyGroups = academicYear.StudyGroups.Count(g => g.IsActive);
             
             var attendanceReport = await _attendanceRepository.GetAcademicYearAttendanceReportAsync(
                 request.AcademicYearId,
@@ -45,7 +45,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAcademicYearReport
                 EndDate = academicYear.EndDate,
                 TotalStudents = totalStudents,
                 TotalGroups = academicYear.StudyGroups.Count,
-                ActiveGroups = activeGroups,
+                ActiveGroups = activeStudyGroups,
                 OverallAttendance = attendanceReport.OverallAttendance,
                 PendingAttendanceConfirmations = attendanceReport.PendingConfirmations
             };

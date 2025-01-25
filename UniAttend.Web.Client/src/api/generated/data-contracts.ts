@@ -57,12 +57,25 @@ export interface AssignReaderCommand {
 }
 
 export interface AttendanceRecordDto {
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  courseSessionId?: number;
+  /** @format int32 */
+  studentId?: number;
+  studentName?: string | null;
   /** @format date-time */
   checkInTime?: string;
-  checkInMethod?: string | null;
+  checkInMethod?: CheckInMethod;
   isConfirmed?: boolean;
-  courseName?: string | null;
-  professorName?: string | null;
+  /** @format date-time */
+  confirmationTime?: string | null;
+  /** @format int32 */
+  confirmedByProfessorId?: number | null;
+  studyGroupName?: string | null;
+  classroomName?: string | null;
+  sessionStartTime?: TimeSpan;
+  sessionEndTime?: TimeSpan;
 }
 
 export interface AttendanceReportDto {
@@ -83,7 +96,7 @@ export interface AttendanceStatsDto {
   /** @format int32 */
   totalCourseSessions?: number;
   /** @format int32 */
-  attendedCourseSessions?: number;
+  attendedcourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
 }
@@ -103,20 +116,10 @@ export interface ChangePasswordCommand {
   newPassword?: string | null;
 }
 
-export interface CourseSessionDto {
-  /** @format int32 */
-  id?: number;
-  /** @format int32 */
-  studyGroupId?: number;
-  groupName?: string | null;
-  /** @format int32 */
-  classroomId?: number;
-  classroomName?: string | null;
-  /** @format date-time */
-  date?: string;
-  startTime?: TimeSpan;
-  endTime?: TimeSpan;
-  status?: string | null;
+/** @format int32 */
+export enum CheckInMethod {
+  Value0 = 0,
+  Value1 = 1,
 }
 
 export interface ClassroomDto {
@@ -130,12 +133,29 @@ export interface ClassroomDto {
   updatedAt?: string | null;
 }
 
+export interface CourseSessionDto {
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  studyGroupId?: number;
+  studyGroupName?: string | null;
+  /** @format int32 */
+  classroomId?: number;
+  classroomName?: string | null;
+  /** @format date-time */
+  date?: string;
+  startTime?: TimeSpan;
+  endTime?: TimeSpan;
+  status?: string | null;
+}
+
 export interface CreateAcademicYearCommand {
   name?: string | null;
   /** @format date-time */
   startDate?: string;
   /** @format date-time */
   endDate?: string;
+  isActive?: boolean;
 }
 
 export interface CreateClassroomCommand {
@@ -147,16 +167,6 @@ export interface CreateDepartmentCommand {
   name?: string | null;
 }
 
-export interface CreateStudyGroupCommand {
-  name?: string | null;
-  /** @format int32 */
-  subjectId?: number;
-  /** @format int32 */
-  academicYearId?: number;
-  /** @format int32 */
-  professorId?: number;
-}
-
 export interface CreateScheduleCommand {
   /** @format int32 */
   studyGroupId?: number;
@@ -166,6 +176,16 @@ export interface CreateScheduleCommand {
   dayOfWeek?: number;
   startTime?: TimeSpan;
   endTime?: TimeSpan;
+}
+
+export interface CreateStudyGroupCommand {
+  name?: string | null;
+  /** @format int32 */
+  subjectId?: number;
+  /** @format int32 */
+  academicYearId?: number;
+  /** @format int32 */
+  professorId?: number;
 }
 
 export interface CreateSubjectCommand {
@@ -239,7 +259,7 @@ export interface EnrollStudentsCommand {
 export interface GroupReportDto {
   /** @format int32 */
   studyGroupId?: number;
-  groupName?: string | null;
+  studyGroupName?: string | null;
   subjectName?: string | null;
   professorName?: string | null;
   /** @format int32 */
@@ -261,17 +281,6 @@ export interface GroupStudentDto {
   isActive?: boolean;
 }
 
-export interface StudyGroupSummaryDto {
-  /** @format int32 */
-  studyGroupId?: number;
-  groupName?: string | null;
-  subjectName?: string | null;
-  /** @format int32 */
-  enrolledStudents?: number;
-  /** @format double */
-  attendanceRate?: number;
-}
-
 export interface LoginCommand {
   username?: string | null;
   password?: string | null;
@@ -283,7 +292,7 @@ export interface OpenCourseSessionCommand {
   /** @format int32 */
   classroomId?: number;
   /** @format int32 */
-  courseId?: number;
+  courseSessionId?: number;
   /** @format date-time */
   date?: string;
   startTime?: TimeSpan;
@@ -353,7 +362,7 @@ export interface ScheduleDto {
   id?: number;
   /** @format int32 */
   studyGroupId?: number;
-  groupName?: string | null;
+  studyGroupName?: string | null;
   /** @format int32 */
   classroomId?: number;
   classroomName?: string | null;
@@ -375,7 +384,7 @@ export interface StudentAttendanceDto {
   studentNumber?: string | null;
   fullName?: string | null;
   /** @format int32 */
-  attendedCourseSessions?: number;
+  attendedcourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
 }
@@ -416,13 +425,24 @@ export interface StudyGroupDto {
   isActive?: boolean;
 }
 
+export interface StudyGroupSummaryDto {
+  /** @format int32 */
+  studyGroupId?: number;
+  studyGroupName?: string | null;
+  subjectName?: string | null;
+  /** @format int32 */
+  enrolledStudents?: number;
+  /** @format double */
+  attendanceRate?: number;
+}
+
 export interface SubjectAttendanceDto {
   /** @format int32 */
   subjectId?: number;
   subjectName?: string | null;
-  groupName?: string | null;
+  studyGroupName?: string | null;
   /** @format int32 */
-  attendedCourseSessions?: number;
+  attendedcourseSessions?: number;
   /** @format int32 */
   totalCourseSessions?: number;
   /** @format double */
@@ -521,17 +541,6 @@ export interface UpdateDepartmentCommand {
   isActive?: boolean;
 }
 
-export interface UpdateStudyGroupCommand {
-  /** @format int32 */
-  id?: number;
-  name?: string | null;
-  /** @format int32 */
-  subjectId?: number;
-  /** @format int32 */
-  professorId?: number;
-  isActive?: boolean;
-}
-
 export interface UpdateProfileCommand {
   /** @format int32 */
   userId?: number;
@@ -551,6 +560,17 @@ export interface UpdateScheduleCommand {
   dayOfWeek?: number;
   startTime?: TimeSpan;
   endTime?: TimeSpan;
+}
+
+export interface UpdateStudyGroupCommand {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
+  /** @format int32 */
+  subjectId?: number;
+  /** @format int32 */
+  professorId?: number;
+  isActive?: boolean;
 }
 
 export interface UpdateSubjectCommand {
@@ -625,7 +645,7 @@ export interface UserDto {
 export interface UserGroupDto {
   /** @format int32 */
   studyGroupId?: number;
-  groupName?: string | null;
+  studyGroupName?: string | null;
   subjectName?: string | null;
   academicYearName?: string | null;
 }

@@ -166,7 +166,7 @@ const formattedStats = computed(() => ({
 
 // Table columns
 const groupColumns: Column[] = [
-  { key: 'groupName', label: 'Group' },
+  { key: 'studyGroupName', label: 'Group' },
   { key: 'subjectName', label: 'Subject' },
   { 
     key: 'attendanceRate',
@@ -195,7 +195,7 @@ async function loadStudentData(studentId: number) {
           ...g,
           id: g.studyGroupId || 0,
           studyGroupId: g.studyGroupId || 0,
-          groupName: g.groupName || '',
+          studyGroupName: g.studyGroupName || '',
           subjectName: g.subjectName || '',
           attendanceRate: 0
         })) as ExtendedUserGroupDto[]

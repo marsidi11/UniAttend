@@ -9,7 +9,12 @@
  * ---------------------------------------------------------------
  */
 
-import { AcademicYearDto, CreateAcademicYearCommand, UpdateAcademicYearCommand } from "./data-contracts";
+import {
+  AcademicYearDto,
+  CreateAcademicYearCommand,
+  ProblemDetails,
+  UpdateAcademicYearCommand,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 export class AcademicYear<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
@@ -56,7 +61,7 @@ export class AcademicYear<SecurityDataType = unknown> extends HttpClient<Securit
    * @secure
    */
   academicYearActiveList = (params: RequestParams = {}) =>
-    this.request<AcademicYearDto, any>({
+    this.request<AcademicYearDto, ProblemDetails>({
       path: `/api/AcademicYear/active`,
       method: "GET",
       secure: true,

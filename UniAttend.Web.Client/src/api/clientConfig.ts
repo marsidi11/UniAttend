@@ -79,8 +79,14 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
           }
           case 403:
             throw new ApiError('Access forbidden', 403);
-          case 404:
-            throw new ApiError('Resource not found', 404);
+          case 404: {
+            const errorData = await response.json().catch(() => ({}));
+            throw new ApiError(
+              errorData.message || 'Resource not found',
+              404,
+              errorData
+            );
+          }
           case 422: {
             const validationData = await response.json();
             throw new ApiError(

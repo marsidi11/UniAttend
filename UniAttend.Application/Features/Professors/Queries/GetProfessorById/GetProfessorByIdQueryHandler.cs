@@ -1,10 +1,11 @@
 using MediatR;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Application.Features.Professors.DTOs;
+using UniAttend.Application.Features.Departments.DTOs;
 
 namespace UniAttend.Application.Features.Professors.Queries.GetProfessorById
 {
-    public class GetProfessorByIdQueryHandler 
+    public class GetProfessorByIdQueryHandler
         : IRequestHandler<GetProfessorByIdQuery, ProfessorDto?>
     {
         private readonly IProfessorRepository _professorRepository;
@@ -14,12 +15,10 @@ namespace UniAttend.Application.Features.Professors.Queries.GetProfessorById
             _professorRepository = professorRepository;
         }
 
-        public async Task<ProfessorDto?> Handle(
-            GetProfessorByIdQuery request,
-            CancellationToken cancellationToken)
+        public async Task<ProfessorDto?> Handle(GetProfessorByIdQuery request, CancellationToken cancellationToken)
         {
             var professor = await _professorRepository.GetByIdAsync(request.Id, cancellationToken);
-            
+
             if (professor == null) return null;
 
             return new ProfessorDto
@@ -28,8 +27,12 @@ namespace UniAttend.Application.Features.Professors.Queries.GetProfessorById
                 UserId = professor.Id,
                 FullName = $"{professor.User?.FirstName} {professor.User?.LastName}".Trim(),
                 Email = professor.User?.Email ?? string.Empty,
-                DepartmentId = professor.DepartmentId,
-                DepartmentName = professor.Department?.Name ?? string.Empty,
+                Departments = professor.Departments.Select(d => new DepartmentDto
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    IsActive = d.IsActive
+                }),
                 IsActive = professor.User?.IsActive ?? false
             };
         }

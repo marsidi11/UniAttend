@@ -80,7 +80,7 @@ const subjectStore = useSubjectStore()
 const authStore = useAuthStore()
 
 // Store refs
-const { groups, isLoading } = storeToRefs(groupStore)
+const { studyGroups, isLoading } = storeToRefs(groupStore)
 const { subjects } = storeToRefs(subjectStore)
 
 // Component state
@@ -126,7 +126,7 @@ const modalTitle = computed(() =>
 )
 
 const filteredGroups = computed(() => {
-  let filtered = groups.value.map(group => ({
+  let filtered = studyGroups.value.map(studyGroup => ({
     ...studyGroup,
     id: studyGroup.id ?? 0 // Use nullish coalescing
   })) as ExtendedStudyGroup[]
@@ -148,7 +148,7 @@ function openCreateModal() {
   showModal.value = true
 }
 
-function handleViewDetails(group: StudyGroupDto) {
+function handleViewDetails(studyGroup: StudyGroupDto) {
   router.push(`/dashboard/groups/${studyGroup.id}`)
 }
 
@@ -166,7 +166,7 @@ async function handleSubmit(groupData: Partial<StudyGroupDto>) {
     if (selectedGroup.value?.id) {
       await groupStore.updateGroup(selectedGroup.value.id, groupData)
     } else {
-      await groupStore.createGroup(groupData)
+      await groupStore.createStudyGroup(groupData)
     }
     showModal.value = false
   } catch (err) {
@@ -177,7 +177,7 @@ async function handleSubmit(groupData: Partial<StudyGroupDto>) {
 // Lifecycle hooks
 onMounted(async () => {
   await Promise.all([
-    groupStore.fetchGroups(),
+    groupStore.fetchStudyGroups(),
     subjectStore.fetchSubjects()
   ])
 })

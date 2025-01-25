@@ -30,7 +30,7 @@
           </div>
           <template v-else>
             <div v-for="classItem in todaycourseSessions" :key="classItem.id">
-              <p class="font-medium">{{ classItem.groupName }}</p>
+              <p class="font-medium">{{ classItem.studyGroupName }}</p>
               <p class="text-sm text-gray-500">
                 {{ formatDate(new Date(classItem.date || '')) }} - {{ classItem.classroomName }}
               </p>

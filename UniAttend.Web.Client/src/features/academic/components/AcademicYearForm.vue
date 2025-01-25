@@ -95,7 +95,8 @@ async function handleSubmit() {
     emit('submit', {
       name: form.value.name,
       startDate: form.value.startDate ? new Date(form.value.startDate).toISOString() : undefined,
-      endDate: form.value.endDate ? new Date(form.value.endDate).toISOString() : undefined
+      endDate: form.value.endDate ? new Date(form.value.endDate).toISOString() : undefined,
+      isActive: form.value.isActive
     })
   } finally {
     isLoading.value = false

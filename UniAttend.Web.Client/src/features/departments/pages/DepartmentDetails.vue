@@ -65,17 +65,23 @@
       <DepartmentForm v-if="showEditModal" :department="department" @submit="handleUpdateDepartment"
         @cancel="showEditModal = false" />
     </Modal>
+
+    <!-- Add Subject Modal -->
+    <Modal v-model="showModal" title="Add Subject">
+      <SubjectForm v-if="showModal" :departments="department ? [department] : []"
+        :default-department-id="Number(route.params.id)" @submit="handleCreateSubject" @cancel="showModal = false" />
+    </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useDepartmentStore } from '@/stores/department.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { useSubjectStore } from '@/stores/subject.store'
-import type { DepartmentDto, UpdateDepartmentCommand, SubjectDto } from '@/api/generated/data-contracts'
+import type { DepartmentDto, UpdateDepartmentCommand, SubjectDto, CreateSubjectCommand } from '@/api/generated/data-contracts'
 import { TableItem } from '@/types/tableItem.types'
 import Button from '@/shared/components/ui/Button.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
@@ -84,12 +90,13 @@ import StatCard from '@/shared/components/ui/StatCard.vue'
 import DataTable from '@/shared/components/ui/DataTable.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import DepartmentForm from '../components/DepartmentForm.vue'
+import SubjectForm from '@/features/subjects/components/SubjectForm.vue'
 
 const route = useRoute()
-const router = useRouter()
 const departmentStore = useDepartmentStore()
 const authStore = useAuthStore()
 const subjectStore = useSubjectStore()
+const showModal = ref(false)
 
 const { currentDepartment: department, isLoading, error } = storeToRefs(departmentStore)
 const showEditModal = ref(false)
@@ -149,11 +156,24 @@ async function handleUpdateDepartment(updatedDepartment: Partial<DepartmentDto>)
   }
 }
 
+async function handleCreateSubject(data: CreateSubjectCommand) {
+  try {
+    await subjectStore.createSubject({
+      ...data,
+      departmentId: Number(route.params.id)
+    })
+    showModal.value = false
+    await loadSubjects(Number(route.params.id))
+  } catch (err) {
+    console.error('Failed to create subject:', err)
+  }
+}
+
 function openEditModal() {
   showEditModal.value = true
 }
 
 function openAddSubjectModal() {
-  router.push(`/dashboard/departments/${route.params.id}/subjects/new`)
+  showModal.value = true
 }
 </script>

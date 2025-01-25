@@ -38,7 +38,7 @@ namespace UniAttend.Application.Features.Users.Commands.UpdateUser
                 var professor = await _unitOfWork.Professors.GetByUserIdAsync(user.Id, cancellationToken)
                     ?? throw new NotFoundException($"Professor record not found for user {user.Id}");
 
-                professor.AssignDepartment(department);
+                professor.AddDepartment(department);
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

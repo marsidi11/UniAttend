@@ -20,11 +20,10 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedNever();
 
-            // Configure relationships
-            builder.HasOne(x => x.Department)
-                .WithMany(x => x.Professors)
-                .HasForeignKey(x => x.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configure many-to-many relationship with Department
+            builder.HasMany(p => p.Departments)
+                .WithMany(d => d.Professors)
+                .UsingEntity(j => j.ToTable("ProfessorDepartments"));
 
             builder.HasOne(x => x.User)
                 .WithOne()

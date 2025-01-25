@@ -49,6 +49,7 @@ import type { SubjectDto, DepartmentDto, CreateSubjectCommand } from '@/api/gene
 interface Props {
   subject?: SubjectDto | null
   departments: DepartmentDto[]
+  defaultDepartmentId?: number
 }
 
 const props = defineProps<Props>()
@@ -60,18 +61,23 @@ const emit = defineEmits<{
 const isLoading = ref(false)
 const form = ref<CreateSubjectCommand>({
   name: '',
-  departmentId: 0,
+  departmentId: props.defaultDepartmentId || 0,
   description: '',
   credits: 1,
 })
 
-watch(() => props.subject, (newSubject) => {
-  if (newSubject) {
+watch(() => [props.subject, props.defaultDepartmentId], ([newSubject, newDefaultId]) => {
+  if (newSubject && typeof newSubject === 'object' && 'name' in newSubject) {
     form.value = {
-      name: newSubject.name,
-      departmentId: newSubject.departmentId,
+      name: newSubject.name ?? '',
+      departmentId: newSubject.departmentId ?? 0,
       description: newSubject.description ?? '',
-      credits: newSubject.credits,
+      credits: newSubject.credits ?? 1,
+    }
+  } else if (typeof newDefaultId === 'number') {
+    form.value = {
+      ...form.value,
+      departmentId: newDefaultId
     }
   }
 }, { immediate: true })

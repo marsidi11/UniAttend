@@ -24,39 +24,41 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public ProfessorRepository(ApplicationDbContext context) : base(context) { }
 
         public override async Task<IEnumerable<Professor>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        return await DbSet
+        {
+            return await DbSet
             .Include(p => p.User)
-            .Include(p => p.Department)
+            .Include(p => p.Departments)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-    }
+        }
 
         public override async Task<Professor?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-            => await DbSet
+        {
+            return await DbSet
                 .Include(p => p.User)
-                .Include(p => p.Department)
+                .Include(p => p.Departments)
                 .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        }
 
         public async Task<Professor?> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
         {
             return await DbSet
                 .Include(p => p.User)
-                .Include(p => p.Department)
+                .Include(p => p.Departments)
                 .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);
         }
 
         public async Task<Professor?> GetByUserId(int userId, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(p => p.User)
-                .Include(p => p.Department)
+                .Include(p => p.Departments)
                 .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);
 
         public async Task<IEnumerable<Professor>> GetByDepartmentId(int departmentId, CancellationToken cancellationToken = default)
     {
         return await DbSet
             .Include(p => p.User)
-            .Include(p => p.Department)
+            .Include(p => p.Departments)
             .Where(p => p.DepartmentId == departmentId)
             .AsNoTracking()
             .ToListAsync(cancellationToken);

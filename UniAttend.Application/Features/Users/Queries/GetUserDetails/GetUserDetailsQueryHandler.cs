@@ -19,49 +19,50 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
             _mapper = mapper;
         }
 
-                        public async Task<UserDetailsDto> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
-                {
-                    var user = await _unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken)
-                        ?? throw new NotFoundException($"User with ID {request.UserId} not found");
-                
-                    var userDetails = _mapper.Map<UserDetailsDto>(user);
-                    
-                    // Initialize result with base user details
-                    var result = userDetails;
-                
-                    // Get additional details based on role
-                    switch (user.Role)
+        public async Task<UserDetailsDto> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken)
+                ?? throw new NotFoundException($"User with ID {request.UserId} not found");
+
+            var userDetails = _mapper.Map<UserDetailsDto>(user);
+
+            // Initialize result with base user details
+            var result = userDetails;
+
+            // Get additional details based on role
+            switch (user.Role)
+            {
+                case UserRole.Student:
+                    var student = await _unitOfWork.Students.GetByIdAsync(user.Id, cancellationToken);
+                    if (student != null)
                     {
-                        case UserRole.Student:
-                            var student = await _unitOfWork.Students.GetByIdAsync(user.Id, cancellationToken);
-                            if (student != null)
-                            {
-                                result = userDetails with
-                                {
-                                    DepartmentId = student.DepartmentId,
-                                    DepartmentName = student.Department?.Name,
-                                    Groups = await GetStudentGroups(student.Id, cancellationToken),
-                                    AttendanceStats = await GetStudentAttendanceStats(student.Id, cancellationToken)
-                                };
-                            }
-                            break;
-                
-                        case UserRole.Professor:
-                            var professor = await _unitOfWork.Professors.GetByIdAsync(user.Id, cancellationToken);
-                            if (professor != null)
-                            {
-                                result = userDetails with
-                                {
-                                    DepartmentId = professor.DepartmentId,
-                                    DepartmentName = professor.Department?.Name,
-                                    Groups = await GetProfessorStudyGroups(professor.Id, cancellationToken)
-                                };
-                            }
-                            break;
+                        result = userDetails with
+                        {
+                            DepartmentId = student.DepartmentId,
+                            DepartmentName = student.Department?.Name,
+                            Groups = await GetStudentGroups(student.Id, cancellationToken),
+                            AttendanceStats = await GetStudentAttendanceStats(student.Id, cancellationToken)
+                        };
                     }
-                
-                    return result;
-                }
+                    break;
+
+                case UserRole.Professor:
+                    var professor = await _unitOfWork.Professors.GetByIdAsync(user.Id, cancellationToken);
+                    if (professor != null)
+                    {
+                        var primaryDepartment = professor.Departments.FirstOrDefault();
+                        result = userDetails with
+                        {
+                            DepartmentId = primaryDepartment?.Id,
+                            DepartmentName = primaryDepartment?.Name,
+                            Groups = await GetProfessorStudyGroups(professor.Id, cancellationToken)
+                        };
+                    }
+                    break;
+            }
+
+            return result;
+        }
 
         private async Task<IEnumerable<UserGroupDto>> GetStudentGroups(int studentId, CancellationToken cancellationToken)
         {

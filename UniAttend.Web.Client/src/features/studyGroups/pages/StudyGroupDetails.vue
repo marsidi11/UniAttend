@@ -130,7 +130,7 @@ const authStore = useAuthStore()
 const reportStore = useReportStore()
 
 // Store refs
-const { currentGroup: baseGroup, isLoading, error } = storeToRefs(groupStore)
+const { currentStudyGroup: baseGroup, isLoading, error } = storeToRefs(groupStore)
 const { subjects } = storeToRefs(subjectStore)
 
 const group = computed<StudyGroup | null>(() => {
@@ -184,7 +184,7 @@ async function loadGroupData() {
   if (studyGroupId) {
     try {
       await Promise.all([
-        groupStore.fetchGroupById(studyGroupId),
+        groupStore.fetchStudyGroupById(studyGroupId),
         loadStudents(studyGroupId),
         loadGroupStats(studyGroupId)
       ])

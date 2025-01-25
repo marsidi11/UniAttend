@@ -65,7 +65,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
   async function confirmAttendance(courseSessionId: number) {
     isLoading.value = true;
     try {
-      await attendanceApi.attendancecourseSessionsConfirmCreate(courseSessionId);
+      await attendanceApi.attendanceCourseSessionsConfirmCreate(courseSessionId);
       if (currentCourseSession.value) {
         currentCourseSession.value = currentCourseSession.value.map(record => ({
           ...record,
@@ -83,7 +83,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
   async function fetchClassAttendance(courseSessionId: number, date?: Date) {
     isLoading.value = true;
     try {
-      const { data } = await attendanceApi.attendancecourseSessionsDetail(
+      const { data } = await attendanceApi.attendanceCourseSessionsDetail(
         courseSessionId,
         date ? { date: date.toISOString() } : undefined
       );

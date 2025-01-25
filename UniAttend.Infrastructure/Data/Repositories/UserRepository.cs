@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Entities.Identity;
 using UniAttend.Core.Interfaces.Repositories;
@@ -12,6 +13,11 @@ namespace UniAttend.Infrastructure.Data.Repositories
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
         public UserRepository(ApplicationDbContext context) : base(context) { }
+
+        public async Task<bool> AnyAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            return await DbSet.AnyAsync(predicate, cancellationToken);
+        }
 
         public override async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {

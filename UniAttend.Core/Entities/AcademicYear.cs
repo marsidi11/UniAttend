@@ -16,7 +16,8 @@ namespace UniAttend.Core.Entities
             StudyGroups = new List<StudyGroup>();
         }
 
-        public AcademicYear(string name, DateTime startDate, DateTime endDate)
+        public AcademicYear(string name, DateTime startDate, DateTime endDate, bool isActive = true) 
+            : base(isActive)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name cannot be empty", nameof(name));
@@ -24,7 +25,7 @@ namespace UniAttend.Core.Entities
                 throw new ArgumentException("Start date must be before end date");
             if (name.Length > 20)
                 throw new ArgumentException("Name cannot exceed 20 characters", nameof(name));
-
+        
             Name = name;
             StartDate = startDate;
             EndDate = endDate;
