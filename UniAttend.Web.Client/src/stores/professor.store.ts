@@ -16,10 +16,11 @@ export const useProfessorStore = defineStore('professor', () => {
     professors.value.filter(p => p.isActive)
   );
 
-  const professorsByDepartment = computed(() => {
+    const professorsByDepartment = computed(() => {
     const grouped = new Map<string, ProfessorDto[]>();
     professors.value.forEach(professor => {
-      const dept = professor.departmentName || 'Unassigned';
+      // Get the first department name or default to 'Unassigned'
+      const dept = professor.departments?.[0]?.name || 'Unassigned';
       if (!grouped.has(dept)) {
         grouped.set(dept, []);
       }

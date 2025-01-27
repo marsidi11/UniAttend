@@ -13,9 +13,6 @@ namespace UniAttend.Infrastructure.Data.Configurations
 
             builder.ToTable("Professors");
 
-            builder.Property(x => x.DepartmentId)
-                .IsRequired();
-
             // Professor shares the same Id with User (one-to-one)
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedNever();

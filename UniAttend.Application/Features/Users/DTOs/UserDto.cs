@@ -1,3 +1,4 @@
+using UniAttend.Application.Features.Departments.DTOs;
 using UniAttend.Core.Enums;
 
 namespace UniAttend.Application.Features.Users.DTOs
@@ -12,6 +13,7 @@ namespace UniAttend.Application.Features.Users.DTOs
         public UserRole Role { get; init; }
         public int? DepartmentId { get; init; }
         public string? DepartmentName { get; init; }
+        public IEnumerable<DepartmentDto> Departments { get; set; } = Enumerable.Empty<DepartmentDto>();
         public bool IsActive { get; init; }
         public DateTime CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }

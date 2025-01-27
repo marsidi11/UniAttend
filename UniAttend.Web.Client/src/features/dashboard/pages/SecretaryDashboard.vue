@@ -33,7 +33,7 @@
         <h2 class="text-lg font-medium mb-4">Quick Actions</h2>
         <div class="space-y-4">
           <Button 
-            @click="router.push('/dashboard/students/register')" 
+            @click="router.push('/dashboard/students/')" 
             class="w-full"
             variant="secondary"
           >

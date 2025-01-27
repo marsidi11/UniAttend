@@ -10,6 +10,6 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
         public string FirstName { get; init; } = string.Empty;
         public string LastName { get; init; } = string.Empty;
         public UserRole Role { get; init; }
-        public int? DepartmentId { get; init; }
+        public ICollection<int>? DepartmentIds { get; init; }
     }
 }

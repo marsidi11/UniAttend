@@ -55,7 +55,7 @@
         <div class="grid grid-cols-3 gap-4">
           <StatCard title="Total Students" :value="studyGroup?.totalStudents || 0" />
           <StatCard title="Average Attendance" :value="`${studyGroup?.averageAttendance || 0}%`" />
-          <StatCard title="Total courseSessions" :value="studyGroup?.totalCourseSessions || 0" />
+          <StatCard title="Total Course Sessions" :value="studyGroup?.totalCourseSessions || 0" />
         </div>
 
         <!-- Students List -->

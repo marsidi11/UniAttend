@@ -7,7 +7,7 @@ import type {
 import { courseSessionApi } from '@/api/apiInstances';
 import { handleError } from '@/utils/errorHandler';
 
-export const useCourseSessiontore = defineStore('class', () => {
+export const useCourseSessionStore = defineStore('class', () => {
   // State
   const courseSessions = ref<CourseSessionDto[]>([]);
   const currentCourseSession = ref<CourseSessionDto | null>(null);

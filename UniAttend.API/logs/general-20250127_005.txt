@@ -1,0 +1,8 @@
+2025-01-27 19:25:03.323 +01:00 [INF] Starting web application
+2025-01-27 19:25:06.467 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-01-27 19:25:08.203 +01:00 [INF] Retrieved 0 professors from database
+2025-01-27 19:25:08.204 +01:00 [INF] After filtering: 0 professors
+2025-01-27 19:37:02.169 +01:00 [INF] Starting web application
+2025-01-27 19:37:51.416 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-01-27 19:37:52.521 +01:00 [INF] Retrieved 0 professors from database
+2025-01-27 19:37:52.523 +01:00 [INF] After filtering: 0 professors

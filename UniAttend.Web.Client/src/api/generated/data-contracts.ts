@@ -205,6 +205,7 @@ export interface CreateUserCommand {
   role?: UserRole;
   /** @format int32 */
   departmentId?: number | null;
+  departmentIds?: number[] | null;
 }
 
 export interface DailyAttendanceDto {
@@ -316,9 +317,7 @@ export interface ProfessorDto {
   userId?: number;
   fullName?: string | null;
   email?: string | null;
-  /** @format int32 */
-  departmentId?: number;
-  departmentName?: string | null;
+  departments?: DepartmentDto[] | null;
   isActive?: boolean;
 }
 

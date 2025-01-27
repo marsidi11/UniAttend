@@ -41,15 +41,20 @@
 
     <!-- Department selection (only for professors) -->
     <div v-if="!props.user && form.role === 3">
-    <label for="departmentId" class="block text-sm font-medium text-gray-700">Department</label>
-    <select id="departmentId" v-model="form.departmentId" required
-      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-      <option value="">Select Department</option>
-      <option v-for="dept in props.departments" :key="dept.id" :value="dept.id">
-        {{ dept.name }}
-      </option>
-    </select>
-  </div>
+  <label for="departmentIds" class="block text-sm font-medium text-gray-700">Departments</label>
+  <select 
+    id="departmentIds" 
+    v-model="form.departmentIds" 
+    multiple
+    required
+    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  >
+    <option v-for="dept in props.departments" :key="dept.id" :value="dept.id">
+      {{ dept.name }}
+    </option>
+  </select>
+  <p class="mt-1 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple departments</p>
+</div>
 
     <!-- Active Status (for existing users only) -->
     <div v-if="props.user">
@@ -104,7 +109,7 @@ interface FormData {
   lastName: string
   email: string
   role: UserRole | null
-  departmentId: number | null
+  departmentIds: number[]
   isActive: boolean
 }
 
@@ -114,7 +119,7 @@ const form = ref<FormData>({
   lastName: '',
   email: '',
   role: null,
-  departmentId: null,
+  departmentIds: [],
   isActive: true
 })
 
@@ -126,7 +131,7 @@ watch(() => props.user, (newUser) => {
       lastName: newUser.lastName ?? '',
       email: newUser.email ?? '',
       role: newUser.role ?? null,
-      departmentId: newUser.departmentId ?? null,
+      departmentIds: [],
       isActive: newUser.isActive ?? true
     }
   } else {
@@ -137,7 +142,7 @@ watch(() => props.user, (newUser) => {
       lastName: '',
       email: '',
       role: null,
-      departmentId: null,
+      departmentIds: [],
       isActive: true
     }
   }
@@ -161,7 +166,7 @@ async function handleSubmit() {
         firstName: form.value.firstName,
         lastName: form.value.lastName,
         email: form.value.email,
-        departmentId: form.value.role === 3 ? form.value.departmentId : undefined,
+        departmentId: form.value.role === 3 ? form.value.departmentIds : undefined,
         isActive: form.value.isActive
       } as UpdateUserCommand)
     } else {
@@ -172,7 +177,7 @@ async function handleSubmit() {
         lastName: form.value.lastName,
         email: form.value.email,
         role: form.value.role,
-        departmentId: form.value.role === 3 ? form.value.departmentId! : undefined
+        departmentIds: form.value.role === 3 ? form.value.departmentIds! : undefined
       }
       emit('submit', createData)
     }

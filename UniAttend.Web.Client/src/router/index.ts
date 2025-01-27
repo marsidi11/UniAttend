@@ -27,7 +27,6 @@ import UserManagement from '@/features/users/pages/UserManagement.vue';
 import UserProfile from '@/features/users/pages/UserProfile.vue';
 import StudentList from '@/features/students/pages/StudentList.vue';
 import StudentDetails from '@/features/students/pages/StudentDetails.vue';
-import ProfessorList from '@/features/professors/pages/ProfessorList.vue';
 // import CardManagement from '@/features/cards/pages/CardManagement.vue';
 
 // Schedule & Groups
@@ -37,7 +36,6 @@ import StudyGroupDetails from '@/features/studyGroups/pages/StudyGroupDetails.vu
 import ClassroomList from '@/features/classrooms/pages/ClassroomList.vue';
 
 // Attendance
-import ProfessorAttendance from '@/features/attendance/pages/ProfessorAttendancePage.vue';
 import StudentAttendance from '@/features/attendance/pages/StudentAttendancePage.vue';
 import AttendanceRecords from '@/features/attendance/pages/AttendanceRecords.vue';
 import OtpCheckIn from '@/features/attendance/pages/OtpCheckIn.vue';
@@ -169,12 +167,6 @@ const routes = [
         path: 'professor',
         name: 'professor-dashboard',
         component: ProfessorDashboard,
-        meta: { roles: ['professor'] }
-      },
-      {
-        path: 'attendance/manage',
-        name: 'manage-attendance',
-        component: ProfessorAttendance,
         meta: { roles: ['professor'] }
       },
       {

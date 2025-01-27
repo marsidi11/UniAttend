@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UniAttend.Core.Entities.Identity;
+using UniAttend.Core.Enums;
 
 namespace UniAttend.Core.Interfaces.Repositories
 {
@@ -13,6 +14,8 @@ namespace UniAttend.Core.Interfaces.Repositories
     {
         Task<bool> AnyAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default);
         
+        Task<User> CreateUserWithRoleAsync(User user, UserRole role, IEnumerable<int>? departmentIds = null, CancellationToken cancellationToken = default);
+    
         /// <summary>
         /// Retrieves a user by their unique username
         /// </summary>

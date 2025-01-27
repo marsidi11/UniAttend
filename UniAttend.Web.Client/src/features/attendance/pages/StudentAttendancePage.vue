@@ -6,7 +6,7 @@
 
     <div class="grid grid-cols-3 gap-4">
       <StatCard
-        title="Total courseSessions"
+        title="Total Course Sessions"
         :value="stats.totalCourseSessions || 0"
       />
       <StatCard

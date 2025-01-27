@@ -20,9 +20,6 @@ namespace UniAttend.Core.Entities
             CreatedAt = DateTime.UtcNow; // Set creation time
         }
 
-        // Identity properties - immutable
-        public int DepartmentId { get; }
-
         // Domain references without EF Core annotations - nullable for EF Core
         public User? User { get; private set; }
         public IReadOnlyCollection<Department> Departments => _departments.AsReadOnly();

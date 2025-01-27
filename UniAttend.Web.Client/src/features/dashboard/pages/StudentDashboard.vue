@@ -16,7 +16,7 @@
     <!-- Personal Stats -->
     <div class="grid grid-cols-3 gap-4">
       <StatCard
-        title="Total courseSessions"
+        title="Total Course Sessions"
         :value="stats.totalCourseSessions"
       />
       <StatCard
@@ -40,7 +40,7 @@
             <Spinner :size="6" />
           </div>
           <div v-else-if="!todaycourseSessions.length" class="text-gray-500 text-center">
-            No courseSessions scheduled for today
+            No Course Sessions scheduled for today
           </div>
           <div 
             v-else

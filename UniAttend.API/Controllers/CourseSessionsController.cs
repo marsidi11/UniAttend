@@ -21,7 +21,7 @@ namespace UniAttend.API.Controllers
         }
 
         /// <summary>
-        /// Gets all active courseSessions with optional filtering
+        /// Gets all Active Course Sessions with optional filtering
         /// </summary>
         /// <param name="studyGroupId">Optional group ID filter</param>
         /// <param name="classroomId">Optional classroom ID filter</param>

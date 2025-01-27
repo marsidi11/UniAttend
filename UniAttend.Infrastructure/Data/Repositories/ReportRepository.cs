@@ -101,7 +101,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
             if (totalCourseSessions == 0)
             {
-                return 100; // No courseSessions held yet
+                return 100; // No Course Sessions held yet
             }
 
             var attendedCourseSessions = await _context.Set<AttendanceRecord>()

@@ -14,19 +14,21 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IEmailService _emailService;
-
+    
         public CreateUserCommandHandler(
             IUnitOfWork unitOfWork,
             IPasswordHasher passwordHasher,
             IEmailService emailService)
         {
-            _unitOfWork = unitOfWork;
-            _passwordHasher = passwordHasher;
-            _emailService = emailService;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         }
 
         public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
+            
+            // Validation
             if (request.Role != UserRole.Secretary && request.Role != UserRole.Professor)
                 throw new ValidationException("Invalid role for User member");
 
@@ -36,19 +38,7 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
             if (await _unitOfWork.Users.EmailExistsAsync(request.Email, cancellationToken))
                 throw new ValidationException("Email already exists");
 
-            // Skip department validation for Secretary role
-            Department? department = null;
-            if (request.Role == UserRole.Professor)
-            {
-                if (!request.DepartmentId.HasValue)
-                    throw new ValidationException("Department is required for professors");
-                    
-                department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentId.Value, cancellationToken)
-                    ?? throw new NotFoundException($"Department with ID {request.DepartmentId.Value} not found");
-            }
-        
             var tempPassword = PasswordGenerator.GenerateTemporaryPassword();
-        
             var user = new User(
                 request.Username,
                 _passwordHasher.HashPassword(tempPassword),
@@ -57,24 +47,21 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
                 request.FirstName,
                 request.LastName
             );
-        
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        
+
             try
             {
-                await _unitOfWork.Users.AddAsync(user, cancellationToken);
-
-                // Only create Professor entity if role is Professor
-                if (request.Role == UserRole.Professor && department != null)
-                {
-                    var professor = new Professor(user); // Use the public constructor
-                    professor.AddDepartment(department); // Use public method to add department
-                    await _unitOfWork.Professors.AddAsync(professor, cancellationToken);
-                }
+                // Create user with role and departments
+                await _unitOfWork.Users.CreateUserWithRoleAsync(
+                    user,
+                    request.Role,
+                    request.DepartmentIds,
+                    cancellationToken);
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);
-        
+
                 await _emailService.SendWelcomeEmailAsync(
                     user.Email,
                     $"{user.FirstName} {user.LastName}",
@@ -82,7 +69,7 @@ namespace UniAttend.Application.Features.Users.Commands.CreateUser
                     tempPassword,
                     cancellationToken
                 );
-        
+
                 return user.Id;
             }
             catch

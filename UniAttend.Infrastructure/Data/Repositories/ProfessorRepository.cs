@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UniAttend.Core.Entities;
+using UniAttend.Core.Enums;
 using UniAttend.Core.Interfaces.Repositories;
 using UniAttend.Infrastructure.Data.Repositories.Base;
 
@@ -26,10 +27,11 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public override async Task<IEnumerable<Professor>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await DbSet
-            .Include(p => p.User)
-            .Include(p => p.Departments)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+                .Include(p => p.User)
+                .Include(p => p.Departments)
+                .Where(p => p.User != null && p.User.Role == UserRole.Professor)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         }
 
         public override async Task<Professor?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -48,20 +50,14 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);
         }
 
-        public async Task<Professor?> GetByUserId(int userId, CancellationToken cancellationToken = default)
-            => await DbSet
+        public async Task<IEnumerable<Professor>> GetByDepartmentId(int departmentId, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
                 .Include(p => p.User)
                 .Include(p => p.Departments)
-                .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);
-
-        public async Task<IEnumerable<Professor>> GetByDepartmentId(int departmentId, CancellationToken cancellationToken = default)
-    {
-        return await DbSet
-            .Include(p => p.User)
-            .Include(p => p.Departments)
-            .Where(p => p.DepartmentId == departmentId)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-    }
+                .Where(p => p.Departments.Any(d => d.Id == departmentId))
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
     }
 }
