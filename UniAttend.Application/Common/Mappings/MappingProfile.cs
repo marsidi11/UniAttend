@@ -28,25 +28,33 @@ namespace UniAttend.Application.Common.Mappings
     .ForMember(d => d.DepartmentName, opt => opt.MapFrom(s => s.Department.Name));
 
             CreateMap<User, UserDto>()
-                .ForMember(d => d.DepartmentId, opt => opt.MapFrom((src, _, _, context) =>
-                    src.Role == UserRole.Student && src.Student != null ?
-                        src.Student.DepartmentId :
-                    (int?)null))
-                .ForMember(d => d.DepartmentName, opt => opt.MapFrom((src, _, _, context) =>
-                    src.Role == UserRole.Student && src.Student != null ?
-                        src.Student.Department?.Name :
-                    null))
-                .ForMember(d => d.Departments, opt => opt.MapFrom((src, _, _, context) =>
-                    src.Role == UserRole.Professor && src.Professor != null ?
-                        src.Professor.Departments.Select(d => new DepartmentDto 
-                        { 
-                            Id = d.Id,
-                            Name = d.Name,
-                            IsActive = d.IsActive
-                        }) :
-                        Enumerable.Empty<DepartmentDto>()))
-                .ForMember(d => d.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-                .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
+    .ForMember(d => d.Departments, opt => opt.MapFrom((src, _, _, context) =>
+    {
+        if (src.Role == UserRole.Professor && src.Professor != null)
+        {
+            return src.Professor.Departments.Select(d => new DepartmentDto
+            {
+                Id = d.Id,
+                Name = d.Name,
+                IsActive = d.IsActive
+            });
+        }
+        else if (src.Role == UserRole.Student && src.Student?.Department != null)
+        {
+            return new[]
+            {
+                            new DepartmentDto
+                            {
+                                Id = src.Student.Department.Id,
+                                Name = src.Student.Department.Name,
+                                IsActive = src.Student.Department.IsActive
+                            }
+            };
+        }
+        return Enumerable.Empty<DepartmentDto>();
+    }))
+    .ForMember(d => d.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+    .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
             CreateMap<Department, DepartmentDto>()
                 .ForMember(d => d.SubjectsCount, opt => opt.MapFrom(src => src.Subjects.Count))

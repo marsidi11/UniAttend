@@ -629,11 +629,10 @@ export interface UserDto {
   firstName?: string | null;
   lastName?: string | null;
   role?: UserRole;
-  /** @format int32 */
-  departmentId?: number | null;
   departmentName?: string | null;
   departments?: DepartmentDto[] | null;
   isActive?: boolean;
+  totpSecret?: string | null;
   /** @format date-time */
   createdAt?: string;
   /** @format date-time */

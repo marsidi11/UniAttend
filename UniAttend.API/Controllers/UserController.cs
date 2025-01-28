@@ -13,6 +13,9 @@ using UniAttend.Application.Features.Users.Queries.GetUserProfile;
 using UniAttend.API.Extensions;
 using UniAttend.Core.Enums;
 using UniAttend.Application.Features.Auth.Commands.ResetPassword;
+using UniAttend.Application.Features.Users.Commands.VerifyTotp;
+using UniAttend.Application.Features.Users.Commands.SetupTotp;
+using UniAttend.Application.Features.Users.DTOs;
 
 namespace UniAttend.API.Controllers
 {
@@ -136,6 +139,32 @@ namespace UniAttend.API.Controllers
         {
             await _mediator.Send(command, cancellationToken);
             return Ok(new { message = "If an account exists with this email, password reset instructions will be sent." });
+        }
+
+        [Authorize(Roles = "Student")]
+        [HttpPost("setup-totp")]
+        public async Task<ActionResult<TotpSetupDto>> SetupTotpAttendance()
+        {
+            var command = new SetupTotpCommand
+            {
+                StudentId = User.GetUserId(),
+                Email = User.GetEmail()
+            };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Student")]
+        [HttpPost("verify-totp")]
+        public async Task<ActionResult<bool>> VerifyTotp([FromBody] string code)
+        {
+            var command = new VerifyTotpCommand
+            {
+                StudentId = User.GetUserId(),
+                Code = code
+            };
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
     }
 }

@@ -8,7 +8,6 @@ namespace UniAttend.Application.Features.Users.Queries.GetUsers
     {
         public int? Id { get; init; }
         public UserRole? Role { get; init; }
-        public int? DepartmentId { get; init; }
         public bool? IsActive { get; init; }
     }
 }

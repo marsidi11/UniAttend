@@ -25,19 +25,6 @@ namespace UniAttend.API.Controllers
             _mediator = mediator;
         }
 
-        [Authorize(Roles = "Student")]
-        [HttpPost("setup-totp")]
-        public async Task<ActionResult<TotpSetupDto>> SetupTotpAttendance()
-        {
-            var command = new SetupTotpCommand
-            {
-                StudentId = User.GetUserId(),
-                Email = User.GetEmail()
-            };
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
-
         [HttpPost("card")]
         public async Task<IActionResult> RecordCardAttendance(RecordCardAttendanceCommand command)
         {

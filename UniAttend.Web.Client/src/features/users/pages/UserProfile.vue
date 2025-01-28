@@ -14,8 +14,11 @@
     <div class="bg-white shadow rounded-lg p-6">
       <ProfileForm
         :user="mappedUser"
+        :totp-setup="totpSetup"
         @update-profile="handleUpdateProfile"
         @update-password="handleUpdatePassword"
+        @setup-totp="handleSetupTotp"
+        @confirm-totp="handleConfirmTotp"
       />
     </div>
   </div>
@@ -25,16 +28,25 @@
 import { computed, ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user.store'
 import { useAuthStore } from '@/stores/auth.store'
-import type { UserProfileDto, UserDto, ChangePasswordCommand } from '@/api/generated/data-contracts'
+import { useAttendanceStore } from '@/stores/attendance.store'
+import type { 
+  UserProfileDto, 
+  UserDto, 
+  ChangePasswordCommand,
+  TotpSetupDto 
+} from '@/api/generated/data-contracts'
 import { StringRole } from '@/types/base.types'
 import ProfileForm from '../components/ProfileForm.vue'
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
+const attendanceStore = useAttendanceStore()
 
 const message = ref<{ text: string; type: 'success' | 'error' } | null>(null)
 
 const currentUser = computed(() => authStore.user)
+
+const totpSetup = ref<TotpSetupDto | null>(null)
 
 const mappedUser = computed<UserDto | null>(() => {
   if (!currentUser.value) return null;
@@ -69,6 +81,28 @@ async function handleUpdatePassword(passwordData: ChangePasswordCommand) {
   } catch (err) {
     console.error('Failed to change password:', err)
     message.value = { text: 'Failed to change password', type: 'error' }
+  }
+}
+
+async function handleSetupTotp() {
+  try {
+    const setup = await attendanceStore.setupTotp()
+    totpSetup.value = setup
+  } catch (err) {
+    console.error('Failed to setup TOTP:', err)
+    message.value = { text: 'Failed to setup two-factor authentication', type: 'error' }
+  }
+}
+
+async function handleConfirmTotp(code: string) {
+  try {
+    await attendanceStore.verifyTotp(code)
+    totpSetup.value = null
+    message.value = { text: 'Two-factor authentication enabled successfully', type: 'success' }
+    await userStore.fetchProfile()
+  } catch (err) {
+    console.error('Failed to confirm TOTP setup:', err)
+    throw err // Re-throw to handle in form component
   }
 }
 
