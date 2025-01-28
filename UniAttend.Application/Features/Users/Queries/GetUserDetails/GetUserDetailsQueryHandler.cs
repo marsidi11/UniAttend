@@ -86,7 +86,7 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserDetails
             return new AttendanceStatsDto
             {
                 TotalCourseSessions = stats.TotalCourseSessions,
-                AttendedcourseSessions = stats.AttendedcourseSessions,
+                AttendedCourseSessions = stats.AttendedCourseSessions,
                 AttendanceRate = stats.AttendanceRate
             };
         }

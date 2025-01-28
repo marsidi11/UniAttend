@@ -96,7 +96,7 @@ export interface AttendanceStatsDto {
   /** @format int32 */
   totalCourseSessions?: number;
   /** @format int32 */
-  attendedcourseSessions?: number;
+  attendedCourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
 }
@@ -203,8 +203,6 @@ export interface CreateUserCommand {
   firstName?: string | null;
   lastName?: string | null;
   role?: UserRole;
-  /** @format int32 */
-  departmentId?: number | null;
   departmentIds?: number[] | null;
 }
 
@@ -383,7 +381,7 @@ export interface StudentAttendanceDto {
   studentNumber?: string | null;
   fullName?: string | null;
   /** @format int32 */
-  attendedcourseSessions?: number;
+  attendedCourseSessions?: number;
   /** @format double */
   attendanceRate?: number;
 }
@@ -441,7 +439,7 @@ export interface SubjectAttendanceDto {
   subjectName?: string | null;
   studyGroupName?: string | null;
   /** @format int32 */
-  attendedcourseSessions?: number;
+  attendedCourseSessions?: number;
   /** @format int32 */
   totalCourseSessions?: number;
   /** @format double */
@@ -634,6 +632,7 @@ export interface UserDto {
   /** @format int32 */
   departmentId?: number | null;
   departmentName?: string | null;
+  departments?: DepartmentDto[] | null;
   isActive?: boolean;
   /** @format date-time */
   createdAt?: string;
@@ -647,6 +646,7 @@ export interface UserGroupDto {
   studyGroupName?: string | null;
   subjectName?: string | null;
   academicYearName?: string | null;
+  professorName?: string | null;
 }
 
 export interface UserProfileDto {

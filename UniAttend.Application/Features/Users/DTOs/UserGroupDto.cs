@@ -1,5 +1,3 @@
-using UniAttend.Core.Enums;
-
 namespace UniAttend.Application.Features.Users.DTOs
 {
     public record UserGroupDto
@@ -8,5 +6,6 @@ namespace UniAttend.Application.Features.Users.DTOs
         public string StudyGroupName { get; init; } = string.Empty;
         public string SubjectName { get; init; } = string.Empty;
         public string AcademicYearName { get; init; } = string.Empty;
+        public string ProfessorName { get; init; } = string.Empty;
     }
 }

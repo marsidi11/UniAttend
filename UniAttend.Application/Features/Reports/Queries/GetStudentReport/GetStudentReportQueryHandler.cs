@@ -54,7 +54,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetStudentReport
                     SubjectId = enrollment.StudyGroup?.SubjectId ?? 0,
                     SubjectName = enrollment.StudyGroup?.Subject?.Name ?? "Unknown",
                     StudyGroupName = enrollment.StudyGroup?.Name ?? "Unknown",
-                    AttendedcourseSessions = attendance.AttendedCourseSessions,
+                    AttendedCourseSessions = attendance.AttendedCourseSessions,
                     TotalCourseSessions = attendance.TotalCourseSessions,
                     AttendanceRate = attendance.TotalCourseSessions > 0 
                         ? (decimal)attendance.AttendedCourseSessions / attendance.TotalCourseSessions * 100 

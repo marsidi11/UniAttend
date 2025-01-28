@@ -17,7 +17,7 @@ namespace UniAttend.Application.Features.Reports.DTOs
         public int StudentId { get; init; }
         public string StudentNumber { get; init; } = string.Empty;
         public string FullName { get; init; } = string.Empty;
-        public int AttendedcourseSessions { get; init; }
+        public int AttendedCourseSessions { get; init; }
         public decimal AttendanceRate { get; init; }
     }
 }

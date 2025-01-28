@@ -17,3 +17,14 @@ System.NullReferenceException: Object reference not set to an instance of an obj
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
 2025-01-27 20:11:12.934 +01:00 [INF] Starting web application
+2025-01-27 20:11:15.728 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-01-27 20:12:39.761 +01:00 [INF] Retrieved 1 professors from database
+2025-01-27 20:12:39.763 +01:00 [INF] After filtering: 1 professors
+2025-01-27 20:13:23.110 +01:00 [INF] Retrieved 1 professors from database
+2025-01-27 20:13:23.111 +01:00 [INF] After filtering: 1 professors
+2025-01-27 20:13:35.288 +01:00 [INF] Retrieved 1 professors from database
+2025-01-27 20:13:35.288 +01:00 [INF] After filtering: 1 professors
+2025-01-27 20:15:27.092 +01:00 [INF] Retrieved 1 professors from database
+2025-01-27 20:15:27.092 +01:00 [INF] After filtering: 1 professors
+2025-01-27 20:15:37.569 +01:00 [INF] Retrieved 1 professors from database
+2025-01-27 20:15:37.570 +01:00 [INF] After filtering: 1 professors

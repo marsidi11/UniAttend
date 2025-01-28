@@ -39,15 +39,14 @@
                   <span class="ml-2">{{ session.classroomName }}</span>
                 </p>
               </div>
-              <div class="flex gap-2">
+                            <div class="flex gap-2">
                 <Button v-if="!isSessionActive(session)" @click="startSession(session)" variant="primary">
                   Start Session
                 </Button>
                 <Button v-else-if="!isSessionConfirmed(session)" @click="confirmSession(session.id!)" variant="primary">
-                  <!-- Changed from success to primary -->
                   Confirm Attendance
                 </Button>
-                <Button v-else-if="session.id" @click="closeSession(session.id)" variant="danger">
+                <Button v-else-if="isSessionActive(session) && session.id" @click="closeSession(session.id)" variant="danger">
                   End Session
                 </Button>
                 <Badge :status="getSessionStatus(session)">
@@ -65,29 +64,12 @@
       </div>
     </div>
 
-    <!-- Recent Attendance Records -->
-    <div class="bg-white p-6 rounded-lg shadow">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-medium">Recent Attendance</h2>
-        <Button @click="router.push('/dashboard/attendance/records')" variant="secondary">
-          View All
-        </Button>
-      </div>
-      <div class="space-y-4">
-        <div v-if="isLoadingRecords" class="flex justify-center">
-          <Spinner :size="6" />
-        </div>
-        <div v-else>
-          <AttendanceList :records="recentRecords" :loading="false" compact />
-        </div>
-      </div>
-    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAttendanceStore } from '@/stores/attendance.store'
 import { useReportStore } from '@/stores/report.store'
 import { useCourseSessionStore } from '@/stores/courseSession.store'
@@ -117,7 +99,6 @@ interface DashboardStats {
   averageAttendance: number
 }
 
-const router = useRouter()
 const attendanceStore = useAttendanceStore()
 const reportStore = useReportStore()
 const courseSessionStore = useCourseSessionStore()
@@ -174,15 +155,10 @@ async function startSession(session: ExtendedCourseSession) {
     const command: OpenCourseSessionCommand = {
       studyGroupId: session.studyGroupId!,
       classroomId: session.classroomId!,
+      courseSessionId: 0,
       date: new Date().toISOString(),
-      startTime: { // Convert to TimeSpan object
-        hours: session.startTime?.hours,
-        minutes: session.startTime?.minutes
-      },
-      endTime: { // Convert to TimeSpan object
-        hours: session.endTime?.hours,
-        minutes: session.endTime?.minutes
-      }
+      startTime: session.startTime!,
+      endTime: session.endTime!
     }
     await courseSessionStore.OpenCourseSession(command)
     await loadSessionAttendance(session.id!)

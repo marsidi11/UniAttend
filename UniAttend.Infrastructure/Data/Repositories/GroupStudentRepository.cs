@@ -60,6 +60,12 @@ namespace UniAttend.Infrastructure.Data.Repositories
             => await DbSet
                 .Where(gs => gs.StudentId == studentId)
                 .Include(gs => gs.StudyGroup)
+                    .ThenInclude(sg => sg.Subject)
+                .Include(gs => gs.StudyGroup)
+                    .ThenInclude(sg => sg.AcademicYear)
+                .Include(gs => gs.StudyGroup)
+                    .ThenInclude(sg => sg.Professor)
+                        .ThenInclude(p => p.User)
                 .ToListAsync(cancellationToken);
 
         public async Task<IEnumerable<GroupStudent>> GetActiveGroupsByStudentIdAsync(int studentId, int academicYearId, CancellationToken cancellationToken = default)

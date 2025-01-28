@@ -34,12 +34,12 @@ namespace UniAttend.Application.Features.Professors.Queries.GetProfessors
                     ? await _professorRepository.GetByDepartmentId(request.DepartmentId.Value, cancellationToken)
                     : await _professorRepository.GetAllAsync(cancellationToken);
         
-                _logger.LogInformation($"Retrieved {professors.Count()} professors from database");
+                // _logger.LogInformation($"Retrieved {professors.Count()} professors from database");
                 
                 var filtered = professors
                     .Where(p => !request.IsActive.HasValue || p.User?.IsActive == request.IsActive.Value);
         
-                _logger.LogInformation($"After filtering: {filtered.Count()} professors");
+                // _logger.LogInformation($"After filtering: {filtered.Count()} professors");
         
                 return filtered.Select(p => new ProfessorDto
                 {

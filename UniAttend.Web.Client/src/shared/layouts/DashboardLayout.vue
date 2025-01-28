@@ -232,12 +232,14 @@ const navigationSections: NavigationSections = {
   ],
   Professor: [
     { to: '/dashboard/professor', icon: 'dashboard', text: 'Dashboard' },
+    { to: '/dashboard/schedule', icon: 'schedule', text: 'My Schedule' },
     { to: '/dashboard/attendance/records', icon: 'fact_check', text: 'Attendance' },
     { to: '/dashboard/groups', icon: 'groups', text: 'My Groups' },
     { to: '/dashboard/reports', icon: 'analytics', text: 'Reports' }
   ],
   Student: [
     { to: '/dashboard/student', icon: 'dashboard', text: 'Dashboard' },
+    { to: '/dashboard/schedule', icon: 'schedule', text: 'My Schedule' },
     { to: '/dashboard/attendance/view', icon: 'schedule', text: 'My Attendance' },
     { to: '/dashboard/attendance/check-in', icon: 'qr_code_scanner', text: 'Check In' },
     { to: '/dashboard/attendance/otp', icon: 'pin', text: 'OTP Check-in' }

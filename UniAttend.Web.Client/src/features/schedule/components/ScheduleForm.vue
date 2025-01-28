@@ -9,7 +9,7 @@
         required
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
       >
-        <option v-for="group in groups" :key="studyGroup.id" :value="studyGroup.id">
+        <option v-for="studyGroup in studyGroups" :key="studyGroup.id" :value="studyGroup.id">
           {{ studyGroup.name }}
         </option>
       </select>
@@ -94,7 +94,7 @@ import type {
 
 interface Props {
   schedule?: ScheduleDto | null
-  groups: StudyGroupDto[]
+  studyGroups: StudyGroupDto[]
   classrooms: ClassroomDto[]  
 }
 

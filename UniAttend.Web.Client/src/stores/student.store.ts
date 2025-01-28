@@ -6,7 +6,6 @@ import type {
   AttendanceRecordDto,
   UserGroupDto
 } from '@/api/generated/data-contracts';
-import { Student } from '@/api/generated/Student';
 import { studentApi } from '@/api/apiInstances';
 import { handleError } from '@/utils/errorHandler';
 
@@ -103,20 +102,33 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
-  async function fetchStudentGroups() {
+    async function fetchStudentGroups() {
     isLoading.value = true;
     try {
       const response = await studentApi.studentEnrolledGroupsList();
-      // Type assertion for the response
-      const groupData = response as unknown as { data: UserGroupDto[] };
-      if (groupData && Array.isArray(groupData.data)) {
-        groups.value = groupData.data;
-        return groupData.data;
+      console.log('Raw response:', response);
+      
+      // If response is already a Response object, parse its JSON
+      if (response instanceof Response) {
+        const jsonData = await response.json();
+        console.log('Parsed JSON:', jsonData);
+        groups.value = jsonData;
+        return jsonData;
       }
+      
+      // If response is already parsed JSON
+      if (Array.isArray(response)) {
+        groups.value = response;
+        return response;
+      }  
+      // Fallback
+      groups.value = [];
       return [];
     } catch (err) {
+      console.error('Error fetching student groups:', err);
       handleError(err, error);
-      throw err;
+      groups.value = [];
+      return [];
     } finally {
       isLoading.value = false;
     }

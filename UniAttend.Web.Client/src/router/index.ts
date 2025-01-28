@@ -27,7 +27,6 @@ import UserManagement from '@/features/users/pages/UserManagement.vue';
 import UserProfile from '@/features/users/pages/UserProfile.vue';
 import StudentList from '@/features/students/pages/StudentList.vue';
 import StudentDetails from '@/features/students/pages/StudentDetails.vue';
-// import CardManagement from '@/features/cards/pages/CardManagement.vue';
 
 // Schedule & Groups
 import ScheduleManager from '@/features/schedule/pages/ScheduleManager.vue';
@@ -39,6 +38,7 @@ import ClassroomList from '@/features/classrooms/pages/ClassroomList.vue';
 import StudentAttendance from '@/features/attendance/pages/StudentAttendancePage.vue';
 import AttendanceRecords from '@/features/attendance/pages/AttendanceRecords.vue';
 import OtpCheckIn from '@/features/attendance/pages/OtpCheckIn.vue';
+// import CardCheckIn from '@/features/attendance/pages/CardCheckIn.vue';
 
 // Reports
 import Reports from '@/features/reports/pages/Reports.vue';
@@ -132,17 +132,11 @@ const routes = [
         component: StudentDetails,
         meta: { roles: ['secretary'] }
       },
-      // {
-      //   path: 'cards',
-      //   name: 'card-management',
-      //   component: CardManagement,
-      //   meta: { roles: ['secretary'] }
-      // },
       {
         path: 'schedule',
         name: 'schedule',
         component: ScheduleManager,
-        meta: { roles: ['secretary'] }
+        meta: { roles: ['secretary', 'professor'] }
       },
       {
         path: 'groups',
@@ -194,6 +188,18 @@ const routes = [
         component: OtpCheckIn,
         meta: { roles: ['student'] }
       },
+      {
+        path: 'attendance/otp-check-in/:sessionId',
+        name: 'otp-check-in',
+        component: OtpCheckIn,
+        meta: { roles: ['student'] }
+      },
+      // {
+      //   path: 'attendance/check-in/:sessionId',
+      //   name: 'card-check-in',
+      //   component: CardCheckIn,
+      //   meta: { roles: ['student'] }
+      // },
       // Shared routes
       {
         path: 'reports',

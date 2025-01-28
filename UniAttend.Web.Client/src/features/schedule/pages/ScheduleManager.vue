@@ -73,14 +73,10 @@
               <span class="sm:hidden">{{ day.label.substr(0, 3) }}</span>
             </div>
             <div v-for="time in timeSlots" :key="`${day.value}-${time}`"
-  class="h-32 sm:h-40 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1.5 sm:p-3 rounded">
-  <ScheduleSlot 
-    :schedules="getSchedulesForSlot(day.value, time)" 
-    :current-time="`${time}:00`"
-    @click="slot => handleSlotClick(slot)" 
-    @delete="handleDelete" 
-  />
-</div>
+              class="h-32 sm:h-40 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1.5 sm:p-3 rounded">
+              <ScheduleSlot :schedules="getSchedulesForSlot(day.value, time)" :current-time="`${time}:00`"
+                @click="slot => handleSlotClick(slot)" @delete="handleDelete" />
+            </div>
           </div>
         </div>
       </div>
@@ -88,7 +84,7 @@
 
     <!-- Create/Edit Schedule Modal -->
     <Modal v-model="showModal" :title="modalTitle">
-      <ScheduleForm v-if="showModal" :schedule="selectedSchedule" :groups="studyGroups" :classrooms="classrooms"
+      <ScheduleForm v-if="showModal" :schedule="selectedSchedule" :study-groups="studyGroups" :classrooms="classrooms"
         @submit="handleSubmit" @cancel="showModal = false" />
     </Modal>
   </div>
@@ -162,7 +158,7 @@ const filteredSchedules = computed(() => {
   }
 
   if (selectedProfessor.value) {
-    // Filter by professor using the professor name from group info
+    // Filter by professor using the professor name from study group info
     filtered = filtered.filter(s => {
       const professorName = s.professorName?.toLowerCase() || ''
       const selectedProf = professors.value.find(p => p.id === Number(selectedProfessor.value))

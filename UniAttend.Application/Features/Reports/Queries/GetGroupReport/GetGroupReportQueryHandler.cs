@@ -48,7 +48,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
                     StudentId = student.StudentId,
                     StudentNumber = student.Student?.StudentId ?? "Unknown",
                     FullName = $"{student.Student?.User?.FirstName} {student.Student?.User?.LastName}",
-                    AttendedcourseSessions = stats.AttendedCourseSessions,
+                    AttendedCourseSessions = stats.AttendedCourseSessions,
                     AttendanceRate = stats.TotalCourseSessions > 0
                         ? (decimal)stats.AttendedCourseSessions / stats.TotalCourseSessions * 100
                         : 0

@@ -250,7 +250,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
             return new AttendanceStats
             {
                 TotalCourseSessions = totalCourseSessions,
-                AttendedcourseSessions = attendedCourseSessions,
+                AttendedCourseSessions = attendedCourseSessions,
                 AttendanceRate = attendanceRate
             };
         }
