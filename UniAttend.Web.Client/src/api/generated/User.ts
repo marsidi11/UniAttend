@@ -13,6 +13,7 @@ import {
   ChangePasswordCommand,
   CreateUserCommand,
   ResetPasswordCommand,
+  TotpSetupDto,
   UpdateProfileCommand,
   UpdateUserCommand,
   UserDetailsDto,
@@ -209,6 +210,40 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags User
+   * @name UserSetupTotpCreate
+   * @request POST:/api/User/setup-totp
+   * @secure
+   */
+  userSetupTotpCreate = (params: RequestParams = {}) =>
+    this.request<TotpSetupDto, any>({
+      path: `/api/User/setup-totp`,
+      method: "POST",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags User
+   * @name UserVerifyTotpCreate
+   * @request POST:/api/User/verify-totp
+   * @secure
+   */
+  userVerifyTotpCreate = (data: string, params: RequestParams = {}) =>
+    this.request<boolean, any>({
+      path: `/api/User/verify-totp`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
       ...params,
     });
 }

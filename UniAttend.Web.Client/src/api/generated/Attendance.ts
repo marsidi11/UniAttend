@@ -9,31 +9,10 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  AttendanceRecordDto,
-  RecordCardAttendanceCommand,
-  RecordOtpAttendanceCommand,
-  TotpSetupDto,
-} from "./data-contracts";
+import { AttendanceRecordDto, RecordCardAttendanceCommand, RecordOtpAttendanceCommand } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
-  /**
-   * No description
-   *
-   * @tags Attendance
-   * @name AttendanceSetupTotpCreate
-   * @request POST:/api/Attendance/setup-totp
-   * @secure
-   */
-  attendanceSetupTotpCreate = (params: RequestParams = {}) =>
-    this.request<TotpSetupDto, any>({
-      path: `/api/Attendance/setup-totp`,
-      method: "POST",
-      secure: true,
-      format: "json",
-      ...params,
-    });
   /**
    * No description
    *

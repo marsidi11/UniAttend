@@ -15,7 +15,6 @@ using UniAttend.Core.Enums;
 using UniAttend.Application.Features.Auth.Commands.ResetPassword;
 using UniAttend.Application.Features.Users.Commands.VerifyTotp;
 using UniAttend.Application.Features.Users.Commands.SetupTotp;
-using UniAttend.Application.Features.Users.DTOs;
 
 namespace UniAttend.API.Controllers
 {

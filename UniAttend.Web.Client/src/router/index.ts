@@ -38,7 +38,7 @@ import ClassroomList from '@/features/classrooms/pages/ClassroomList.vue';
 import StudentAttendance from '@/features/attendance/pages/StudentAttendancePage.vue';
 import AttendanceRecords from '@/features/attendance/pages/AttendanceRecords.vue';
 import OtpCheckIn from '@/features/attendance/pages/OtpCheckIn.vue';
-// import CardCheckIn from '@/features/attendance/pages/CardCheckIn.vue';
+import CardCheckIn from '@/features/attendance/pages/CardCheckIn.vue';
 
 // Reports
 import Reports from '@/features/reports/pages/Reports.vue';
@@ -194,12 +194,12 @@ const routes = [
         component: OtpCheckIn,
         meta: { roles: ['student'] }
       },
-      // {
-      //   path: 'attendance/check-in/:sessionId',
-      //   name: 'card-check-in',
-      //   component: CardCheckIn,
-      //   meta: { roles: ['student'] }
-      // },
+      {
+        path: 'attendance/check-in/:sessionId',
+        name: 'card-check-in',
+        component: CardCheckIn,
+        meta: { roles: ['student'] }
+      },
       // Shared routes
       {
         path: 'reports',

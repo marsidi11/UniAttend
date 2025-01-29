@@ -12,9 +12,11 @@ namespace UniAttend.Application.Features.Users.DTOs
         public string LastName { get; init; } = string.Empty;
         public UserRole Role { get; init; }
         public string? DepartmentName { get; init; }
-        public IEnumerable<DepartmentDto> Departments { get; set; } = Enumerable.Empty<DepartmentDto>();
+        public IEnumerable<DepartmentDto> Departments { get; set; } = [];
         public bool IsActive { get; init; }
-        public string? totpSecret { get; init; }
+        public string? TotpSecret { get; init; }
+        public bool? IsTwoFactorEnabled { get; init; }
+        public bool? IsTwoFactorVerified { get; init; }
         public DateTime CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
     }

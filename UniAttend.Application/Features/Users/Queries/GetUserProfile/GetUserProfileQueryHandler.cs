@@ -28,7 +28,9 @@ namespace UniAttend.Application.Features.Users.Queries.GetUserProfile
                 user.Email,
                 user.FirstName,
                 user.LastName,
-                user.Role);
+                user.Role,
+                user.IsTwoFactorEnabled,
+                user.IsTwoFactorVerified);
         }
     }
 }

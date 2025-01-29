@@ -11,6 +11,7 @@
     "update-api": "npm run generate-api"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "@vueuse/core": "^12.2.0",
     "axios": "^1.7.9",
     "pinia": "^2.3.0",

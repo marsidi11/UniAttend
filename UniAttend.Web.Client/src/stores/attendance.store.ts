@@ -3,8 +3,7 @@ import { ref, computed } from 'vue';
 import type { 
   AttendanceRecordDto,
   RecordCardAttendanceCommand,
-  RecordOtpAttendanceCommand,
-  TotpSetupDto
+  RecordOtpAttendanceCommand
 } from '@/api/generated/data-contracts';
 import { attendanceApi } from '@/api/apiInstances';
 import { handleError } from '@/utils/errorHandler';
@@ -98,18 +97,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
-  async function setupTotp(): Promise<TotpSetupDto> {
-    isLoading.value = true;
-    try {
-      const { data } = await attendanceApi.attendanceSetupTotpCreate();
-      return data;
-    } catch (err) {
-      handleError(err);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  
 
   return {
     // State
@@ -126,7 +114,6 @@ export const useAttendanceStore = defineStore('attendance', () => {
     recordCardAttendance,
     recordOtpAttendance, 
     confirmAttendance,
-    fetchClassAttendance,
-    setupTotp
+    fetchClassAttendance
   };
 });

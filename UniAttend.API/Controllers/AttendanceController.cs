@@ -9,7 +9,6 @@ using UniAttend.Application.Features.Attendance.Queries.GetStudentAttendance;
 using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.API.Extensions;
 using UniAttend.Core.Enums;
-using UniAttend.Application.Features.Attendance.Commands.SetupTotp;
 
 namespace UniAttend.API.Controllers
 {

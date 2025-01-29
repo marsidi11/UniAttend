@@ -29,6 +29,15 @@ namespace UniAttend.Infrastructure.Data.Configurations
 
             builder.HasIndex(u => u.Email)
                 .IsUnique();
+
+            builder.Property(u => u.IsTwoFactorEnabled)
+            .HasDefaultValue(false);
+
+            builder.Property(u => u.IsTwoFactorVerified)
+                .HasDefaultValue(false);
+
+            builder.Property(u => u.TotpSecret)
+                .HasMaxLength(128);
         }
     }
 }

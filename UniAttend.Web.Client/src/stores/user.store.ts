@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useToast } from 'vue-toastification';
-import type { 
+import type {
   UserDto,
-  UserProfileDto, 
-  UserDetailsDto, 
-  UpdateProfileCommand, 
+  UserProfileDto,
+  UserDetailsDto,
+  UpdateProfileCommand,
   ChangePasswordCommand,
   CreateUserCommand,
-  UpdateUserCommand
+  UpdateUserCommand,
+  TotpSetupDto
 } from '@/api/generated/data-contracts';
 import { UserRole } from '@/api/generated/data-contracts';
 import { userApi } from '@/api/apiInstances';
@@ -16,7 +17,7 @@ import { handleError } from '@/utils/errorHandler';
 
 export const useUserStore = defineStore('user', () => {
   const toast = useToast();
-  
+
   // State
   const users = ref<UserDto[]>([]);
   const profile = ref<UserProfileDto | null>(null);
@@ -56,7 +57,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-    async function createUser(userData: CreateUserCommand) {
+  async function createUser(userData: CreateUserCommand) {
     isLoading.value = true;
     try {
       const response = await userApi.userCreate(userData);
@@ -144,7 +145,7 @@ export const useUserStore = defineStore('user', () => {
   async function fetchUserDetails(id?: number) {
     isLoading.value = true;
     try {
-      const { data } = id 
+      const { data } = id
         ? await userApi.userDetailsDetail(id)
         : await userApi.userDetailsList();
       details.value = data;
@@ -170,6 +171,35 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function setupTotp(): Promise<TotpSetupDto> {
+    isLoading.value = true;
+    try {
+      const { data } = await userApi.userSetupTotpCreate();
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function verifyTotp(code: string): Promise<boolean> {
+    isLoading.value = true;
+    try {
+      const { data } = await userApi.userVerifyTotpCreate(code);
+      if (data) {
+        await fetchProfile(); // Refresh user data after successful verification
+      }
+      return data;
+    } catch (err) {
+      handleError(err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     // State
     users,
@@ -184,9 +214,11 @@ export const useUserStore = defineStore('user', () => {
     createUser,
     updateUser,
     deactivateUser,
-    fetchProfile, 
+    fetchProfile,
     updateProfile,
     fetchUserDetails,
-    changePassword
+    changePassword,
+    setupTotp,
+    verifyTotp
   };
 });

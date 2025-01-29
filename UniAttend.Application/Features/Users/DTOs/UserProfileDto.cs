@@ -11,6 +11,8 @@ namespace UniAttend.Application.Features.Users.DTOs
         string Email,
         string FirstName,
         string LastName,
-        UserRole Role
+        UserRole Role,
+        bool IsTwoFactorEnabled,
+        bool IsTwoFactorVerified
     );
 }

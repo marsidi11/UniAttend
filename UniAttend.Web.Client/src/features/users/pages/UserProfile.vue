@@ -11,56 +11,43 @@
       {{ message.text }}
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
-      <ProfileForm
-        :user="mappedUser"
-        :totp-setup="totpSetup"
-        @update-profile="handleUpdateProfile"
-        @update-password="handleUpdatePassword"
-        @setup-totp="handleSetupTotp"
-        @confirm-totp="handleConfirmTotp"
-      />
-    </div>
+    <ProfileForm :user="mappedUser" :totp-setup="totpSetup" @update-profile="handleUpdateProfile"
+      @update-password="handleUpdatePassword" @setup-totp="handleSetupTotp" @confirm-totp="handleConfirmTotp" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user.store'
-import { useAuthStore } from '@/stores/auth.store'
-import { useAttendanceStore } from '@/stores/attendance.store'
 import type { 
   UserProfileDto, 
   UserDto, 
   ChangePasswordCommand,
   TotpSetupDto 
 } from '@/api/generated/data-contracts'
-import { StringRole } from '@/types/base.types'
 import ProfileForm from '../components/ProfileForm.vue'
 
 const userStore = useUserStore()
-const authStore = useAuthStore()
-const attendanceStore = useAttendanceStore()
+
+const isLoading = ref(true)
+const profileData = ref<UserProfileDto | null>(null)
 
 const message = ref<{ text: string; type: 'success' | 'error' } | null>(null)
-
-const currentUser = computed(() => authStore.user)
 
 const totpSetup = ref<TotpSetupDto | null>(null)
 
 const mappedUser = computed<UserDto | null>(() => {
-  if (!currentUser.value) return null;
+  if (!profileData.value) return null;
   
-  const roleMap: Record<StringRole, number> = {
-    'admin': 1,
-    'secretary': 2,
-    'professor': 3,
-    'student': 4
-  };
-
   return {
-    ...currentUser.value,
-    role: roleMap[currentUser.value.role as StringRole] || 1
+    id: profileData.value.id,
+    username: profileData.value.username,
+    email: profileData.value.email,
+    firstName: profileData.value.firstName,
+    lastName: profileData.value.lastName,
+    role: profileData.value.role,
+    isTwoFactorEnabled: profileData.value.isTwoFactorEnabled,
+    isTwoFactorVerified: profileData.value.isTwoFactorVerified
   } as UserDto;
 })
 
@@ -86,7 +73,7 @@ async function handleUpdatePassword(passwordData: ChangePasswordCommand) {
 
 async function handleSetupTotp() {
   try {
-    const setup = await attendanceStore.setupTotp()
+    const setup = await userStore.setupTotp()
     totpSetup.value = setup
   } catch (err) {
     console.error('Failed to setup TOTP:', err)
@@ -96,7 +83,7 @@ async function handleSetupTotp() {
 
 async function handleConfirmTotp(code: string) {
   try {
-    await attendanceStore.verifyTotp(code)
+    await userStore.verifyTotp(code)
     totpSetup.value = null
     message.value = { text: 'Two-factor authentication enabled successfully', type: 'success' }
     await userStore.fetchProfile()
@@ -112,6 +99,17 @@ watch(message, (newMessage) => {
     setTimeout(() => {
       message.value = null
     }, 5000)
+  }
+})
+
+onMounted(async () => {
+  try {
+    profileData.value = await userStore.fetchProfile()
+  } catch (err) {
+    console.error('Failed to fetch profile:', err)
+    message.value = { text: 'Failed to load profile data', type: 'error' }
+  } finally {
+    isLoading.value = false
   }
 })
 </script>

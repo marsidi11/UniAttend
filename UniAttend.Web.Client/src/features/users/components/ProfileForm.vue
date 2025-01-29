@@ -52,102 +52,81 @@
     </div>
 
     <!-- TOTP Setup Section - Only for Students -->
-    <div v-if="isStudent" class="space-y-4">
+    <div v-if="isStudent" class="mt-6">
       <h3 class="text-lg font-medium">Two-Factor Authentication</h3>
-
-      <div v-if="!user?.totpSecret" class="bg-yellow-50 p-4 rounded-md">
-        <p class="text-sm text-yellow-700">
-          You haven't set up two-factor authentication yet. This is required for attendance check-in.
-        </p>
-        <Button @click="setupTotp" variant="secondary" size="sm" class="mt-2">
-          Set up 2FA
-        </Button>
+      <div v-if="!user?.isTwoFactorEnabled" class="mt-2">
+        <Button @click="setupTotp">Setup 2FA</Button>
       </div>
-
-      <div v-else class="bg-green-50 p-4 rounded-md">
-        <p class="text-sm text-green-700">
-          Two-factor authentication is enabled
-        </p>
+      <div v-else-if="!user?.isTwoFactorVerified" class="mt-2 text-yellow-600">
+        2FA is set up but not verified
+      </div>
+      <div v-else class="mt-2 text-green-600 flex items-center">
+        <CheckCircleIcon class="h-5 w-5 mr-2" />
+        2FA is enabled and verified
       </div>
     </div>
 
     <!-- TOTP Setup Modal -->
     <Modal v-model="showTotpModal" title="Set up Two-Factor Authentication">
-    <template #default>
-      <div v-if="totpSetupData" class="space-y-6">
-        <!-- Step 1: Show QR Code -->
-        <div v-if="!isVerifyingTotp" class="space-y-6">
-          <div class="text-center">
-            <img 
-              :src="qrCodeDataUrl" 
-              alt="QR Code" 
-              class="mx-auto w-48 h-48"
-            />
-            <p class="mt-2 text-sm text-gray-600">
-              Scan this QR code with your authenticator app
-            </p>
-          </div>
+      <template #default>
+        <div v-if="totpSetupData" class="space-y-6">
+          <!-- Step 1: Show QR Code -->
+          <div v-if="!isVerifyingTotp" class="space-y-6">
+            <div class="text-center">
+              <img :src="qrCodeDataUrl" alt="QR Code" class="mx-auto w-48 h-48" />
+              <p class="mt-2 text-sm text-gray-600">
+                Scan this QR code with your authenticator app
+              </p>
+            </div>
 
-          <div class="mt-4">
-            <p class="text-sm font-medium">Manual Entry Code:</p>
-            <code class="block p-2 mt-1 bg-gray-100 rounded text-sm break-all">
+            <div class="mt-4">
+              <p class="text-sm font-medium">Manual Entry Code:</p>
+              <code class="block p-2 mt-1 bg-gray-100 rounded text-sm break-all">
               {{ totpSetupData.secretKey }}
             </code>
+            </div>
+
+            <div class="mt-6">
+              <Button @click="startVerification" class="w-full">
+                I've saved these details
+              </Button>
+            </div>
           </div>
 
-          <div class="mt-6">
-            <Button @click="startVerification" class="w-full">
-              I've saved these details
-            </Button>
+          <!-- Step 2: Verify Code -->
+          <div v-else class="space-y-6">
+            <div class="text-center">
+              <h3 class="text-lg font-medium">Verify Setup</h3>
+              <p class="mt-2 text-sm text-gray-600">
+                Enter the code from your authenticator app to verify the setup
+              </p>
+            </div>
+
+            <div>
+              <label for="verificationCode" class="block text-sm font-medium text-gray-700">
+                Verification Code
+              </label>
+              <input id="verificationCode" v-model="verificationCode" type="text" maxlength="6" pattern="\d{6}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center tracking-widest font-mono"
+                placeholder="000000" @input="handleCodeInput" />
+            </div>
+
+            <div v-if="verificationError" class="text-sm text-red-600 text-center">
+              {{ verificationError }}
+            </div>
+
+            <div class="flex space-x-3">
+              <Button @click="cancelVerification" variant="secondary" class="flex-1">
+                Back
+              </Button>
+              <Button @click="confirmTotpSetup" :disabled="!isValidCode" :loading="isVerifying" class="flex-1">
+                Verify
+              </Button>
+            </div>
           </div>
         </div>
-
-        <!-- Step 2: Verify Code -->
-        <div v-else class="space-y-6">
-          <div class="text-center">
-            <h3 class="text-lg font-medium">Verify Setup</h3>
-            <p class="mt-2 text-sm text-gray-600">
-              Enter the code from your authenticator app to verify the setup
-            </p>
-          </div>
-
-          <div>
-            <label for="verificationCode" class="block text-sm font-medium text-gray-700">
-              Verification Code
-            </label>
-            <input
-              id="verificationCode"
-              v-model="verificationCode"
-              type="text"
-              maxlength="6"
-              pattern="\d{6}"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center tracking-widest font-mono"
-              placeholder="000000"
-              @input="handleCodeInput"
-            />
-          </div>
-
-          <div v-if="verificationError" class="text-sm text-red-600 text-center">
-            {{ verificationError }}
-          </div>
-
-          <div class="flex space-x-3">
-            <Button @click="cancelVerification" variant="secondary" class="flex-1">
-              Back
-            </Button>
-            <Button 
-              @click="confirmTotpSetup" 
-              :disabled="!isValidCode" 
-              :loading="isVerifying"
-              class="flex-1"
-            >
-              Verify
-            </Button>
-          </div>
-        </div>
-      </div>
-    </template>
-  </Modal>
+      </template>
+    </Modal>
 
     <div v-if="error" class="text-sm text-red-600">
       {{ error }}
@@ -161,6 +140,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { CheckCircleIcon } from '@heroicons/vue/24/solid'
 import Button from '@/shared/components/ui/Button.vue'
 import Modal from '@/shared/components/ui/Modal.vue'
 import * as QRCode from 'qrcode'
@@ -276,7 +256,7 @@ watch(() => props.totpSetup, async (newSetup) => {
   if (newSetup) {
     totpSetupData.value = newSetup
     showTotpModal.value = true
-    
+
     try {
       // Update QR code generation with proper typing
       const options: QRCodeToDataURLOptions = {
@@ -289,7 +269,7 @@ watch(() => props.totpSetup, async (newSetup) => {
       }
 
       qrCodeDataUrl.value = await QRCode.toDataURL(
-        newSetup.qrCodeUri || '', 
+        newSetup.qrCodeUri || '',
         options
       )
     } catch (err) {

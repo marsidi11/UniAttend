@@ -633,6 +633,8 @@ export interface UserDto {
   departments?: DepartmentDto[] | null;
   isActive?: boolean;
   totpSecret?: string | null;
+  isTwoFactorEnabled?: boolean | null;
+  isTwoFactorVerified?: boolean | null;
   /** @format date-time */
   createdAt?: string;
   /** @format date-time */
@@ -656,6 +658,8 @@ export interface UserProfileDto {
   firstName?: string | null;
   lastName?: string | null;
   role?: UserRole;
+  isTwoFactorEnabled?: boolean;
+  isTwoFactorVerified?: boolean;
 }
 
 /** @format int32 */

@@ -94,6 +94,7 @@ export const useClassroomStore = defineStore('classroom', () => {
       isLoading.value = true;
       try {
         await classroomApi.classroomsReaderCreate(id, { 
+          classroomId: id,
           readerDeviceId: deviceId 
         });
         await getClassroomById(id);
