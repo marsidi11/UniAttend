@@ -59,7 +59,6 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordOtpAttendance
                 record.CheckInMethod,
                 record.IsConfirmed,
                 record.ConfirmationTime,
-                record.ConfirmedByProfessorId,
                 record.CourseSession.StudyGroup.Name,
                 record.CourseSession.Classroom.Name,
                 record.CourseSession.StartTime,

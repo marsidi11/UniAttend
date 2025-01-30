@@ -25,8 +25,6 @@ namespace UniAttend.Core.Interfaces.Repositories
 
         Task ConfirmAttendanceRecordsAsync(int courseSessionId, CancellationToken cancellationToken = default);
 
-        Task ConfirmAttendanceRecordsAsync(int courseSessionId, int professorId, CancellationToken cancellationToken = default);
-
         Task<CourseSession> GetSessionWithDetailsAsync(
             int sessionId,
             CancellationToken cancellationToken = default);

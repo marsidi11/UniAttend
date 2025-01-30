@@ -104,7 +104,6 @@ namespace UniAttend.Application.Common.Mappings
                 src.CheckInMethod,
                 src.IsConfirmed,
                 src.ConfirmationTime,
-                src.ConfirmedByProfessorId,
                 src.CourseSession.StudyGroup.Name,
                 src.CourseSession.Classroom.Name,
                 src.CourseSession.StartTime,

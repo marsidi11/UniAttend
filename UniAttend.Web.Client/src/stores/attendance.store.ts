@@ -97,7 +97,14 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
-  
+  async function markAbsent(courseSessionId: number, studentId: number) {
+    try {
+      await attendanceApi.markAbsent(courseSessionId, studentId);
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    }
+  }  
 
   return {
     // State
@@ -114,6 +121,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
     recordCardAttendance,
     recordOtpAttendance, 
     confirmAttendance,
-    fetchClassAttendance
+    fetchClassAttendance,
+    markAbsent
   };
 });

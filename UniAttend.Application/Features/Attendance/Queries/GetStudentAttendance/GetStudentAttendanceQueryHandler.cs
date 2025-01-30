@@ -43,7 +43,6 @@ namespace UniAttend.Application.Features.Attendance.Queries.GetStudentAttendance
                 r.CheckInMethod,
                 r.IsConfirmed,
                 r.ConfirmationTime,
-                r.ConfirmedByProfessorId,
                 r.CourseSession.StudyGroup.Name,
                 r.CourseSession.Classroom.Name,
                 r.CourseSession.StartTime,

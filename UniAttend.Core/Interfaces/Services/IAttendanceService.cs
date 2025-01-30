@@ -18,9 +18,9 @@ namespace UniAttend.Core.Interfaces.Services
         Task<AttendanceRecord> RecordOtpAttendanceAsync(string otpCode, int studentId, int courseSessionId, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Confirms attendance records for a specific class by professor
+        /// Confirms attendance records for a specific course session
         /// </summary>
-        Task<bool> ConfirmAttendanceAsync(int courseSessionId, int professorId, CancellationToken cancellationToken = default);
+        Task<bool> ConfirmAttendanceAsync(int courseSessionId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Generates alerts for students with high absence rates
@@ -31,5 +31,10 @@ namespace UniAttend.Core.Interfaces.Services
         /// Validates if a student can record attendance for a specific class
         /// </summary>
         Task<bool> CanRecordAttendanceAsync(int studentId, int courseSessionId, CancellationToken cancellationToken = default);
+
+        // <summary>
+        /// Marks a student as absent for a specific class
+        /// </summary>
+        Task MarkStudentAbsentAsync(int courseSessionId, int studentId, CancellationToken cancellationToken = default);
     }
 }

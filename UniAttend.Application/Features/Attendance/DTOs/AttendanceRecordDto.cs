@@ -11,7 +11,6 @@ namespace UniAttend.Application.Features.Attendance.DTOs
         CheckInMethod CheckInMethod,
         bool IsConfirmed,
         DateTime? ConfirmationTime,
-        int? ConfirmedByProfessorId,
         string StudyGroupName,
         string ClassroomName,
         TimeSpan SessionStartTime,

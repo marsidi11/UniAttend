@@ -9,6 +9,7 @@ using UniAttend.Application.Features.Attendance.Queries.GetStudentAttendance;
 using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.API.Extensions;
 using UniAttend.Core.Enums;
+using UniAttend.Application.Features.Attendance.Commands.MarkAbsent;
 
 namespace UniAttend.API.Controllers
 {
@@ -47,7 +48,6 @@ namespace UniAttend.API.Controllers
             var command = new ConfirmAttendanceCommand
             {
                 CourseSessionId = courseSessionId,
-                ProfessorId = User.GetUserId()
             };
             await _mediator.Send(command);
             return Ok();
@@ -90,6 +90,22 @@ namespace UniAttend.API.Controllers
             };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Marks a student as absent for a specific class
+        /// </summary>
+        [Authorize(Roles = "Professor")]
+        [HttpPost("courseSessions/{courseSessionId}/students/{studentId}/absent")]
+        public async Task<IActionResult> MarkAbsent(int courseSessionId, int studentId)
+        {
+            var command = new MarkAbsentCommand
+            {
+                CourseSessionId = courseSessionId,
+                StudentId = studentId
+            };
+            await _mediator.Send(command);
+            return Ok();
         }
     }
 }

@@ -2,7 +2,8 @@ namespace UniAttend.Core.Enums
 {
     public enum CheckInMethod
     {
-        Card,
-        Totp
+        Card = 0,
+        Totp = 1,
+        Manual = 2
     }
 }

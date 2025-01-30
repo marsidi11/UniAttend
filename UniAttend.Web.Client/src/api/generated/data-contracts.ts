@@ -70,8 +70,6 @@ export interface AttendanceRecordDto {
   isConfirmed?: boolean;
   /** @format date-time */
   confirmationTime?: string | null;
-  /** @format int32 */
-  confirmedByProfessorId?: number | null;
   studyGroupName?: string | null;
   classroomName?: string | null;
   sessionStartTime?: TimeSpan;

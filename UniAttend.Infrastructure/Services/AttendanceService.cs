@@ -13,7 +13,7 @@ namespace UniAttend.Infrastructure.Services
         private readonly IGroupStudentRepository _groupStudentRepository;
         private readonly ICourseSessionRepository _courseSessionRepository;
         private readonly IUnitOfWork _unitOfWork;
-    
+
         public AttendanceService(
             IAttendanceRecordRepository attendanceRepository,
             IStudentRepository studentRepository,
@@ -29,70 +29,93 @@ namespace UniAttend.Infrastructure.Services
         }
 
         public async Task<AttendanceRecord> RecordCardAttendanceAsync(
-            string cardId, 
+            string cardId,
             string readerDeviceId,
             CancellationToken cancellationToken = default)
         {
             var student = await _studentRepository.GetByCardIdAsync(cardId, cancellationToken)
                 ?? throw new NotFoundException($"No student found with card ID: {cardId}");
-        
+
             var activeCourseSession = await _courseSessionRepository.GetActiveByDeviceIdAsync(readerDeviceId, cancellationToken)
                 ?? throw new ValidationException($"No active course session found for reader device: {readerDeviceId}");
-        
+
             if (!await CanRecordAttendanceAsync(student.Id, activeCourseSession.Id, cancellationToken))
                 throw new ValidationException("Student cannot record attendance for this course session");
-        
+
             var record = new AttendanceRecord(
                 activeCourseSession.Id,
                 student.Id,
                 DateTime.UtcNow,
                 CheckInMethod.Card
             );
-        
+
             await _attendanceRepository.AddAsync(record, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
             return record;
         }
-        
+
         public async Task<AttendanceRecord> RecordOtpAttendanceAsync(
             string otpCode,
-            int studentId, 
+            int studentId,
             int courseSessionId,
             CancellationToken cancellationToken = default)
         {
             var student = await _studentRepository.GetByIdAsync(studentId, cancellationToken)
                 ?? throw new NotFoundException($"Student not found with ID: {studentId}");
-        
+
             if (!await CanRecordAttendanceAsync(studentId, courseSessionId, cancellationToken))
                 throw new ValidationException("Student cannot record attendance for this course session");
-        
+
             var record = new AttendanceRecord(
                 courseSessionId,
                 studentId,
                 DateTime.UtcNow,
                 CheckInMethod.Totp
             );
-        
+
             await _attendanceRepository.AddAsync(record, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
             return record;
         }
-        
-        public async Task<bool> ConfirmAttendanceAsync(
-            int courseSessionId,
-            int professorId,
-            CancellationToken cancellationToken = default)
+
+        /// <summary>
+        /// Confirms attendance records for a course session
+        /// </summary>
+        /// <param name="courseSessionId">ID of the course session</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>True if confirmation was successful</returns>
+                public async Task<bool> ConfirmAttendanceAsync(int courseSessionId, CancellationToken cancellationToken = default)
         {
-            var records = await _attendanceRepository.GetUnconfirmedRecordsAsync(courseSessionId, cancellationToken);
-        
-            foreach (var record in records)
+            var session = await _courseSessionRepository.GetByIdAsync(courseSessionId, cancellationToken);
+            
+            // Get all enrolled students
+            var enrolledStudents = session.StudyGroup.Students;
+            
+            // Get existing attendance records
+            var existingRecords = await _attendanceRepository.GetByCourseSessionIdAsync(courseSessionId, cancellationToken);
+            
+            // Create absent records for students without attendance
+            foreach (var enrollment in enrolledStudents)
             {
-                record.Confirm(professorId);
+                if (!existingRecords.Any(r => r.StudentId == enrollment.StudentId))
+                {
+                    var absentRecord = new AttendanceRecord(
+                        courseSessionId,
+                        enrollment.StudentId,
+                        session.Date,
+                        CheckInMethod.Manual
+                    );
+                    absentRecord.MarkAsAbsent();
+                    await _attendanceRepository.AddAsync(absentRecord, cancellationToken);
+                }
             }
         
+            // Confirm existing records
+            await _attendanceRepository.ConfirmAttendanceRecordsAsync(courseSessionId, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
             return true;
         }
 
@@ -136,6 +159,33 @@ namespace UniAttend.Infrastructure.Services
                     }
                 }
             }
+        }
+
+        public async Task MarkStudentAbsentAsync(
+            int courseSessionId, 
+            int studentId,
+            CancellationToken cancellationToken = default)
+        {
+            var existingRecord = await _attendanceRepository
+                .GetStudentAttendanceForCourseSessionAsync(studentId, courseSessionId, cancellationToken);
+                
+            if (existingRecord != null)
+            {
+                existingRecord.MarkAsAbsent(); 
+            }
+            else
+            {
+                var newRecord = new AttendanceRecord(
+                    courseSessionId,
+                    studentId,
+                    DateTime.UtcNow,
+                    CheckInMethod.Manual
+                );
+                newRecord.MarkAsAbsent();
+                await _attendanceRepository.AddAsync(newRecord, cancellationToken);
+            }
+        
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 }

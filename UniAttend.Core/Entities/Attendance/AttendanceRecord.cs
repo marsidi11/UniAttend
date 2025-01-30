@@ -14,6 +14,7 @@ namespace UniAttend.Core.Entities.Attendance
             CheckInTime = checkInTime;
             CheckInMethod = checkInMethod;
             IsConfirmed = false;
+            Status = AttendanceStatus.PendingConfirmation;
         }
 
         public int CourseSessionId { get; private set; }
@@ -21,18 +22,26 @@ namespace UniAttend.Core.Entities.Attendance
         public DateTime CheckInTime { get; private set; }
         public CheckInMethod CheckInMethod { get; private set; }
         public bool IsConfirmed { get; private set; }
-        public int? ConfirmedByProfessorId { get; private set; }
         public DateTime? ConfirmationTime { get; private set; }
+        public bool IsAbsent { get; private set; }
+        public AttendanceStatus Status { get; private set; }
 
         // Navigation properties
         public virtual CourseSession CourseSession { get; private set; } = null!;
         public virtual Student Student { get; private set; } = null!;
-        public virtual Professor? ConfirmedByProfessor { get; private set; }
 
-        public void Confirm(int professorId)
+        public void Confirm()
         {
             IsConfirmed = true;
-            ConfirmedByProfessorId = professorId;
+            Status = AttendanceStatus.Present;
+            ConfirmationTime = DateTime.UtcNow;
+        }
+
+        public void MarkAsAbsent()
+        {
+            IsAbsent = true;
+            IsConfirmed = true;
+            Status = AttendanceStatus.Absent;
             ConfirmationTime = DateTime.UtcNow;
         }
     }

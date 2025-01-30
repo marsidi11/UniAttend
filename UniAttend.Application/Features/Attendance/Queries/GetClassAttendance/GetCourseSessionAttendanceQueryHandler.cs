@@ -35,7 +35,6 @@ namespace UniAttend.Application.Features.Attendance.Queries.GetCourseSessionAtte
                 r.CheckInMethod,
                 r.IsConfirmed,
                 r.ConfirmationTime,
-                r.ConfirmedByProfessorId,
                 r.CourseSession.StudyGroup.Name,
                 r.CourseSession.Classroom.Name,
                 r.CourseSession.StartTime,

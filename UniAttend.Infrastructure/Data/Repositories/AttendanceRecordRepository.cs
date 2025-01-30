@@ -79,20 +79,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
             var records = await GetUnconfirmedRecordsAsync(courseSessionId, cancellationToken);
             foreach (var record in records)
             {
-                DbSet.Update(record);
-            }
-            await Context.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task ConfirmAttendanceRecordsAsync(
-        int courseSessionId,
-        int professorId,
-        CancellationToken cancellationToken = default)
-        {
-            var records = await GetUnconfirmedRecordsAsync(courseSessionId, cancellationToken);
-            foreach (var record in records)
-            {
-                record.Confirm(professorId);
+                record.Confirm();
                 DbSet.Update(record);
             }
             await Context.SaveChangesAsync(cancellationToken);
@@ -149,36 +136,36 @@ namespace UniAttend.Infrastructure.Data.Repositories
             return session;
         }
 
-                public async Task<(int TotalCourseSessions, int AttendedCourseSessions)> GetStudentGroupAttendanceAsync(
-                int studentId,
-                int studyGroupId,
-                DateTime? startDate = null,
-                DateTime? endDate = null,
-                CancellationToken cancellationToken = default)
+        public async Task<(int TotalCourseSessions, int AttendedCourseSessions)> GetStudentGroupAttendanceAsync(
+        int studentId,
+        int studyGroupId,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        CancellationToken cancellationToken = default)
         {
             var query = DbSet
                 .Include(ar => ar.CourseSession)
                 .Where(ar =>
                     ar.StudentId == studentId &&
                     ar.CourseSession.StudyGroupId == studyGroupId);
-        
+
             if (startDate.HasValue)
                 query = query.Where(ar => ar.CheckInTime >= startDate.Value);
-        
+
             if (endDate.HasValue)
                 query = query.Where(ar => ar.CheckInTime <= endDate.Value);
-        
+
             var attendance = await query.ToListAsync(cancellationToken);
-        
+
             var totalCourseSessions = await Context.Set<CourseSession>()
                 .CountAsync(c =>
                     c.StudyGroupId == studyGroupId &&
                     (!startDate.HasValue || c.Date >= startDate.Value.Date) &&
                     (!endDate.HasValue || c.Date <= endDate.Value.Date),
                     cancellationToken);
-        
+
             var attendedCourseSessions = attendance.Count(a => a.IsConfirmed);
-        
+
             return (TotalCourseSessions: totalCourseSessions, AttendedCourseSessions: attendedCourseSessions);
         }
 
@@ -258,17 +245,17 @@ namespace UniAttend.Infrastructure.Data.Repositories
         public async Task<IEnumerable<AttendanceRecord>> GetDetailedByCourseSessionIdAsync(
         int courseSessionId,
         CancellationToken cancellationToken = default)
-    {
-        return await DbSet
-            .Include(ar => ar.Student)
-                .ThenInclude(s => s.User)
-            .Include(ar => ar.CourseSession)
-                .ThenInclude(cs => cs.StudyGroup)
-            .Include(ar => ar.CourseSession)
-                .ThenInclude(cs => cs.Classroom)
-            .Where(ar => ar.CourseSessionId == courseSessionId)
-            .ToListAsync(cancellationToken);
-    }
+        {
+            return await DbSet
+                .Include(ar => ar.Student)
+                    .ThenInclude(s => s.User)
+                .Include(ar => ar.CourseSession)
+                    .ThenInclude(cs => cs.StudyGroup)
+                .Include(ar => ar.CourseSession)
+                    .ThenInclude(cs => cs.Classroom)
+                .Where(ar => ar.CourseSessionId == courseSessionId)
+                .ToListAsync(cancellationToken);
+        }
 
         public async Task<IEnumerable<AttendanceRecord>> GetDetailedStudentAttendanceAsync(
         int studentId,

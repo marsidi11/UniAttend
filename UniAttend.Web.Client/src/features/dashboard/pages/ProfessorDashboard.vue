@@ -60,7 +60,7 @@
 
             <!-- Attendance List when session is active -->
             <AttendanceList :records="getSessionAttendance(session)" :loading="isLoadingAttendance"
-              :empty-message="'No attendance records yet'" compact />
+              :empty-message="'No attendance records yet'" :actions="attendanceActions" compact />
           </div>
         </template>
       </div>
@@ -115,6 +115,15 @@ const stats = ref<DashboardStats>({
   averageAttendance: 0
 })
 
+const attendanceActions = [
+  {
+    label: 'Mark Absent',
+    icon: 'person_off',
+    show: (record: AttendanceRecordDto) => !record.isConfirmed && !record.isAbsent,
+    action: (record: AttendanceRecordDto) => markStudentAbsent(record)
+  }
+]
+
 const recentRecords = ref<AttendanceRecordDto[]>([])
 const todayScheduledSessions = ref<ExtendedCourseSession[]>([])
 const currentSessionAttendance = ref<AttendanceRecordDto[]>([])
@@ -129,6 +138,15 @@ function formatTimeString(time: TimeSpan | undefined): string {
   const hours = time.hours?.toString().padStart(2, '0') || '00'
   const minutes = time.minutes?.toString().padStart(2, '0') || '00'
   return `${hours}:${minutes}`
+}
+
+async function markStudentAbsent(record: AttendanceRecordDto) {
+  try {
+    await attendanceStore.markAbsent(record.courseSessionId, record.studentId);
+    await loadSessionAttendance(record.courseSessionId);
+  } catch (err) {
+    console.error('Failed to mark student as absent:', err);
+  }
 }
 
 function isSessionActive(session: ExtendedCourseSession): boolean {

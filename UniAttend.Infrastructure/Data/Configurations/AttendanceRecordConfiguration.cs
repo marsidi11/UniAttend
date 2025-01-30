@@ -31,12 +31,6 @@ namespace UniAttend.Infrastructure.Data.Configurations
             .WithMany()
             .HasForeignKey(x => x.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(x => x.ConfirmedByProfessor)
-            .WithMany()
-            .HasForeignKey(x => x.ConfirmedByProfessorId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         }
     }
 }
