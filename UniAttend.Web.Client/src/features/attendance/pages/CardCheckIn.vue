@@ -45,12 +45,16 @@
       <CardReader v-if="selectedDeviceId && courseSession?.status === 'Active' && courseSession.id"
         :device-id="selectedDeviceId" :course-session-id="courseSession.id" />
     </div>
+
+    <div v-if="error" class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+      {{ error }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useClassroomStore } from '@/stores/classroom.store'
 import { useCourseSessionStore } from '@/stores/courseSession.store'
@@ -59,6 +63,7 @@ import Badge from '@/shared/components/ui/Badge.vue'
 import type { TimeSpan } from '@/api/generated/data-contracts'
 
 const route = useRoute()
+const router = useRouter() 
 const classroomStore = useClassroomStore()
 const courseSessionStore = useCourseSessionStore()
 
@@ -66,16 +71,43 @@ const selectedDeviceId = ref('')
 const { classroomsWithReaders } = storeToRefs(classroomStore)
 const { currentCourseSession: courseSession } = storeToRefs(courseSessionStore)
 
+// Error handling state
+const error = ref<string | null>(null)
+
 function formatTime(time: TimeSpan | undefined): string {
   if (!time) return '--:--'
   return `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`
 }
 
 onMounted(async () => {
-  const sessionId = Number(route.params.id)
-  if (sessionId) {
-    await courseSessionStore.getCourseSessionById(sessionId)
+  try {
+    // Get session ID from route params and validate
+    const sessionId = route.params.id
+    console.log('Raw session ID from route:', sessionId)
+    
+    if (!sessionId || Array.isArray(sessionId)) {
+      throw new Error('Invalid session ID')
+    }
+
+    const parsedSessionId = parseInt(sessionId, 10)
+    console.log('Parsed session ID:', parsedSessionId)
+
+    if (isNaN(parsedSessionId)) {
+      throw new Error('Invalid session ID format')
+    }
+
+    // Fetch course session
+    await courseSessionStore.getCourseSessionById(parsedSessionId)
+    console.log('Fetched course session:', courseSession.value)
+
+    // Fetch classrooms
+    await classroomStore.fetchClassrooms()
+    console.log('Available classrooms:', classroomsWithReaders.value)
+
+  } catch (err: any) {
+    console.error('Error in CardCheckIn setup:', err)
+    error.value = err.message
+    router.push('/dashboard') // Redirect on error
   }
-  await classroomStore.fetchClassrooms()
 })
 </script>

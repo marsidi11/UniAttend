@@ -13,14 +13,17 @@ namespace UniAttend.Application.Features.CourseSessions.Queries.GetActiveCourseS
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<CourseSessionDto>> Handle(GetActiveCourseSessionsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CourseSessionDto>> Handle(
+            GetActiveCourseSessionsQuery request, 
+            CancellationToken cancellationToken)
         {
             var sessions = await _unitOfWork.CourseSessions.GetActiveSessionsAsync(
+                courseSessionId: request.CourseSessionId,
                 studyGroupId: request.StudyGroupId,
                 classroomId: request.ClassroomId,
                 date: request.Date,
                 cancellationToken: cancellationToken);
-
+        
             return sessions.Select(s => new CourseSessionDto
             {
                 Id = s.Id,

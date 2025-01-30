@@ -93,14 +93,14 @@ namespace UniAttend.API.Controllers
             int id,
             CancellationToken cancellationToken)
         {
-            var query = new GetActiveCourseSessionsQuery { StudyGroupId = id };
+            var query = new GetActiveCourseSessionsQuery { CourseSessionId = id };
             var result = await _mediator.Send(query, cancellationToken);
-            var CourseSessionDto = result.FirstOrDefault();
-
-            if (CourseSessionDto == null)
+            var courseSessionDto = result.FirstOrDefault();
+        
+            if (courseSessionDto == null)
                 return NotFound();
-
-            return Ok(CourseSessionDto);
+        
+            return Ok(courseSessionDto);
         }
 
         /// <summary>

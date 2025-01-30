@@ -39,14 +39,17 @@
                   <span class="ml-2">{{ session.classroomName }}</span>
                 </p>
               </div>
-                            <div class="flex gap-2">
-                <Button v-if="!isSessionActive(session)" @click="startSession(session)" variant="primary">
-                  Start Session
+              <div class="flex gap-2">
+                <Button v-if="!isSessionActive(session)" @click="startSession(session)" variant="primary"
+                  :disabled="startingSessionId === session.studyGroupId">
+                  {{ startingSessionId === session.studyGroupId ? 'Starting...' : 'Start Session' }}
                 </Button>
-                <Button v-else-if="!isSessionConfirmed(session)" @click="confirmSession(session.id!)" variant="primary">
+                <Button v-else-if="isSessionActive(session) && !isSessionConfirmed(session)"
+                  @click="confirmSession(session.id!)" variant="primary">
                   Confirm Attendance
                 </Button>
-                <Button v-else-if="isSessionActive(session) && session.id" @click="closeSession(session.id)" variant="danger">
+                <Button v-else-if="isSessionActive(session) && session.id" @click="closeSession(session.id)"
+                  variant="danger">
                   End Session
                 </Button>
                 <Badge :status="getSessionStatus(session)">
@@ -56,9 +59,8 @@
             </div>
 
             <!-- Attendance List when session is active -->
-            <div v-if="isSessionActive(session)" class="mt-4">
-              <AttendanceList :records="currentSessionAttendance" :loading="isLoadingAttendance" compact />
-            </div>
+            <AttendanceList :records="getSessionAttendance(session)" :loading="isLoadingAttendance"
+              :empty-message="'No attendance records yet'" compact />
           </div>
         </template>
       </div>
@@ -69,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useAttendanceStore } from '@/stores/attendance.store'
 import { useReportStore } from '@/stores/report.store'
 import { useCourseSessionStore } from '@/stores/courseSession.store'
@@ -117,6 +119,9 @@ const recentRecords = ref<AttendanceRecordDto[]>([])
 const todayScheduledSessions = ref<ExtendedCourseSession[]>([])
 const currentSessionAttendance = ref<AttendanceRecordDto[]>([])
 const isLoadingAttendance = ref(false)
+const startingSessionId = ref<number | null>(null)
+const activeSessionId = ref<number | null>(null)
+const pollInterval = ref<number | null>(null)
 
 // Utility functions
 function formatTimeString(time: TimeSpan | undefined): string {
@@ -151,6 +156,9 @@ function getSessionStatus(session: CourseSessionDto): BadgeStatus {
 
 // Session management functions
 async function startSession(session: ExtendedCourseSession) {
+  if (startingSessionId.value === session.studyGroupId) return
+  startingSessionId.value = session.studyGroupId!
+
   try {
     const command: OpenCourseSessionCommand = {
       studyGroupId: session.studyGroupId!,
@@ -160,29 +168,75 @@ async function startSession(session: ExtendedCourseSession) {
       startTime: session.startTime!,
       endTime: session.endTime!
     }
-    await courseSessionStore.OpenCourseSession(command)
-    await loadSessionAttendance(session.id!)
+    const newSession = await courseSessionStore.OpenCourseSession(command)
+    if (newSession?.id) {
+      session.id = newSession.id
+      await loadSessionAttendance(newSession.id)
+      startAttendancePolling(newSession.id) // Start polling
+    }
     await loadDashboardData()
   } catch (err) {
     console.error('Failed to start session:', err)
+  } finally {
+    startingSessionId.value = null
   }
 }
 
+function getSessionAttendance(session: ExtendedCourseSession): AttendanceRecordDto[] {
+  if (!isSessionActive(session)) return []
+  if (session.id !== activeSessionId.value) return []
+  console.log('Getting attendance for session:', session.id, currentSessionAttendance.value)
+  return currentSessionAttendance.value || []
+}
+
 async function loadSessionAttendance(sessionId: number) {
+  console.log('Loading attendance for session:', sessionId)
   isLoadingAttendance.value = true
+  
   try {
     const records = await attendanceStore.fetchClassAttendance(sessionId)
-    currentSessionAttendance.value = records || []
+    console.log('Raw attendance records:', records)
+    
+    if (records) {
+      currentSessionAttendance.value = Array.isArray(records) ? records : []
+      console.log('Updated attendance records:', currentSessionAttendance.value)
+    } else {
+      console.warn('No records returned')
+      currentSessionAttendance.value = []
+    }
   } catch (err) {
     console.error('Failed to load session attendance:', err)
+    currentSessionAttendance.value = []
   } finally {
     isLoadingAttendance.value = false
   }
 }
 
+// Add polling function
+function startAttendancePolling(sessionId: number) {
+  console.log('Starting attendance polling for session:', sessionId)
+  stopAttendancePolling()
+  activeSessionId.value = sessionId
+
+  pollInterval.value = window.setInterval(async () => {
+    if (activeSessionId.value) {
+      await loadSessionAttendance(activeSessionId.value)
+    }
+  }, 30000) // Poll every 30 seconds
+}
+
+function stopAttendancePolling() {
+  if (pollInterval.value) {
+    clearInterval(pollInterval.value)
+    pollInterval.value = null
+  }
+  activeSessionId.value = null
+}
+
 async function closeSession(sessionId: number) {
   try {
     await courseSessionStore.closeCourseSession(sessionId)
+    stopAttendancePolling()
     await loadDashboardData()
   } catch (err) {
     console.error('Failed to close session:', err)
@@ -194,15 +248,14 @@ async function loadDashboardData() {
   try {
     const today = new Date()
     const [schedules, sessions, attendanceStats] = await Promise.all([
-      // Get professor's schedule for today
-      scheduleStore.fetchSchedules(undefined, undefined, authStore.user?.id), // professor's schedule
+      scheduleStore.fetchSchedules(undefined, undefined, authStore.user?.id),
       courseSessionStore.fetchCourseSessions({ date: today }),
       attendanceStore.fetchAttendance()
     ])
 
     // Map schedules to sessions
     todayScheduledSessions.value = schedules.map(schedule => ({
-      id: undefined, // Will be set when session starts
+      id: undefined,
       studyGroupId: schedule.studyGroupId,
       studyGroupName: schedule.studyGroupName,
       classroomId: schedule.classroomId,
@@ -213,14 +266,26 @@ async function loadDashboardData() {
       isConfirmed: false
     }))
 
-    // Update with any active sessions
+    // Update with active sessions
     if (sessions?.length) {
       todayScheduledSessions.value = todayScheduledSessions.value.map(scheduled => {
-        const active = sessions.find(s => 
-          s.studyGroupId === scheduled.studyGroupId && 
+        const active = sessions.find(s =>
+          s.studyGroupId === scheduled.studyGroupId &&
           s.classroomId === scheduled.classroomId
         )
-        return active ? { ...scheduled, ...active } : scheduled
+        if (active) {
+          if (active.status?.toLowerCase() === 'active') {
+            startAttendancePolling(active.id!)
+            // Load attendance immediately for active session
+            loadSessionAttendance(active.id!)
+          }
+          return {
+            ...scheduled,
+            ...active,
+            id: active.id
+          }
+        }
+        return scheduled
       })
     }
 
@@ -274,5 +339,9 @@ async function loadRecentRecords() {
 onMounted(() => {
   loadDashboardData()
   loadRecentRecords()
+})
+
+onUnmounted(() => {
+  stopAttendancePolling()
 })
 </script>

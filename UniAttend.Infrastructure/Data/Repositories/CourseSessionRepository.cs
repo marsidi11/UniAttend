@@ -21,6 +21,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync(cs => cs.Id == id, cancellationToken);
 
         public async Task<IEnumerable<CourseSession>> GetActiveSessionsAsync(
+            int? courseSessionId = null,
             int? studyGroupId = null,
             int? classroomId = null,
             DateTime? date = null,
@@ -30,16 +31,19 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(cs => cs.StudyGroup)
                 .Include(cs => cs.Classroom)
                 .Where(cs => cs.Status == "Active");
-
+        
+            if (courseSessionId.HasValue)
+                query = query.Where(cs => cs.Id == courseSessionId);
+        
             if (studyGroupId.HasValue)
                 query = query.Where(cs => cs.StudyGroupId == studyGroupId);
-
+        
             if (classroomId.HasValue)
                 query = query.Where(cs => cs.ClassroomId == classroomId);
-
+        
             if (date.HasValue)
                 query = query.Where(cs => cs.Date.Date == date.Value.Date);
-
+        
             return await query
                 .OrderBy(cs => cs.Date)
                 .ThenBy(cs => cs.StartTime)

@@ -9,6 +9,7 @@ namespace UniAttend.Core.Interfaces.Repositories
         Task<CourseSession?> GetActiveByDeviceIdAsync(string deviceId, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<CourseSession>> GetActiveSessionsAsync(
+            int? courseSessionId = null,
             int? studyGroupId = null,
             int? classroomId = null, 
             DateTime? date = null,

@@ -189,13 +189,13 @@ const routes = [
         meta: { roles: ['student'] }
       },
       {
-        path: 'attendance/otp-check-in/:sessionId',
+        path: 'attendance/otp-check-in/:id',
         name: 'otp-check-in',
         component: OtpCheckIn,
         meta: { roles: ['student'] }
       },
       {
-        path: 'attendance/check-in/:sessionId',
+        path: 'attendance/check-in/:id',
         name: 'card-check-in',
         component: CardCheckIn,
         meta: { roles: ['student'] }

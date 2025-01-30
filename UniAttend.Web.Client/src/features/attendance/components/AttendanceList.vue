@@ -1,39 +1,28 @@
 <template>
-  <div class="space-y-4">
-    <div class="flex justify-between items-center">
-      <h2 class="text-xl font-semibold">Attendance History</h2>
-      <div class="flex gap-4">
-        <DatePicker v-model="startDateStr" placeholder="Start Date" />
-        <DatePicker v-model="endDateStr" placeholder="End Date" />
-        <Button @click="loadAttendance">Filter</Button>
-      </div>
-    </div>
-
-    <div v-if="isLoading" class="flex justify-center">
+  <div>
+    <div v-if="loading" class="flex justify-center py-4">
       <Spinner />
     </div>
 
-    <div v-else-if="records.length === 0" class="text-center py-8">
-      No attendance records found
+    <div v-else-if="!records || records.length === 0" class="text-center py-4 text-gray-500">
+      {{ emptyMessage || 'No attendance records found' }}
     </div>
 
     <table v-else class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
-          <th>Date</th>
-          <th>Course</th>
-          <th>Professor</th>
-          <th>Check-in Method</th>
-          <th>Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-in Time</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <tr v-for="(record, index) in records" :key="index">
-          <td>{{ record.checkInTime ? formatDate(new Date(record.checkInTime)) : '' }}</td>
-          <td>{{ record.courseName }}</td>
-          <td>{{ record.professor }}</td>
-          <td>{{ record.checkInMethod }}</td>
-          <td>
+        <tr v-for="record in records" :key="record.id">
+          <td class="px-6 py-4 whitespace-nowrap">{{ record.studentName }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ formatDateTime(record.checkInTime || '') }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ formatCheckInMethod(record.checkInMethod || 0) }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
             <Badge :status="record.isConfirmed ? 'success' : 'warning'">
               {{ record.isConfirmed ? 'Confirmed' : 'Pending' }}
             </Badge>
@@ -45,42 +34,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useAttendanceStore } from '@/stores/attendance.store';
-import { formatDate } from '@/utils/dateUtils';
-import DatePicker from '@/shared/components/ui/DatePicker.vue';
-import Button from '@/shared/components/ui/Button.vue';
-import Spinner from '@/shared/components/ui/Spinner.vue';
-import Badge from '@/shared/components/ui/Badge.vue';
+import { defineProps } from 'vue'
+import type { AttendanceRecordDto, CheckInMethod } from '@/api/generated/data-contracts'
+import Badge from '@/shared/components/ui/Badge.vue'
+import Spinner from '@/shared/components/ui/Spinner.vue'
 
-const attendanceStore = useAttendanceStore();
+defineProps<{
+  records: AttendanceRecordDto[]
+  loading?: boolean
+  emptyMessage?: string
+  compact?: boolean
+}>()
 
-// Date handling with proper typing
-const startDateStr = ref<string>('');
-const endDateStr = ref<string>('');
-
-// Convert string dates to Date objects
-const startDate = computed(() => startDateStr.value ? new Date(startDateStr.value) : undefined);
-const endDate = computed(() => endDateStr.value ? new Date(endDateStr.value) : undefined);
-
-// Store refs with proper typing
-const { records, isLoading } = storeToRefs(attendanceStore);
-
-// Methods
-async function loadAttendance() {
-  try {
-    await attendanceStore.fetchAttendance(
-      startDate.value,
-      endDate.value
-    );
-  } catch (err) {
-    console.error('Failed to load attendance:', err);
-  }
+function formatDateTime(dateStr: string) {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return date.toLocaleString()
 }
 
-// Lifecycle hooks
-onMounted(() => {
-  loadAttendance();
-});
+function formatCheckInMethod(method: CheckInMethod | number) {
+  switch(method) {
+    case 0: return 'Card'
+    case 1: return 'OTP'
+    default: return 'Unknown'
+  }
+}
 </script>

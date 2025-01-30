@@ -1,14 +1,17 @@
 <template>
-  <div class="space-y-4">
-    <!-- Test input - visible for development -->
-    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+  <div class="card-reader space-y-4 bg-white p-6 rounded-lg border">
+    <!-- Card Input Field -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Card Reader Simulation
+      </label>
       <input 
         type="text" 
         v-model="cardId"
         @keyup.enter="handleCardSwipe"
         ref="cardInput"
-        class="w-full p-2 border rounded"
-        placeholder="Enter card ID and press Enter"
+        class="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500"
+        placeholder="Scan your card (Enter ID and press Enter)"
         :disabled="status === 'Processing'"
         autocomplete="off"
       />
@@ -16,28 +19,33 @@
 
     <!-- Card Reader Visual Interface -->
     <div 
-      class="text-center p-8 border-2 border-dashed rounded-lg transition-colors cursor-pointer"
+      class="text-center p-8 border-2 border-dashed rounded-lg transition-all duration-200 cursor-pointer"
       :class="{
-        'border-indigo-500 bg-indigo-50': isInputFocused,
-        'border-gray-300 hover:border-indigo-300': !isInputFocused,
+        'border-indigo-500 bg-indigo-50': isInputFocused || status === 'Processing',
+        'border-gray-300 hover:border-indigo-300': !isInputFocused && status === 'Ready',
+        'border-green-500 bg-green-50': status === 'Success',
         'border-red-500 bg-red-50': status === 'Error'
       }"
       @click="focusInput"
     >
       <div class="space-y-4">
+        <!-- Card Reader Icon -->
         <span class="material-icons text-6xl" :class="{
-          'text-indigo-500': isInputFocused,
-          'text-gray-400': !isInputFocused && status !== 'Error',
-          'text-red-500': status === 'Error'
+          'text-indigo-500 animate-pulse': status === 'Processing',
+          'text-green-500': status === 'Success',
+          'text-red-500': status === 'Error',
+          'text-gray-400': status === 'Ready'
         }">
-          {{ status === 'Processing' ? 'sensors' : 'contactless' }}
+          {{ getStatusIcon }}
         </span>
         
+        <!-- Status Message -->
         <div>
           <p class="text-lg font-medium" :class="{
-            'text-indigo-600': isInputFocused,
-            'text-gray-600': !isInputFocused && status !== 'Error',
-            'text-red-600': status === 'Error'
+            'text-indigo-600': status === 'Processing',
+            'text-green-600': status === 'Success',
+            'text-red-600': status === 'Error',
+            'text-gray-600': status === 'Ready'
           }">
             {{ statusMessage }}
           </p>
@@ -66,11 +74,20 @@ const cardInput = ref<HTMLInputElement | null>(null)
 
 const statusMessage = computed(() => {
   switch (status.value) {
-    case 'Ready': return 'Click here or tap card to scan'
-    case 'Processing': return 'Processing...'
-    case 'Success': return 'Card accepted!'
-    case 'Error': return 'Scan failed - Try again'
+    case 'Ready': return 'Ready to scan - Click here or tap card'
+    case 'Processing': return 'Reading card...'
+    case 'Success': return 'Attendance recorded successfully!'
+    case 'Error': return 'Failed to record attendance - Try again'
     default: return 'Ready to scan'
+  }
+})
+
+const getStatusIcon = computed(() => {
+  switch (status.value) {
+    case 'Processing': return 'sensors'
+    case 'Success': return 'check_circle'
+    case 'Error': return 'error'
+    default: return 'contactless'
   }
 })
 
@@ -87,9 +104,9 @@ async function handleCardSwipe() {
       courseSessionId: props.courseSessionId
     })
     status.value = 'Success'
-  } catch (error) {
+  } catch (error: any) {
     status.value = 'Error'
-    lastError.value = 'Card not recognized'
+    lastError.value = error.response?.data?.message || 'Card not recognized'
   }
   
   cardId.value = ''

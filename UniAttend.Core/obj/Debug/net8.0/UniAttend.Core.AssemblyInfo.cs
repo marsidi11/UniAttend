@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("UniAttend.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1488d9857301d0d3bf6e4e82bef1c79e0d093e1d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1293cb57a5a7398ed69dc00f080d748e8095ae98")]
 [assembly: System.Reflection.AssemblyProductAttribute("UniAttend.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("UniAttend.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
