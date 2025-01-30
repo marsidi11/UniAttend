@@ -10,6 +10,7 @@ namespace UniAttend.Application.Features.Attendance.DTOs
         DateTime CheckInTime,
         CheckInMethod CheckInMethod,
         bool IsConfirmed,
+        bool isAbsent,
         DateTime? ConfirmationTime,
         string StudyGroupName,
         string ClassroomName,

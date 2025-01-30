@@ -283,5 +283,36 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .OrderByDescending(a => a.CheckInTime)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<AttendanceStats> GetDepartmentAttendanceStatsAsync(
+        int departmentId,
+        int? academicYearId,
+        CancellationToken cancellationToken = default)
+        {
+            var query = DbSet
+                .Include(ar => ar.CourseSession)
+                    .ThenInclude(cs => cs.StudyGroup)
+                        .ThenInclude(sg => sg.Subject)
+                .Where(ar => ar.CourseSession.StudyGroup.Subject.DepartmentId == departmentId);
+
+            if (academicYearId.HasValue)
+            {
+                query = query.Where(ar => ar.CourseSession.StudyGroup.AcademicYearId == academicYearId.Value);
+            }
+
+            var records = await query.ToListAsync(cancellationToken);
+
+            return new AttendanceStats
+            {
+                TotalSessions = records.Select(r => r.CourseSessionId).Distinct().Count(),
+                TotalStudents = records.Select(r => r.StudentId).Distinct().Count(),
+                PresentCount = records.Count(r => r.IsConfirmed && !r.IsAbsent),
+                AbsentCount = records.Count(r => r.IsConfirmed && r.IsAbsent),
+                PendingCount = records.Count(r => !r.IsConfirmed),
+                AverageAttendance = records.Any()
+                    ? (decimal)records.Count(r => r.IsConfirmed && !r.IsAbsent) / records.Count * 100
+                    : 0
+            };
+        }
     }
 }

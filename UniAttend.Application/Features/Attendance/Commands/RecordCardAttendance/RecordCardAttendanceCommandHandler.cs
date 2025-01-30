@@ -28,6 +28,7 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordCardAttendanc
                 record.CheckInTime,
                 record.CheckInMethod,
                 record.IsConfirmed,
+                record.IsAbsent,
                 record.ConfirmationTime,
                 record.CourseSession.StudyGroup.Name,
                 record.CourseSession.Classroom.Name,

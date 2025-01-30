@@ -10,6 +10,8 @@
   <None Update="appsettings.json">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </None>
+  <PackageReference Include="FastReport.OpenSource" Version="2025.1.0" />
+  <PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2025.1.0" />
   
     <PackageReference Include="itext7" Version="9.0.0" />
     <PackageReference Include="itext7.pdfhtml" Version="6.0.0" />
@@ -39,6 +41,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.3.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>

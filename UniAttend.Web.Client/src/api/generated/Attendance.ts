@@ -111,4 +111,23 @@ export class Attendance<SecurityDataType = unknown> extends HttpClient<SecurityD
       format: "json",
       ...params,
     });
+  /**
+   * No description
+   *
+   * @tags Attendance
+   * @name AttendanceCourseSessionsStudentsAbsentCreate
+   * @request POST:/api/Attendance/courseSessions/{courseSessionId}/students/{studentId}/absent
+   * @secure
+   */
+  attendanceCourseSessionsStudentsAbsentCreate = (
+    courseSessionId: number,
+    studentId: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, any>({
+      path: `/api/Attendance/courseSessions/${courseSessionId}/students/${studentId}/absent`,
+      method: "POST",
+      secure: true,
+      ...params,
+    });
 }

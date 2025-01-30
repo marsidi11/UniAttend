@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace UniAttend.Core.Interfaces.Services
 {
     public interface ITotpService

@@ -103,6 +103,7 @@ namespace UniAttend.Application.Common.Mappings
                 src.CheckInTime,
                 src.CheckInMethod,
                 src.IsConfirmed,
+                src.IsAbsent,
                 src.ConfirmationTime,
                 src.CourseSession.StudyGroup.Name,
                 src.CourseSession.Classroom.Name,

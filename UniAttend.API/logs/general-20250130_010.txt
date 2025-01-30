@@ -1,0 +1,1 @@
+2025-01-30 23:54:24.265 +01:00 [INF] Starting web application

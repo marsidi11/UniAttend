@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp">
+  <Dictionary>
+    <TableDataSource Name="DepartmentStats">
+      <Column Name="GroupName" DataType="System.String"/>
+      <Column Name="TotalStudents" DataType="System.Int32"/>
+      <Column Name="AttendanceRate" DataType="System.Decimal"/>
+      <Column Name="PresentCount" DataType="System.Int32"/>
+      <Column Name="AbsentCount" DataType="System.Int32"/>
+    </TableDataSource>
+  </Dictionary>
+</Report>

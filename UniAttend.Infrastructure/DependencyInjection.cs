@@ -66,6 +66,7 @@ namespace UniAttend.Infrastructure
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IPrintService, PdfPrintService>();
             services.AddScoped<ITotpService, TotpService>();
+            services.AddScoped<IReportService, FastReportService>();
             services.AddScoped<IRateLimiter, RateLimiter>();
             services.AddScoped<IAttendanceRecordRepository, AttendanceRecordRepository>();
             services.AddScoped<ICourseSessionRepository, CourseSessionRepository>();

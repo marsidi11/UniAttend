@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using UniAttend.API.Extensions;
 using UniAttend.Application.Features.Students.Queries.GetStudentAbsenceAlerts;
-using UniAttend.Application.Features.Students.Queries.GetStudentAttendance;
 using UniAttend.Application.Features.Students.Queries.GetStudentGroups;
 using UniAttend.Application.Features.Students.Commands.AssignCard;
 using UniAttend.Application.Features.Students.Commands.RemoveCard;
@@ -39,19 +38,6 @@ namespace UniAttend.API.Controllers
         {
             var studentId = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetAll), new { id = studentId }, studentId);
-        }
-
-        [HttpGet("attendance")]
-        public async Task<IActionResult> GetAttendanceRecords([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
-        {
-            var query = new GetStudentAttendanceQuery
-            {
-                StudentId = User.GetUserId(),
-                StartDate = startDate,
-                EndDate = endDate
-            };
-            var result = await _mediator.Send(query);
-            return Ok(result);
         }
 
         [HttpGet("enrolled-groups")]

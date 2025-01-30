@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp">
+  <Dictionary>
+    <TableDataSource Name="AttendanceRecords">
+      <Column Name="Date" DataType="System.DateTime"/>
+      <Column Name="Subject" DataType="System.String"/>
+      <Column Name="Status" DataType="System.String"/>
+    </TableDataSource>
+  </Dictionary>
+</Report>

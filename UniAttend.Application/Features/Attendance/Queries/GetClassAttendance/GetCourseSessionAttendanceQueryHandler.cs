@@ -30,15 +30,16 @@ namespace UniAttend.Application.Features.Attendance.Queries.GetCourseSessionAtte
                 r.Id,
                 r.CourseSessionId,
                 r.StudentId,
-                $"{r.Student.User.FirstName} {r.Student.User.LastName}",
+                $"{r.Student?.User?.FirstName ?? "Unknown"} {r.Student?.User?.LastName ?? ""}".Trim(),
                 r.CheckInTime,
                 r.CheckInMethod,
                 r.IsConfirmed,
+                r.IsAbsent,
                 r.ConfirmationTime,
-                r.CourseSession.StudyGroup.Name,
-                r.CourseSession.Classroom.Name,
-                r.CourseSession.StartTime,
-                r.CourseSession.EndTime
+                r.CourseSession?.StudyGroup?.Name ?? "Unknown",
+                r.CourseSession?.Classroom?.Name ?? "Unknown",
+                r.CourseSession?.StartTime ?? TimeSpan.Zero,
+                r.CourseSession?.EndTime ?? TimeSpan.Zero
             ));
         }
     }

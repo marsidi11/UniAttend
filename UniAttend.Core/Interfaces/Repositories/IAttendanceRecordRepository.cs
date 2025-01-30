@@ -63,5 +63,17 @@ namespace UniAttend.Core.Interfaces.Repositories
         DateTime startDate,
         DateTime endDate,
         CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets attendance statistics for a department
+        /// </summary>
+        /// <param name="departmentId">ID of the department</param>
+        /// <param name="academicYearId">Optional academic year filter</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Department attendance statistics</returns>
+        Task<AttendanceStats> GetDepartmentAttendanceStatsAsync(
+            int departmentId,
+            int? academicYearId,
+            CancellationToken cancellationToken = default);
     }
 }

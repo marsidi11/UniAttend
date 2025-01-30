@@ -54,6 +54,9 @@ builder.Services.AddApplication();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+// Configure FastReport
+builder.Services.AddInfrastructure(builder.Configuration);
+
 // Configure Authentication
 builder.Services.AddAuthentication(options =>
 {

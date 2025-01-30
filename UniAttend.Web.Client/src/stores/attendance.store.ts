@@ -99,7 +99,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
 
   async function markAbsent(courseSessionId: number, studentId: number) {
     try {
-      await attendanceApi.markAbsent(courseSessionId, studentId);
+      await attendanceApi.attendanceCourseSessionsStudentsAbsentCreate(courseSessionId, studentId);
     } catch (err) {
       handleError(err, error);
       throw err;

@@ -118,6 +118,7 @@ export interface ChangePasswordCommand {
 export enum CheckInMethod {
   Value0 = 0,
   Value1 = 1,
+  Value2 = 2,
 }
 
 export interface ClassroomDto {
@@ -265,7 +266,7 @@ export interface GroupReportDto {
   totalCourseSessions?: number;
   /** @format double */
   averageAttendance?: number;
-  students?: StudentAttendanceDto[] | null;
+  students?: AttendanceRecordDto[] | null;
 }
 
 export interface GroupStudentDto {
@@ -373,7 +374,7 @@ export interface ScheduleDto {
   updatedAt?: string | null;
 }
 
-export interface StudentAttendanceDto {
+export interface AttendanceRecordDto {
   /** @format int32 */
   studentId?: number;
   studentNumber?: string | null;
