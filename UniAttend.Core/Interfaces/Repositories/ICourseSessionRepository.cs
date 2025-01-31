@@ -12,6 +12,7 @@ namespace UniAttend.Core.Interfaces.Repositories
             int? courseSessionId = null,
             int? studyGroupId = null,
             int? classroomId = null, 
+            int? professorId = null,
             DateTime? date = null,
             CancellationToken cancellationToken = default);
             

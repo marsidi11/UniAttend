@@ -39,19 +39,32 @@
                   <span class="ml-2">{{ session.classroomName }}</span>
                 </p>
               </div>
-              <div class="flex gap-2">
-                <Button v-if="!isSessionActive(session)" @click="startSession(session)" variant="primary"
-                  :disabled="startingSessionId === session.studyGroupId">
+                            <div class="flex gap-2">
+                <Button v-if="!isSessionActive(session)" 
+                  @click="startSession(session)" 
+                  variant="primary" 
+                  :disabled="startingSessionId === session.studyGroupId ||
+                    todayScheduledSessions.some(s =>
+                      s.studyGroupId === session.studyGroupId &&
+                      s.status?.toLowerCase() === 'active'
+                    )">
                   {{ startingSessionId === session.studyGroupId ? 'Starting...' : 'Start Session' }}
                 </Button>
-                <Button v-else-if="isSessionActive(session) && !isSessionConfirmed(session)"
-                  @click="confirmSession(session.id!)" variant="primary">
-                  Confirm Attendance
-                </Button>
-                <Button v-else-if="isSessionActive(session) && session.id" @click="closeSession(session.id)"
+                
+                <!-- Show End Session whenever session is active -->
+                <Button v-if="isSessionActive(session) && session.id" 
+                  @click="closeSession(session.id)"
                   variant="danger">
                   End Session
                 </Button>
+              
+                <!-- Show Confirm Attendance if not confirmed -->
+                <Button v-if="isSessionActive(session) && !isSessionConfirmed(session)"
+                  @click="confirmSession(session.id!)" 
+                  variant="primary">
+                  Confirm Attendance
+                </Button>
+              
                 <Badge :status="getSessionStatus(session)">
                   {{ session.status }}
                 </Badge>
@@ -133,13 +146,6 @@ const startingSessionId = ref<number | null>(null)
 const activeSessionId = ref<number | null>(null)
 const pollInterval = ref<number | null>(null)
 
-interface CourseSessionQueryParams {
-  studyGroupId?: number;
-  classroomId?: number;
-  date?: Date;
-  professorId?: number;
-}
-
 // Utility functions
 function formatTimeString(time: TimeSpan | undefined): string {
   if (!time) return '';
@@ -189,6 +195,8 @@ function getSessionStatus(session: CourseSessionDto | ExtendedCourseSession): Ba
 // Session management functions
 async function startSession(session: ExtendedCourseSession) {
   if (startingSessionId.value === session.studyGroupId) return
+  if (isSessionActive(session)) return
+
   startingSessionId.value = session.studyGroupId!
 
   try {
@@ -200,13 +208,35 @@ async function startSession(session: ExtendedCourseSession) {
       startTime: session.startTime!,
       endTime: session.endTime!
     }
+
     const newSession = await courseSessionStore.OpenCourseSession(command)
-    if (newSession?.id) {
-      session.id = newSession.id
+    if (!newSession?.id) throw new Error('Failed to create session')
+
+    // Immediately update local state
+    const sessionIndex = todayScheduledSessions.value.findIndex(
+      s => s.studyGroupId === session.studyGroupId
+    )
+    
+    if (sessionIndex !== -1) {
+      const updatedSession: ExtendedCourseSession = {
+        ...todayScheduledSessions.value[sessionIndex],
+        id: newSession.id,
+        status: 'active',
+        isConfirmed: false
+      }
+      todayScheduledSessions.value[sessionIndex] = updatedSession
+      
+      // Start attendance tracking
       await loadSessionAttendance(newSession.id)
-      startAttendancePolling(newSession.id) // Start polling
+      startAttendancePolling(newSession.id)
+      
+      // Update dashboard stats
+      stats.value = {
+        ...stats.value,
+        activeCourseSessions: stats.value.activeCourseSessions + 1,
+        pendingConfirmations: stats.value.pendingConfirmations + 1
+      }
     }
-    await loadDashboardData()
   } catch (err) {
     console.error('Failed to start session:', err)
   } finally {
@@ -278,75 +308,72 @@ async function closeSession(sessionId: number) {
 async function loadDashboardData() {
   isLoading.value = true
   try {
-    // Ensure we're using the start of today for proper date comparison
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
 
-    const [schedules, sessions, attendanceStats] = await Promise.all([
+    // 1. Fetch all required data
+    const [schedules, activeSessions, attendanceStats] = await Promise.all([
       scheduleStore.fetchSchedules(undefined, undefined, authStore.user?.id),
       courseSessionStore.fetchCourseSessions({
         date: today,
         professorId: authStore.user?.id
-      } as CourseSessionQueryParams), // Cast to the correct type
+      }),
       attendanceStore.fetchAttendance()
     ])
 
-    console.log('Fetched schedules:', schedules)
-    console.log('Fetched sessions:', sessions)
-
-    // Filter schedules for today
-    const todaySchedules = schedules.filter(schedule => {
-      const scheduleDay = new Date().getDay() // 0 = Sunday, 1 = Monday, etc.
-      return schedule.dayOfWeek === scheduleDay // Assuming schedule has dayOfWeek property
-    })
-
-    // Clear previous sessions
+    // 2. Clear previous state
     todayScheduledSessions.value = []
 
-    // Map schedules to sessions without duplicates
-    const processedGroups = new Set()
+    // 3. First handle active sessions
+    const activeSessionsMap = new Map()
+    activeSessions?.forEach(session => {
+      if (session.status?.toLowerCase() === 'active') {
+        activeSessionsMap.set(session.studyGroupId, true)
+        const sessionObject: ExtendedCourseSession = {
+          ...session,
+          status: 'active',
+          isConfirmed: false
+        }
+        todayScheduledSessions.value.push(sessionObject)
+        
+        // Start polling for active sessions
+        startAttendancePolling(session.id!)
+        loadSessionAttendance(session.id!)
+      }
+    })
+
+    // 4. Then add scheduled sessions that aren't active yet
+    const todaySchedules = schedules.filter(schedule => {
+      const scheduleDay = new Date().getDay()
+      return schedule.dayOfWeek === scheduleDay && !activeSessionsMap.has(schedule.studyGroupId)
+    })
 
     todaySchedules.forEach(schedule => {
-      if (processedGroups.has(schedule.studyGroupId)) return;
-      processedGroups.add(schedule.studyGroupId);
-
-      // Find matching active session
-      const activeSession = sessions?.find(s =>
-        s.studyGroupId === schedule.studyGroupId &&
-        s.classroomId === schedule.classroomId
-      );
-
-      // Create the session object with explicit typing
       const sessionObject: ExtendedCourseSession = {
         ...schedule,
-        id: activeSession?.id,
-        studyGroupId: schedule.studyGroupId,
-        studyGroupName: schedule.studyGroupName,
-        classroomId: schedule.classroomId,
-        classroomName: schedule.classroomName,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        status: activeSession?.status || 'scheduled',
-        isConfirmed: activeSession?.status === 'completed' || false
-      };
-
-      if (activeSession?.status?.toLowerCase() === 'active') {
-        startAttendancePolling(activeSession.id!);
-        loadSessionAttendance(activeSession.id!);
+        id: undefined,
+        status: 'scheduled',
+        isConfirmed: false
       }
+      todayScheduledSessions.value.push(sessionObject)
+    })
 
-      todayScheduledSessions.value.push(sessionObject);
-    });
+    // 5. Sort sessions by time
+    todayScheduledSessions.value.sort((a, b) => {
+      const timeA = a.startTime?.hours || 0
+      const timeB = b.startTime?.hours || 0
+      return timeA - timeB
+    })
 
-    // Update stats
+    // 6. Update stats
     stats.value = {
-      activeCourseSessions: sessions?.filter(s => s.status?.toLowerCase() === 'active').length || 0,
-      pendingConfirmations: sessions?.filter(s => {
-        const extendedSession = s as ExtendedCourseSession
-        return !extendedSession.isConfirmed && s.status?.toLowerCase() === 'active'
+      activeCourseSessions: activeSessions?.filter(s => s.status?.toLowerCase() === 'active').length || 0,
+      pendingConfirmations: activeSessions?.filter(s => {
+        const session = s as ExtendedCourseSession
+        return !session.isConfirmed && s.status?.toLowerCase() === 'active'
       }).length || 0,
       averageAttendance: calculateAverageAttendance(attendanceStats)
     }
+
   } catch (err) {
     console.error('Failed to load dashboard data:', err)
   } finally {

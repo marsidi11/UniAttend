@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { 
+import type {
   AttendanceRecordDto,
   RecordCardAttendanceCommand,
   RecordOtpAttendanceCommand
@@ -16,7 +16,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
   const error = ref<string | null>(null);
 
   // Getters
-  const hasUnconfirmedRecords = computed(() => 
+  const hasUnconfirmedRecords = computed(() =>
     records.value.some(r => !r.isConfirmed)
   );
 
@@ -97,6 +97,23 @@ export const useAttendanceStore = defineStore('attendance', () => {
     }
   }
 
+  async function fetchAttendanceStudentList(startDate?: Date, endDate?: Date) {
+    isLoading.value = true;
+    try {
+      const { data } = await attendanceApi.attendanceStudentList({
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString()
+      });
+      records.value = data;
+      return data;
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function markAbsent(courseSessionId: number, studentId: number) {
     try {
       await attendanceApi.attendanceCourseSessionsStudentsAbsentCreate(courseSessionId, studentId);
@@ -104,7 +121,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
       handleError(err, error);
       throw err;
     }
-  }  
+  }
 
   return {
     // State
@@ -112,16 +129,17 @@ export const useAttendanceStore = defineStore('attendance', () => {
     currentCourseSession,
     isLoading,
     error,
-    
+
     // Getters
     hasUnconfirmedRecords,
-    
+
     // Actions
     fetchAttendance,
     recordCardAttendance,
-    recordOtpAttendance, 
+    recordOtpAttendance,
     confirmAttendance,
     fetchClassAttendance,
+    fetchAttendanceStudentList,
     markAbsent
   };
 });

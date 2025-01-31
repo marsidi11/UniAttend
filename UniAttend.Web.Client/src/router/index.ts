@@ -133,12 +133,6 @@ const routes = [
         meta: { roles: ['secretary'] }
       },
       {
-        path: 'schedule',
-        name: 'schedule',
-        component: ScheduleManager,
-        meta: { roles: ['secretary', 'professor'] }
-      },
-      {
         path: 'classrooms',
         name: 'classrooms',
         component: ClassroomList,
@@ -189,6 +183,12 @@ const routes = [
         meta: { roles: ['student'] }
       },
       // Shared routes
+      {
+        path: 'schedule',
+        name: 'schedule',
+        component: ScheduleManager,
+        meta: { roles: ['secretary', 'professor', 'student'] }
+      },
       {
         path: 'reports',
         name: 'reports',

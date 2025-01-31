@@ -63,7 +63,7 @@
           <h2 class="text-lg font-medium mb-4">Attendance Overview</h2>
           <div class="grid grid-cols-3 gap-4">
             <StatCard title="Total Course Sessions" :value="formattedStats.totalCourseSessions" />
-            <StatCard title="courseSessions Attended" :value="formattedStats.attendedCourseSessions" />
+            <StatCard title="Course Sessions Attended" :value="formattedStats.attendedCourseSessions" />
             <StatCard title="Absence Rate" :value="`${formattedStats.absenceRate}%`" />
           </div>
         </div>

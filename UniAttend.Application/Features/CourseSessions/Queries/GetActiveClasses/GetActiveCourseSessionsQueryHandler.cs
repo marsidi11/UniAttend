@@ -21,6 +21,7 @@ namespace UniAttend.Application.Features.CourseSessions.Queries.GetActiveCourseS
                 courseSessionId: request.CourseSessionId,
                 studyGroupId: request.StudyGroupId,
                 classroomId: request.ClassroomId,
+                professorId: request.ProfessorId,
                 date: request.Date,
                 cancellationToken: cancellationToken);
         

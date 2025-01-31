@@ -24,36 +24,46 @@ namespace UniAttend.Infrastructure.Data.Repositories
             int? courseSessionId = null,
             int? studyGroupId = null,
             int? classroomId = null,
+            int? professorId = null,
             DateTime? date = null,
             CancellationToken cancellationToken = default)
         {
             var query = DbSet
                 .Include(cs => cs.StudyGroup)
+                .ThenInclude(sg => sg.Professor)
                 .Include(cs => cs.Classroom)
                 .Where(cs => cs.Status == "Active");
-
+        
             if (courseSessionId.HasValue)
                 query = query.Where(cs => cs.Id == courseSessionId);
-
+        
             if (studyGroupId.HasValue)
                 query = query.Where(cs => cs.StudyGroupId == studyGroupId);
-
+        
             if (classroomId.HasValue)
                 query = query.Where(cs => cs.ClassroomId == classroomId);
-
-            if (date.HasValue)
-                query = query.Where(cs => cs.Date.Date == date.Value.Date);
-
+        
+            if (professorId.HasValue)
+                query = query.Where(cs => cs.StudyGroup.ProfessorId == professorId.Value);
+        
             if (date.HasValue)
             {
                 var startOfDay = date.Value.Date;
                 var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
-                query = query.Where(cs => cs.Date >= startOfDay && cs.Date <= endOfDay);
+                query = query.Where(cs => cs.Date >= startOfDay && cs.Date < endOfDay);
             }
-
-            return await query
+        
+            var result = await query
                 .OrderBy(cs => cs.StartTime)
                 .ToListAsync(cancellationToken);
+        
+            // Console.WriteLine($"Found {result.Count()} sessions");
+            // foreach (var session in result)
+            // {
+            //     Console.WriteLine($"Session ID: {session.Id}, StudyGroup: {session.StudyGroupId}, Professor: {session.StudyGroup?.ProfessorId}");
+            // }
+        
+            return result;
         }
 
         public async Task<IEnumerable<CourseSession>> GetByDateRangeAsync(

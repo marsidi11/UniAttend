@@ -31,6 +31,7 @@ namespace UniAttend.API.Controllers
         public async Task<ActionResult<IEnumerable<CourseSessionDto>>> GetActiveCourseSessions(
             [FromQuery] int? studyGroupId,
             [FromQuery] int? classroomId,
+            [FromQuery] int? professorId,
             [FromQuery] DateTime? date,
             CancellationToken cancellationToken)
         {
@@ -38,6 +39,7 @@ namespace UniAttend.API.Controllers
             {
                 StudyGroupId = studyGroupId,
                 ClassroomId = classroomId,
+                ProfessorId = professorId,
                 Date = date
             };
 

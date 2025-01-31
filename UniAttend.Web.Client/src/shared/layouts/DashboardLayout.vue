@@ -222,7 +222,6 @@ const navigationSections: NavigationSections = {
   Secretary: [
     { to: '/dashboard/secretary', icon: 'dashboard', text: 'Dashboard' },
     { to: '/dashboard/students', icon: 'school', text: 'Students' },
-    { to: '/dashboard/cards', icon: 'credit_card', text: 'Cards' },
     { to: '/dashboard/schedule', icon: 'schedule', text: 'Schedule' },
     { to: '/dashboard/groups', icon: 'groups', text: 'Study Groups' },
     { to: '/dashboard/subjects', icon: 'book', text: 'Subjects' },
@@ -241,8 +240,6 @@ const navigationSections: NavigationSections = {
     { to: '/dashboard/student', icon: 'dashboard', text: 'Dashboard' },
     { to: '/dashboard/schedule', icon: 'schedule', text: 'My Schedule' },
     { to: '/dashboard/attendance/view', icon: 'schedule', text: 'My Attendance' },
-    { to: '/dashboard/attendance/check-in', icon: 'qr_code_scanner', text: 'Check In' },
-    { to: '/dashboard/attendance/otp', icon: 'pin', text: 'OTP Check-in' }
   ]
 }
 

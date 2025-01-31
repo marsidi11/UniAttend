@@ -8,6 +8,7 @@ namespace UniAttend.Application.Features.CourseSessions.Queries.GetActiveCourseS
         public int? CourseSessionId { get; init; }
         public int? StudyGroupId { get; init; }
         public int? ClassroomId { get; init; }
+        public int? ProfessorId { get; init; }
         public DateTime? Date { get; init; }
     }
 }

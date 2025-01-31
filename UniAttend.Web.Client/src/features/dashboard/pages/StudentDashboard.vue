@@ -109,6 +109,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStudentStore } from '@/stores/student.store'
+import { useAttendanceStore } from '@/stores/attendance.store'
 import { useCourseSessionStore } from '@/stores/courseSession.store'
 import type { TimeSpan } from '@/api/generated/data-contracts'
 import type {
@@ -125,6 +126,7 @@ import AttendanceList from '@/features/attendance/components/AttendanceList.vue'
 
 const router = useRouter()
 const studentStore = useStudentStore()
+const attendanceStore =useAttendanceStore()
 const courseSessionStore = useCourseSessionStore()
 
 // State
@@ -182,7 +184,7 @@ function formatTime(time: TimeSpan | undefined): string {
 async function loadDashboardData() {
   try {
     // Load attendance stats
-    const stats = await studentStore.fetchStudentAttendance()
+    const stats = await attendanceStore.fetchAttendanceStudentList()
     if (stats.length > 0) {
       attendanceStats.value = {
         totalCourseSessions: stats[0].courseSessionId || 0,
@@ -229,7 +231,7 @@ async function loadTodayActiveSessions() {
 async function loadRecentAttendance() {
   isLoadingAttendance.value = true
   try {
-    const records = await studentStore.fetchStudentAttendance()
+    const records = await attendanceStore.fetchAttendanceStudentList()
     recentAttendance.value = records
   } catch (err) {
     console.error('Failed to load attendance:', err)

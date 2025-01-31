@@ -35,6 +35,7 @@ export const useCourseSessionStore = defineStore('class', () => {
   async function fetchCourseSessions(filters?: { 
     studyGroupId?: number;
     classroomId?: number;
+    professorId?: number;
     date?: Date;
   }) {
     isLoading.value = true;

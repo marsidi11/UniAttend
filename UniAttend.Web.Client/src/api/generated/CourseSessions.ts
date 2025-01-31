@@ -27,6 +27,8 @@ export class CourseSessions<SecurityDataType = unknown> extends HttpClient<Secur
       studyGroupId?: number;
       /** @format int32 */
       classroomId?: number;
+      /** @format int32 */
+      professorId?: number;
       /** @format date-time */
       date?: string;
     },

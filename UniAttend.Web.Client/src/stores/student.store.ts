@@ -80,34 +80,12 @@ export const useStudentStore = defineStore('student', () => {
     }
   }
 
-  async function fetchStudentAttendance(startDate?: Date, endDate?: Date) {
-    isLoading.value = true;
-    try {
-      const response = await studentApi.studentAttendanceList({
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString()
-      });
-      // Type assertion for the response
-      const attendanceData = response as unknown as { data: AttendanceRecordDto[] };
-      if (attendanceData && Array.isArray(attendanceData.data)) {
-        attendance.value = attendanceData.data;
-        return attendanceData.data;
-      }
-      return [];
-    } catch (err) {
-      handleError(err, error);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-    async function fetchStudentGroups() {
+  async function fetchStudentGroups() {
     isLoading.value = true;
     try {
       const response = await studentApi.studentEnrolledGroupsList();
       console.log('Raw response:', response);
-      
+
       // If response is already a Response object, parse its JSON
       if (response instanceof Response) {
         const jsonData = await response.json();
@@ -115,12 +93,12 @@ export const useStudentStore = defineStore('student', () => {
         groups.value = jsonData;
         return jsonData;
       }
-      
+
       // If response is already parsed JSON
       if (Array.isArray(response)) {
         groups.value = response;
         return response;
-      }  
+      }
       // Fallback
       groups.value = [];
       return [];
@@ -199,7 +177,6 @@ export const useStudentStore = defineStore('student', () => {
     // Actions
     fetchStudentsList,
     createStudent,
-    fetchStudentAttendance,
     fetchStudentGroups,
     getAbsenceAlerts,
     assignCard,
