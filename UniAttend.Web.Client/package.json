@@ -11,9 +11,13 @@
     "update-api": "npm run generate-api"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
     "@heroicons/vue": "^2.2.0",
     "@vueuse/core": "^12.2.0",
     "axios": "^1.7.9",
+    "chart.js": "^4.4.7",
     "pinia": "^2.3.0",
     "qrcode": "^1.5.4",
     "vue": "^3.5.13",

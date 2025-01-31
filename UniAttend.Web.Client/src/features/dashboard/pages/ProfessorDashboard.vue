@@ -400,15 +400,11 @@ async function loadRecentRecords() {
     });
 
     if (reportData?.dailyRecords) {
-      recentRecords.value = reportData.dailyRecords.map((day: {
-        date: string;
-        totalCourseSessions: number;
-        attendanceRate: number;
-      }) => ({
-        checkInTime: day.date,
+      recentRecords.value = reportData.dailyRecords.map(value => ({
+        checkInTime: value.date?.toString(),
         isConfirmed: true,
-        courseName: `${day.totalCourseSessions} sessions`,
-        professor: `${day.attendanceRate}% attendance`
+        courseName: `${value.totalCourseSessions} sessions`,
+        professor: `${value.attendanceRate}% attendance`
       }));
     }
   } catch (err) {

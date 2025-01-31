@@ -11,7 +11,21 @@ namespace UniAttend.Core.Entities
         {
             ValidateTimeRange(startTime, endTime);
             ValidateDayOfWeek(dayOfWeek);
-            
+
+            StudyGroupId = studyGroupId;
+            ClassroomId = classroomId;
+            DayOfWeek = dayOfWeek;
+            StartTime = startTime;
+            EndTime = endTime;
+        }
+
+        public void UpdateProperties(
+        int studyGroupId,
+        int classroomId,
+        int dayOfWeek,
+        TimeSpan startTime,
+        TimeSpan endTime)
+        {
             StudyGroupId = studyGroupId;
             ClassroomId = classroomId;
             DayOfWeek = dayOfWeek;

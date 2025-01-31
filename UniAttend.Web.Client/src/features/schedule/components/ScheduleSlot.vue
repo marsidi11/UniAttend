@@ -1,59 +1,53 @@
 <template>
-  <div class="schedule-container" :class="{ 'has-multiple': schedules.length > 1 }">
-    <TransitionGroup name="schedule-list" tag="div" class="schedule-stack">
-      <div v-for="(schedule, index) in schedules" :key="schedule.id ?? index" class="schedule-card"
-        :style="{ zIndex: schedules.length - index }" :class="[
-          getCardcourseSessions(schedule),
-          { 'is-expanded': expandedId === (schedule.id ?? -1) },
-          { 'stacked-card': schedules.length > 1 && index > 0 }
-        ]" @click="toggleExpand(schedule.id ?? -1)">
-
-        <!-- Compact View -->
-        <div class="card-header">
-          <div class="flex justify-between items-start w-full">
-            <div class="flex flex-col min-w-0 flex-1">
-              <div class="flex items-center gap-2">
-                <span class="font-medium text-sm truncate">{{ schedule.studyGroupName }}</span>
-                <span class="text-xs bg-white bg-opacity-50 px-2 py-0.5 rounded-full">
-                  {{ schedule.classroomName }}
-                </span>
-              </div>
-              <span class="text-xs text-gray-600 truncate">{{ schedule.subjectName }}</span>
-            </div>
-          </div>
+  <div class="schedule-container">
+    <div v-for="(schedule, index) in schedules" 
+         :key="schedule.id ?? index" 
+         class="schedule-card"
+         :class="[
+           getCardcourseSessions(schedule),
+           { 'expanded': expandedId === (schedule.id ?? -1) }
+         ]"
+         @click="toggleExpand(schedule.id ?? -1)">
+      
+      <!-- Basic Info -->
+      <div class="basic-info">
+        <div class="header">
+          <span class="title">{{ schedule.studyGroupName }}</span>
+          <span class="time">{{ formatTimeString(schedule.startTime) }}</span>
         </div>
-
-        <!-- Expanded View -->
-        <div v-if="expandedId === (schedule.id ?? -1)" class="expanded-content" @click.stop>
-          <div class="grid grid-cols-2 gap-3 text-sm mt-2 pt-2 border-t border-gray-200">
-            <div>
-              <span class="text-gray-500 text-xs">Professor</span>
-              <p class="font-medium">{{ schedule.professorName }}</p>
-            </div>
-            <div>
-              <span class="text-gray-500 text-xs">Time</span>
-              <p class="font-medium">
-                {{ formatTimeString(schedule.startTime) }} - {{ formatTimeString(schedule.endTime) }}
-              </p>
-            </div>
-          </div>
-
-          <div class="action-buttons">
-            <button v-if="showActions" @click.stop="$emit('click', schedule)" class="edit-button">
-              Edit
-            </button>
-            <button v-if="showActions && isFirstSlot(schedule)" @click.stop="$emit('delete', schedule)"
-              class="delete-button">
-              Delete
-            </button>
-          </div>
-
+        <div class="details">
+          <span class="classroom">{{ schedule.classroomName }}</span>
+          <span class="subject">{{ schedule.subjectName }}</span>
         </div>
       </div>
-    </TransitionGroup>
 
-    <!-- Schedule Count Indicator -->
-    <div v-if="schedules.length > 1" class="schedule-count">
+      <!-- Expanded Info -->
+      <div v-if="expandedId === (schedule.id ?? -1)" class="expanded-info">
+        <div class="expanded-grid">
+          <div class="info-item">
+            <span class="label">Professor</span>
+            <span class="value">{{ schedule.professorName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Time</span>
+            <span class="value">{{ formatTimeString(schedule.startTime) }} - {{ formatTimeString(schedule.endTime) }}</span>
+          </div>
+        </div>
+        
+        <div v-if="showActions" class="actions">
+          <button class="action-btn edit" @click.stop="$emit('click', schedule)">
+            Edit
+          </button>
+          <button v-if="isFirstSlot(schedule)" 
+                  class="action-btn delete" 
+                  @click.stop="$emit('delete', schedule)">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="schedules.length > 1" class="counter">
       {{ schedules.length }}
     </div>
   </div>
@@ -87,7 +81,7 @@ function toggleExpand(id: number) {
 
 const showActions = computed(() => {
   const authStore = useAuthStore()
-  return ['Admin', 'Secretary'].includes(authStore.userRole || '')
+  return ['admin', 'secretary'].includes(authStore.userRole || '')
 })
 
 function getCardcourseSessions(schedule: ScheduleDto) {
@@ -130,71 +124,89 @@ function timeToMinutes(time: string): number {
 
 <style scoped>
 .schedule-container {
-  @apply h-full w-full overflow-visible relative;
-}
-
-.schedule-stack {
-  @apply relative space-y-1;
+  @apply relative h-full w-full;
 }
 
 .schedule-card {
-  @apply relative border rounded-lg p-2.5 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md bg-white;
-  min-height: 4.5rem;
+  @apply mb-2 p-3 rounded-lg border cursor-pointer transition-all duration-200;
+  background-color: white;
 }
 
-.stacked-card {
-  @apply -mt-3 hover:-translate-y-1;
+.schedule-card:hover {
+  @apply shadow-md transform -translate-y-0.5;
 }
 
-.has-multiple .schedule-card {
-  @apply hover:z-50;
+.schedule-card.expanded {
+  @apply shadow-lg z-50 relative;
 }
 
-.is-expanded {
-  @apply shadow-lg ring-1 ring-black ring-opacity-5 z-50 scale-105 bg-white;
+.basic-info {
+  @apply space-y-1;
 }
 
-.expanded-content {
-  @apply animate-fadeIn bg-white relative;
+.header {
+  @apply flex justify-between items-start;
 }
 
-.action-buttons {
-  @apply flex justify-end gap-2 mt-3 pt-2 border-t;
+.title {
+  @apply font-medium text-gray-900;
 }
 
-.edit-button {
-  @apply px-3 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 rounded-md hover:bg-indigo-50 transition-colors duration-200;
+.time {
+  @apply text-sm text-gray-600;
 }
 
-.delete-button {
-  @apply px-3 py-1 text-xs font-medium text-red-600 hover:text-red-800 rounded-md hover:bg-red-50 transition-colors duration-200;
+.details {
+  @apply flex flex-col text-sm;
 }
 
-.schedule-count {
-  @apply absolute -top-1 -right-1 w-5 h-5 rounded-full bg-indigo-500 text-white text-xs font-medium flex items-center justify-center shadow-sm z-50;
+.classroom {
+  @apply text-gray-600;
 }
 
-/* Animation for expanding cards */
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
+.subject {
+  @apply text-gray-500;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-0.25rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.expanded-info {
+  @apply mt-2 pt-2 border-t border-gray-100;
 }
 
-@media (max-width: 640px) {
-  .schedule-card {
-    @apply p-2;
-    min-height: 4rem;
-  }
+.expanded-grid {
+  @apply grid grid-cols-1 gap-1;
+}
+
+.info-item {
+  @apply flex flex-col items-start text-sm py-1;
+}
+
+.label {
+  @apply text-gray-500 font-medium;
+}
+
+.value {
+  @apply text-gray-700 mt-0.5;
+}
+
+.actions {
+  @apply mt-3 pt-2 flex flex-col items-center gap-2 border-t border-gray-100;
+}
+
+.action-btn {
+  @apply px-4 py-1.5 rounded text-sm font-medium w-full max-w-[120px];
+}
+
+.action-btn.edit {
+  @apply bg-indigo-50 text-indigo-700 hover:bg-indigo-100;
+}
+
+.action-btn.delete {
+  @apply bg-red-50 text-red-700 hover:bg-red-100;
+}
+
+.counter {
+  @apply absolute top-0 right-0 -mt-2 -mr-2 w-5 h-5 
+         flex items-center justify-center rounded-full 
+         bg-indigo-500 text-white text-xs font-medium;
 }
 </style>

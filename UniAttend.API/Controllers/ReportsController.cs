@@ -34,11 +34,6 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets a detailed attendance report for a specific student
         /// </summary>
-        /// <param name="id">Student ID</param>
-        /// <param name="startDate">Optional start date for filtering</param>
-        /// <param name="endDate">Optional end date for filtering</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Student attendance report</returns>
         [HttpGet("students/{id}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<StudentReportDto>> GetStudentReport(
@@ -60,10 +55,6 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets the current student's attendance report
         /// </summary>
-        /// <param name="startDate">Optional start date for filtering</param>
-        /// <param name="endDate">Optional end date for filtering</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Student's own attendance report</returns>
         [HttpGet("my-report")]
         [Authorize(Roles = "Student")]
         public async Task<ActionResult<StudentReportDto>> GetMyReport(
@@ -85,11 +76,6 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets a study group's attendance report
         /// </summary>
-        /// <param name="id">Study group ID</param>
-        /// <param name="startDate">Optional start date for filtering</param>
-        /// <param name="endDate">Optional end date for filtering</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Group attendance report</returns>
         [HttpGet("groups/{id}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<GroupReportDto>> GetGroupReport(
@@ -111,10 +97,6 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets a department's attendance statistics
         /// </summary>
-        /// <param name="id">Department ID</param>
-        /// <param name="academicYearId">Optional academic year for filtering</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Department attendance report</returns>
         [HttpGet("departments/{id}")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<ActionResult<DepartmentReportDto>> GetDepartmentReport(
@@ -134,13 +116,6 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets a filtered attendance report
         /// </summary>
-        /// <param name="startDate">Start date for the report</param>
-        /// <param name="endDate">End date for the report</param>
-        /// <param name="departmentId">Optional department filter</param>
-        /// <param name="subjectId">Optional subject filter</param>
-        /// <param name="studyGroupId">Optional study group filter</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Filtered attendance report</returns>
         [HttpGet("attendance")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<AttendanceReportRecordDto>> GetAttendanceReport(
@@ -166,9 +141,6 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Gets an academic year's attendance statistics
         /// </summary>
-        /// <param name="id">Academic year ID</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Academic year report</returns>
         [HttpGet("academic-years/{id}")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<ActionResult<AcademicYearReportDto>> GetAcademicYearReport(
@@ -180,6 +152,9 @@ namespace UniAttend.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Exports a student's attendance report as a PDF
+        /// </summary>
         [HttpGet("export/students/{id}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<IActionResult> ExportStudentReport(
@@ -189,11 +164,14 @@ namespace UniAttend.API.Controllers
         {
             var fileContent = await _reportService.GenerateStudentReportAsync(id, startDate, endDate);
             return File(
-                fileContent, 
+                fileContent,
                 "application/pdf",
                 $"student-report-{id}-{DateTime.Now:yyyyMMdd}.pdf");
         }
 
+        /// <summary>
+        /// Exports a study group's attendance report as a PDF
+        /// </summary>
         [HttpGet("export/groups/{id}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<IActionResult> ExportGroupReport(
@@ -208,6 +186,9 @@ namespace UniAttend.API.Controllers
                 $"group-report-{id}-{DateTime.Now:yyyyMMdd}.pdf");
         }
 
+        /// <summary>
+        /// Exports a department's attendance report as a PDF
+        /// </summary>
         [HttpGet("export/departments/{id}")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<IActionResult> ExportDepartmentReport(
@@ -221,6 +202,9 @@ namespace UniAttend.API.Controllers
                 $"department-report-{id}-{DateTime.Now:yyyyMMdd}.pdf");
         }
 
+        /// <summary>
+        /// Exports an academic year's attendance report as a PDF
+        /// </summary>
         [HttpGet("export/attendance/{studyGroupId}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<IActionResult> ExportAttendanceReport(

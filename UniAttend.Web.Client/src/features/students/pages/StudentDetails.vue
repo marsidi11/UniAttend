@@ -219,8 +219,15 @@ async function loadStudentData(studentId: number) {
 async function loadStudentAttendance(studentId: number) {
   isLoadingAttendance.value = true
   try {
-    const records = await studentStore.fetchStudentAttendance(studentId)
-    attendance.value = records ?? [] 
+    const report = await reportStore.getStudentReport(studentId)
+    attendance.value = (report?.subjects ?? []).map(subject => ({
+      id: 0,
+      subjectName: subject.subjectName ?? '',
+      studyGroupName: subject.studyGroupName ?? '',
+      isAttended: (subject.attendedCourseSessions ?? 0) > 0,
+      totalSessions: subject.totalCourseSessions ?? 0,
+      attendanceRate: subject.attendanceRate ?? 0
+    }))
   } catch (err) {
     console.error('Failed to load attendance records:', err)
     attendance.value = []

@@ -4,7 +4,7 @@ import type {
   StudentReportDto,
   GroupReportDto,
   DepartmentReportDto,
-  AttendanceReportDto,
+  AttendanceReportRecordDto,
   AcademicYearReportDto
 } from '@/api/generated/data-contracts';
 import { reportApi } from '@/api/apiInstances';
@@ -15,12 +15,12 @@ export const useReportStore = defineStore('report', () => {
   const studentReport = ref<StudentReportDto | null>(null);
   const groupReport = ref<GroupReportDto | null>(null);
   const departmentReport = ref<DepartmentReportDto | null>(null);
-  const attendanceReport = ref<AttendanceReportDto | null>(null);
+  const attendanceReport = ref<AttendanceReportRecordDto | null>(null);
   const academicYearReport = ref<AcademicYearReportDto | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  // Actions
+  // Report Retrieval Functions
   async function getStudentReport(id: number, startDate?: Date, endDate?: Date) {
     isLoading.value = true;
     try {
@@ -126,13 +126,55 @@ export const useReportStore = defineStore('report', () => {
     }
   }
 
-  async function exportAttendanceReport(studyGroupId: number, startDate: Date, endDate: Date) {
+  // Export Functions
+  async function exportStudentReport(id: number, startDate?: Date, endDate?: Date) {
     isLoading.value = true;
     try {
-      await reportApi.reportsExportAttendanceList({
-        studyGroupId,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
+      await reportApi.reportsExportStudentsDetail(id, {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString()
+      });
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function exportGroupReport(id: number, startDate?: Date, endDate?: Date) {
+    isLoading.value = true;
+    try {
+      await reportApi.reportsExportGroupsDetail(id, {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString()
+      });
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function exportDepartmentReport(id: number, academicYearId?: number) {
+    isLoading.value = true;
+    try {
+      await reportApi.reportsExportDepartmentsDetail(id, { academicYearId });
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function exportAttendanceReport(studyGroupId: number, startDate?: Date, endDate?: Date) {
+    isLoading.value = true;
+    try {
+      await reportApi.reportsExportAttendanceDetail(studyGroupId, {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString()
       });
     } catch (err) {
       handleError(err, error);
@@ -152,13 +194,18 @@ export const useReportStore = defineStore('report', () => {
     isLoading,
     error,
 
-    // Actions
+    // Report Retrieval Actions
     getStudentReport,
     getMyReport,
     getGroupReport,
     getDepartmentReport,
     getAttendanceReport,
     getAcademicYearReport,
-    exportAttendanceReport    
+
+    // Export Actions
+    exportStudentReport,
+    exportGroupReport,
+    exportDepartmentReport,
+    exportAttendanceReport
   };
 });
