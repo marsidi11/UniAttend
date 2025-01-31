@@ -92,7 +92,8 @@ import AttendanceList from '@/features/attendance/components/AttendanceList.vue'
 type BadgeStatus = 'success' | 'warning' | 'error' | 'info'
 
 interface ExtendedCourseSession extends CourseSessionDto {
-  isConfirmed?: boolean;
+  isConfirmed: boolean;
+  status: string;
 }
 
 interface DashboardStats {
@@ -132,15 +133,27 @@ const startingSessionId = ref<number | null>(null)
 const activeSessionId = ref<number | null>(null)
 const pollInterval = ref<number | null>(null)
 
+interface CourseSessionQueryParams {
+  studyGroupId?: number;
+  classroomId?: number;
+  date?: Date;
+  professorId?: number;
+}
+
 // Utility functions
 function formatTimeString(time: TimeSpan | undefined): string {
-  if (!time) return ''
-  const hours = time.hours?.toString().padStart(2, '0') || '00'
-  const minutes = time.minutes?.toString().padStart(2, '0') || '00'
-  return `${hours}:${minutes}`
+  if (!time) return '';
+
+  // Ensure we have numbers for hours and minutes
+  const hours = typeof time.hours === 'number' ? time.hours.toString().padStart(2, '0') : '00';
+  const minutes = typeof time.minutes === 'number' ? time.minutes.toString().padStart(2, '0') : '00';
+
+  return `${hours}:${minutes}`;
 }
 
 async function markStudentAbsent(record: AttendanceRecordDto) {
+  if (!record.courseSessionId || !record.studentId) return;
+
   try {
     await attendanceStore.markAbsent(record.courseSessionId, record.studentId);
     await loadSessionAttendance(record.courseSessionId);
@@ -166,9 +179,10 @@ async function confirmSession(sessionId: number) {
   }
 }
 
-function getSessionStatus(session: CourseSessionDto): BadgeStatus {
-  if (isSessionActive(session)) return 'success'
-  if (session.status?.toLowerCase() === 'scheduled') return 'info'
+function getSessionStatus(session: CourseSessionDto | ExtendedCourseSession): BadgeStatus {
+  const status = session.status?.toLowerCase()
+  if (status === 'active') return 'success'
+  if (status === 'scheduled') return 'info'
   return 'info'
 }
 
@@ -210,11 +224,11 @@ function getSessionAttendance(session: ExtendedCourseSession): AttendanceRecordD
 async function loadSessionAttendance(sessionId: number) {
   console.log('Loading attendance for session:', sessionId)
   isLoadingAttendance.value = true
-  
+
   try {
     const records = await attendanceStore.fetchClassAttendance(sessionId)
     console.log('Raw attendance records:', records)
-    
+
     if (records) {
       currentSessionAttendance.value = Array.isArray(records) ? records : []
       console.log('Updated attendance records:', currentSessionAttendance.value)
@@ -264,53 +278,73 @@ async function closeSession(sessionId: number) {
 async function loadDashboardData() {
   isLoading.value = true
   try {
+    // Ensure we're using the start of today for proper date comparison
     const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
     const [schedules, sessions, attendanceStats] = await Promise.all([
       scheduleStore.fetchSchedules(undefined, undefined, authStore.user?.id),
-      courseSessionStore.fetchCourseSessions({ date: today }),
+      courseSessionStore.fetchCourseSessions({
+        date: today,
+        professorId: authStore.user?.id
+      } as CourseSessionQueryParams), // Cast to the correct type
       attendanceStore.fetchAttendance()
     ])
 
-    // Map schedules to sessions
-    todayScheduledSessions.value = schedules.map(schedule => ({
-      id: undefined,
-      studyGroupId: schedule.studyGroupId,
-      studyGroupName: schedule.studyGroupName,
-      classroomId: schedule.classroomId,
-      classroomName: schedule.classroomName,
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
-      status: 'scheduled',
-      isConfirmed: false
-    }))
+    console.log('Fetched schedules:', schedules)
+    console.log('Fetched sessions:', sessions)
 
-    // Update with active sessions
-    if (sessions?.length) {
-      todayScheduledSessions.value = todayScheduledSessions.value.map(scheduled => {
-        const active = sessions.find(s =>
-          s.studyGroupId === scheduled.studyGroupId &&
-          s.classroomId === scheduled.classroomId
-        )
-        if (active) {
-          if (active.status?.toLowerCase() === 'active') {
-            startAttendancePolling(active.id!)
-            // Load attendance immediately for active session
-            loadSessionAttendance(active.id!)
-          }
-          return {
-            ...scheduled,
-            ...active,
-            id: active.id
-          }
-        }
-        return scheduled
-      })
-    }
+    // Filter schedules for today
+    const todaySchedules = schedules.filter(schedule => {
+      const scheduleDay = new Date().getDay() // 0 = Sunday, 1 = Monday, etc.
+      return schedule.dayOfWeek === scheduleDay // Assuming schedule has dayOfWeek property
+    })
+
+    // Clear previous sessions
+    todayScheduledSessions.value = []
+
+    // Map schedules to sessions without duplicates
+    const processedGroups = new Set()
+
+    todaySchedules.forEach(schedule => {
+      if (processedGroups.has(schedule.studyGroupId)) return;
+      processedGroups.add(schedule.studyGroupId);
+
+      // Find matching active session
+      const activeSession = sessions?.find(s =>
+        s.studyGroupId === schedule.studyGroupId &&
+        s.classroomId === schedule.classroomId
+      );
+
+      // Create the session object with explicit typing
+      const sessionObject: ExtendedCourseSession = {
+        ...schedule,
+        id: activeSession?.id,
+        studyGroupId: schedule.studyGroupId,
+        studyGroupName: schedule.studyGroupName,
+        classroomId: schedule.classroomId,
+        classroomName: schedule.classroomName,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
+        status: activeSession?.status || 'scheduled',
+        isConfirmed: activeSession?.status === 'completed' || false
+      };
+
+      if (activeSession?.status?.toLowerCase() === 'active') {
+        startAttendancePolling(activeSession.id!);
+        loadSessionAttendance(activeSession.id!);
+      }
+
+      todayScheduledSessions.value.push(sessionObject);
+    });
 
     // Update stats
     stats.value = {
-      activeCourseSessions: sessions?.filter(s => isSessionActive(s)).length || 0,
-      pendingConfirmations: sessions?.filter(s => !(s as ExtendedCourseSession).isConfirmed).length || 0,
+      activeCourseSessions: sessions?.filter(s => s.status?.toLowerCase() === 'active').length || 0,
+      pendingConfirmations: sessions?.filter(s => {
+        const extendedSession = s as ExtendedCourseSession
+        return !extendedSession.isConfirmed && s.status?.toLowerCase() === 'active'
+      }).length || 0,
       averageAttendance: calculateAverageAttendance(attendanceStats)
     }
   } catch (err) {
@@ -321,36 +355,39 @@ async function loadDashboardData() {
 }
 
 function calculateAverageAttendance(records: AttendanceRecordDto[]): number {
-  if (!records.length) return 0
-  const confirmed = records.filter(r => r.isConfirmed).length
-  return Math.round((confirmed / records.length) * 100)
+  if (!records || !records.length) return 0;
+  const confirmed = records.filter(r => r.isConfirmed).length;
+  return Math.round((confirmed / records.length) * 100);
 }
 
-
 async function loadRecentRecords() {
-  isLoadingRecords.value = true
+  isLoadingRecords.value = true;
   try {
-    const today = new Date()
-    const lastWeek = new Date(today)
-    lastWeek.setDate(lastWeek.getDate() - 7)
+    const today = new Date();
+    const lastWeek = new Date(today);
+    lastWeek.setDate(lastWeek.getDate() - 7);
 
     const reportData = await reportStore.getAttendanceReport({
       startDate: lastWeek,
       endDate: today
-    })
+    });
 
     if (reportData?.dailyRecords) {
-      recentRecords.value = reportData.dailyRecords.map(day => ({
+      recentRecords.value = reportData.dailyRecords.map((day: {
+        date: string;
+        totalCourseSessions: number;
+        attendanceRate: number;
+      }) => ({
         checkInTime: day.date,
         isConfirmed: true,
         courseName: `${day.totalCourseSessions} sessions`,
         professor: `${day.attendanceRate}% attendance`
-      }))
+      }));
     }
   } catch (err) {
-    console.error('Failed to load recent records:', err)
+    console.error('Failed to load recent records:', err);
   } finally {
-    isLoadingRecords.value = false
+    isLoadingRecords.value = false;
   }
 }
 

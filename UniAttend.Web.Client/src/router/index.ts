@@ -139,18 +139,6 @@ const routes = [
         meta: { roles: ['secretary', 'professor'] }
       },
       {
-        path: 'groups',
-        name: 'study-groups',
-        component: StudyGroupList,
-        meta: { roles: ['secretary', 'professor'] }
-      },
-      {
-        path: 'groups/:id',
-        name: 'group-details',
-        component: StudyGroupDetails,
-        meta: { roles: ['secretary', 'professor'] }
-      },
-      {
         path: 'classrooms',
         name: 'classrooms',
         component: ClassroomList,
@@ -224,6 +212,18 @@ const routes = [
         name: 'subject-details',
         component: SubjectDetails,
         meta: { roles: ['admin', 'secretary'] }
+      },
+      {
+        path: 'groups',
+        name: 'study-groups',
+        component: StudyGroupList,
+        meta: { roles: ['secretary', 'professor'] }
+      },
+      {
+        path: 'groups/:id',
+        name: 'group-details',
+        component: StudyGroupDetails,
+        meta: { roles: ['secretary', 'professor'] }
       },
       {
         path: 'profile',
