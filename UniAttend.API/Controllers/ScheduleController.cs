@@ -9,6 +9,7 @@ using UniAttend.Application.Features.Schedule.Queries.GetClassroomSchedule;
 using UniAttend.Application.Features.Schedule.Queries.GetGroupSchedule;
 using UniAttend.Application.Features.Schedule.Queries.GetProfessorSchedule;
 using UniAttend.Application.Features.Schedule.DTOs;
+using UniAttend.Application.Features.Schedule.Queries.GetStudentSchedule;
 
 namespace UniAttend.API.Controllers
 {
@@ -36,10 +37,21 @@ namespace UniAttend.API.Controllers
         [HttpGet("professor/{professorId}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetByProfessor(
-    int professorId,
-    CancellationToken cancellationToken)
+            int professorId,
+            CancellationToken cancellationToken)
         {
             var query = new GetProfessorScheduleQuery { ProfessorId = professorId };
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("student/{studentId}")]
+        [Authorize(Roles = "Admin,Secretary,Student")]
+        public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetByStudent(
+            int studentId,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetStudentScheduleQuery { StudentId = studentId };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }

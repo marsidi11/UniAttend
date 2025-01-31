@@ -26,6 +26,9 @@ namespace UniAttend.Core.Entities
         TimeSpan startTime,
         TimeSpan endTime)
         {
+            ValidateTimeRange(startTime, endTime);
+            ValidateDayOfWeek(dayOfWeek);
+
             StudyGroupId = studyGroupId;
             ClassroomId = classroomId;
             DayOfWeek = dayOfWeek;
@@ -33,16 +36,16 @@ namespace UniAttend.Core.Entities
             EndTime = endTime;
         }
 
-        // Identity properties - immutable
-        public int StudyGroupId { get; }
-        public int ClassroomId { get; }
-        public int DayOfWeek { get; }
-        public TimeSpan StartTime { get; }
-        public TimeSpan EndTime { get; }
+        // Identity properties with private setters
+        public int StudyGroupId { get; private set; }
+        public int ClassroomId { get; private set; }
+        public int DayOfWeek { get; private set; }
+        public TimeSpan StartTime { get; private set; }
+        public TimeSpan EndTime { get; private set; }
 
-        // Domain references without EF Core annotations
-        public StudyGroup StudyGroup { get; }
-        public Classroom Classroom { get; }
+        // Navigation properties
+        public StudyGroup StudyGroup { get; private set; }
+        public Classroom Classroom { get; private set; }
 
         // Domain validation
         private void ValidateTimeRange(TimeSpan start, TimeSpan end)

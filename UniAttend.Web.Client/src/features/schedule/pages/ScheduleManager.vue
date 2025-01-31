@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
       <h1 class="text-2xl font-bold text-gray-900">
-        {{ isProfessor ? 'My Schedule' : 'Schedule Management' }}
+        {{ isProfessorOrStudent ? 'My Schedule' : 'Schedule Management' }}
       </h1>
       <Button v-if="showFilters" @click="openCreateModal">Add Schedule</Button>
     </div>
@@ -114,18 +114,20 @@ import ScheduleSlot from '../components/ScheduleSlot.vue'
 // Initialize stores - Only initialize what's needed based on role
 const scheduleStore = useScheduleStore()
 const authStore = useAuthStore()
-const isProfessor = computed(() => authStore.userRole === 'professor')
+const isProfessorOrStudent = computed(() => 
+  ['professor', 'student'].includes(authStore.userRole || '')
+)
 
 // Conditional store initialization
-const groupStore = !isProfessor.value ? useGroupStore() : null
-const classroomStore = !isProfessor.value ? useClassroomStore() : null
-const professorStore = !isProfessor.value ? useProfessorStore() : null
+const groupStore = !isProfessorOrStudent.value ? useGroupStore() : null
+const classroomStore = !isProfessorOrStudent.value ? useClassroomStore() : null
+const professorStore = !isProfessorOrStudent.value ? useProfessorStore() : null
 
 // Get store refs - Only get what's needed based on role
 const { schedules, isLoading } = storeToRefs(scheduleStore)
-const studyGroups = !isProfessor.value ? storeToRefs(groupStore!).studyGroups : ref([])  
-const classrooms = !isProfessor.value ? storeToRefs(classroomStore!).classrooms : ref([])
-const professors = !isProfessor.value ? storeToRefs(professorStore!).professors : ref([])
+const studyGroups = !isProfessorOrStudent.value ? storeToRefs(groupStore!).studyGroups : ref([])  
+const classrooms = !isProfessorOrStudent.value ? storeToRefs(classroomStore!).classrooms : ref([])
+const professors = !isProfessorOrStudent.value ? storeToRefs(professorStore!).professors : ref([])
 
 // Component state
 const showModal = ref(false)
@@ -265,7 +267,7 @@ async function handleSubmit(scheduleData: CreateScheduleCommand | UpdateSchedule
 // Modify watch to prevent unnecessary API calls for professors
 watch([selectedGroup, selectedClassroom, selectedProfessor], 
   async ([studyGroup, classroom, professor]) => {
-    if (isProfessor.value) return // Don't respond to filter changes for professors
+    if (isProfessorOrStudent.value) return // Don't respond to filter changes for professors
     
     try {
       if (professor) {
@@ -285,9 +287,14 @@ watch([selectedGroup, selectedClassroom, selectedProfessor],
 // Modify onMounted for optimized loading
 onMounted(async () => {
   try {
-    if (isProfessor.value && authStore.user?.id) {
-      // Only fetch professor's schedules
-      await scheduleStore.fetchSchedules(undefined, undefined, authStore.user.id)
+    if (isProfessorOrStudent.value && authStore.user?.id) {
+      if (authStore.userRole === 'student') {
+        // Fetch student schedules
+        await scheduleStore.fetchSchedules(undefined, authStore.user.id)
+      } else {
+        // Fetch professor schedules
+        await scheduleStore.fetchSchedules(undefined, undefined, undefined, authStore.user.id)
+      }
     } else {
       // For admin/secretary fetch all required data
       await Promise.all([

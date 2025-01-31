@@ -47,6 +47,7 @@ export const useScheduleStore = defineStore('schedule', () => {
 
   async function fetchSchedules(
     studyGroupId?: number, 
+    studentId?: number, 
     classroomId?: number, 
     professorId?: number
   ) {
@@ -55,6 +56,8 @@ export const useScheduleStore = defineStore('schedule', () => {
       let data;
       if (professorId) {
         ({ data } = await scheduleApi.scheduleProfessorDetail(professorId));
+      } else if (studentId) {
+        ({ data } = await scheduleApi.scheduleStudentDetail(studentId));
       } else if (classroomId) {
         ({ data } = await scheduleApi.scheduleClassroomDetail(classroomId));
       } else if (studyGroupId) {

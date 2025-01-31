@@ -67,6 +67,22 @@ export class Schedule<SecurityDataType = unknown> extends HttpClient<SecurityDat
    * No description
    *
    * @tags Schedule
+   * @name ScheduleStudentDetail
+   * @request GET:/api/Schedule/student/{studentId}
+   * @secure
+   */
+  scheduleStudentDetail = (studentId: number, params: RequestParams = {}) =>
+    this.request<ScheduleDto[], any>({
+      path: `/api/Schedule/student/${studentId}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Schedule
    * @name ScheduleClassroomDetail
    * @request GET:/api/Schedule/classroom/{classroomId}
    * @secure

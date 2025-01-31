@@ -7177,3 +7177,4 @@ UniAttend.Shared.Exceptions.ValidationException: The classroom is already booked
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
 2025-01-31 23:46:38.498 +01:00 [INF] Starting web application
+2025-01-31 23:46:39.341 +01:00 [WRN] Failed to determine the https port for redirect.
