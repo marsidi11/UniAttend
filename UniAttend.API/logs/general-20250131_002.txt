@@ -1,5 +1,6 @@
-2025-01-30 23:54:24.265 +01:00 [INF] Starting web application
-2025-01-30 23:55:00.551 +01:00 [ERR] An unhandled exception has occurred while executing the request.
+2025-01-31 00:09:36.205 +01:00 [INF] Starting web application
+2025-01-31 00:11:08.675 +01:00 [INF] Starting web application
+2025-01-31 00:11:10.653 +01:00 [ERR] An unhandled exception has occurred while executing the request.
 Swashbuckle.AspNetCore.SwaggerGen.SwaggerGeneratorException: Failed to generate Operation for action - UniAttend.API.Controllers.ReportsController.GetGroupReport (UniAttend.API). See inner exception
  ---> Swashbuckle.AspNetCore.SwaggerGen.SwaggerGeneratorException: Failed to generate schema for type - UniAttend.Application.Features.Reports.DTOs.GroupReportDto. See inner exception
  ---> System.InvalidOperationException: Can't use schemaId "$AttendanceRecordDto" for type "$UniAttend.Application.Features.Reports.DTOs.AttendanceRecordDto". The same schemaId is already used for type "$UniAttend.Application.Features.Attendance.DTOs.AttendanceRecordDto"

@@ -11,7 +11,7 @@
 
 import {
   AcademicYearReportDto,
-  AttendanceReportDto,
+  AttendanceReportRecordDto,
   DepartmentReportDto,
   GroupReportDto,
   StudentReportDto,
@@ -143,7 +143,7 @@ export class Reports<SecurityDataType = unknown> extends HttpClient<SecurityData
     },
     params: RequestParams = {},
   ) =>
-    this.request<AttendanceReportDto, any>({
+    this.request<AttendanceReportRecordDto, any>({
       path: `/api/Reports/attendance`,
       method: "GET",
       query: query,
@@ -171,14 +171,13 @@ export class Reports<SecurityDataType = unknown> extends HttpClient<SecurityData
    * No description
    *
    * @tags Reports
-   * @name ReportsExportAttendanceList
-   * @request GET:/api/Reports/export/attendance
+   * @name ReportsExportStudentsDetail
+   * @request GET:/api/Reports/export/students/{id}
    * @secure
    */
-  reportsExportAttendanceList = (
+  reportsExportStudentsDetail = (
+    id: number,
     query?: {
-      /** @format int32 */
-      studyGroupId?: number;
       /** @format date-time */
       startDate?: string;
       /** @format date-time */
@@ -187,7 +186,80 @@ export class Reports<SecurityDataType = unknown> extends HttpClient<SecurityData
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/Reports/export/attendance`,
+      path: `/api/Reports/export/students/${id}`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Reports
+   * @name ReportsExportGroupsDetail
+   * @request GET:/api/Reports/export/groups/{id}
+   * @secure
+   */
+  reportsExportGroupsDetail = (
+    id: number,
+    query?: {
+      /** @format date-time */
+      startDate?: string;
+      /** @format date-time */
+      endDate?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<void, any>({
+      path: `/api/Reports/export/groups/${id}`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Reports
+   * @name ReportsExportDepartmentsDetail
+   * @request GET:/api/Reports/export/departments/{id}
+   * @secure
+   */
+  reportsExportDepartmentsDetail = (
+    id: number,
+    query?: {
+      /** @format int32 */
+      academicYearId?: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<void, any>({
+      path: `/api/Reports/export/departments/${id}`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Reports
+   * @name ReportsExportAttendanceDetail
+   * @request GET:/api/Reports/export/attendance/{studyGroupId}
+   * @secure
+   */
+  reportsExportAttendanceDetail = (
+    studyGroupId: number,
+    query?: {
+      /** @format date-time */
+      startDate?: string;
+      /** @format date-time */
+      endDate?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<void, any>({
+      path: `/api/Reports/export/attendance/${studyGroupId}`,
       method: "GET",
       query: query,
       secure: true,

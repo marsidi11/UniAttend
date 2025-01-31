@@ -1,17 +1,13 @@
 <template>
-  <div class="schedule-container" :class="{'has-multiple': schedules.length > 1}">
+  <div class="schedule-container" :class="{ 'has-multiple': schedules.length > 1 }">
     <TransitionGroup name="schedule-list" tag="div" class="schedule-stack">
-      <div v-for="(schedule, index) in schedules"
-           :key="schedule.id ?? index"
-           class="schedule-card"
-           :style="{ zIndex: schedules.length - index }"
-           :class="[
-             getCardcourseSessions(schedule),
-             {'is-expanded': expandedId === (schedule.id ?? -1)},
-             {'stacked-card': schedules.length > 1 && index > 0}
-           ]"
-           @click="toggleExpand(schedule.id ?? -1)">
-        
+      <div v-for="(schedule, index) in schedules" :key="schedule.id ?? index" class="schedule-card"
+        :style="{ zIndex: schedules.length - index }" :class="[
+          getCardcourseSessions(schedule),
+          { 'is-expanded': expandedId === (schedule.id ?? -1) },
+          { 'stacked-card': schedules.length > 1 && index > 0 }
+        ]" @click="toggleExpand(schedule.id ?? -1)">
+
         <!-- Compact View -->
         <div class="card-header">
           <div class="flex justify-between items-start w-full">
@@ -28,9 +24,7 @@
         </div>
 
         <!-- Expanded View -->
-        <div v-if="expandedId === (schedule.id ?? -1)" 
-             class="expanded-content"
-             @click.stop>
+        <div v-if="expandedId === (schedule.id ?? -1)" class="expanded-content" @click.stop>
           <div class="grid grid-cols-2 gap-3 text-sm mt-2 pt-2 border-t border-gray-200">
             <div>
               <span class="text-gray-500 text-xs">Professor</span>
@@ -43,32 +37,31 @@
               </p>
             </div>
           </div>
-          
+
           <div class="action-buttons">
-            <button @click.stop="$emit('click', schedule)" 
-                    class="edit-button">
+            <button v-if="showActions" @click.stop="$emit('click', schedule)" class="edit-button">
               Edit
             </button>
-            <button v-if="isFirstSlot(schedule)"
-                    @click.stop="$emit('delete', schedule)" 
-                    class="delete-button">
+            <button v-if="showActions && isFirstSlot(schedule)" @click.stop="$emit('delete', schedule)"
+              class="delete-button">
               Delete
             </button>
           </div>
+
         </div>
       </div>
     </TransitionGroup>
-    
+
     <!-- Schedule Count Indicator -->
-    <div v-if="schedules.length > 1" 
-         class="schedule-count">
+    <div v-if="schedules.length > 1" class="schedule-count">
       {{ schedules.length }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth.store'
 import type { ScheduleDto } from '@/api/generated/data-contracts'
 
 interface TimeObject {
@@ -91,6 +84,11 @@ const expandedId = ref<number | null>(null)
 function toggleExpand(id: number) {
   expandedId.value = expandedId.value === id ? null : id
 }
+
+const showActions = computed(() => {
+  const authStore = useAuthStore()
+  return ['Admin', 'Secretary'].includes(authStore.userRole || '')
+})
 
 function getCardcourseSessions(schedule: ScheduleDto) {
   const baseClass = 'bg-gradient-to-br'
@@ -140,9 +138,7 @@ function timeToMinutes(time: string): number {
 }
 
 .schedule-card {
-  @apply relative border rounded-lg p-2.5 cursor-pointer
-         transition-all duration-200 shadow-sm hover:shadow-md
-         bg-white;
+  @apply relative border rounded-lg p-2.5 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md bg-white;
   min-height: 4.5rem;
 }
 
@@ -155,8 +151,7 @@ function timeToMinutes(time: string): number {
 }
 
 .is-expanded {
-  @apply shadow-lg ring-1 ring-black ring-opacity-5 z-50
-         scale-105 bg-white;
+  @apply shadow-lg ring-1 ring-black ring-opacity-5 z-50 scale-105 bg-white;
 }
 
 .expanded-content {
@@ -168,21 +163,15 @@ function timeToMinutes(time: string): number {
 }
 
 .edit-button {
-  @apply px-3 py-1 text-xs font-medium text-indigo-600 
-         hover:text-indigo-800 rounded-md hover:bg-indigo-50
-         transition-colors duration-200;
+  @apply px-3 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 rounded-md hover:bg-indigo-50 transition-colors duration-200;
 }
 
 .delete-button {
-  @apply px-3 py-1 text-xs font-medium text-red-600
-         hover:text-red-800 rounded-md hover:bg-red-50
-         transition-colors duration-200;
+  @apply px-3 py-1 text-xs font-medium text-red-600 hover:text-red-800 rounded-md hover:bg-red-50 transition-colors duration-200;
 }
 
 .schedule-count {
-  @apply absolute -top-1 -right-1 w-5 h-5 rounded-full
-         bg-indigo-500 text-white text-xs font-medium
-         flex items-center justify-center shadow-sm z-50;
+  @apply absolute -top-1 -right-1 w-5 h-5 rounded-full bg-indigo-500 text-white text-xs font-medium flex items-center justify-center shadow-sm z-50;
 }
 
 /* Animation for expanding cards */
@@ -191,8 +180,15 @@ function timeToMinutes(time: string): number {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-0.25rem); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 640px) {

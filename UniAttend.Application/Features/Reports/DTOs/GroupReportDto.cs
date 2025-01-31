@@ -9,10 +9,10 @@ namespace UniAttend.Application.Features.Reports.DTOs
         public int TotalStudents { get; init; }
         public int TotalCourseSessions { get; init; }
         public decimal AverageAttendance { get; init; }
-        public List<AttendanceRecordDto> Students { get; init; } = new();
+        public List<AttendanceRecordReportDto> Students { get; init; } = new();
     }
 
-    public record AttendanceRecordDto
+    public record AttendanceRecordReportDto
     {
         public int StudentId { get; init; }
         public string StudentNumber { get; init; } = string.Empty;

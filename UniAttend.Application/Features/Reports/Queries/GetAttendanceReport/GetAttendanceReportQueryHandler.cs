@@ -5,7 +5,7 @@ using UniAttend.Core.Interfaces.Repositories;
 
 namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
 {
-    public class GetAttendanceReportQueryHandler : IRequestHandler<GetAttendanceReportQuery, AttendanceReportDto>
+    public class GetAttendanceReportQueryHandler : IRequestHandler<GetAttendanceReportQuery, AttendanceReportRecordDto>
     {
         private readonly IReportRepository _reportRepository;
         private readonly ILogger<GetAttendanceReportQueryHandler> _logger;
@@ -18,7 +18,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
             _logger = logger;
         }
 
-        public async Task<AttendanceReportDto> Handle(
+        public async Task<AttendanceReportRecordDto> Handle(
             GetAttendanceReportQuery request, 
             CancellationToken cancellationToken)
         {
@@ -44,7 +44,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
                 .OrderBy(d => d.Date)
                 .ToList();
 
-            return new AttendanceReportDto
+            return new AttendanceReportRecordDto
             {
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,

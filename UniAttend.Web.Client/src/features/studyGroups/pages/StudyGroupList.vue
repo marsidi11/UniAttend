@@ -2,12 +2,14 @@
   <div class="space-y-6">
     <!-- Header -->
     <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-900">Study Groups</h1>
+      <h1 class="text-2xl font-bold text-gray-900">
+        {{ isProfessor ? 'My Study Groups' : 'Study Groups' }}
+      </h1>
       <Button v-if="isAdmin" @click="openCreateModal">Add Group</Button>
     </div>
 
     <!-- Filters -->
-    <div class="flex gap-4 bg-white p-4 rounded-lg shadow">
+    <div v-if="isAdmin" class="flex gap-4 bg-white p-4 rounded-lg shadow">
       <div class="w-64">
         <label class="block text-sm font-medium text-gray-700">Subject</label>
         <select
@@ -91,7 +93,11 @@ const selectedStatus = ref('')
 
 // Computed properties
 const isAdmin = computed(() => 
-  authStore.userRole === 'admin' || authStore.userRole === 'secretary'
+  ['admin', 'secretary'].includes(authStore.userRole || '')
+)
+
+const isProfessor = computed(() => 
+  authStore.userRole === 'professor'
 )
 
 const columns = [
@@ -176,9 +182,17 @@ async function handleSubmit(groupData: Partial<StudyGroupDto>) {
 
 // Lifecycle hooks
 onMounted(async () => {
-  await Promise.all([
-    groupStore.fetchStudyGroups(),
-    subjectStore.fetchSubjects()
-  ])
-})
+  try {
+    const loadGroups = isProfessor.value && authStore.user?.id
+      ? groupStore.fetchProfessorStudyGroups(authStore.user.id)
+      : groupStore.fetchStudyGroups();
+
+    await Promise.all([
+      loadGroups,
+      subjectStore.fetchSubjects()
+    ]);
+  } catch (err) {
+    console.error('Failed to load data:', err);
+  }
+});
 </script>

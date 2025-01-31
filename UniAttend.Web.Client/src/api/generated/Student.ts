@@ -50,30 +50,6 @@ export class Student<SecurityDataType = unknown> extends HttpClient<SecurityData
    * No description
    *
    * @tags Student
-   * @name StudentAttendanceList
-   * @request GET:/api/Student/attendance
-   * @secure
-   */
-  studentAttendanceList = (
-    query?: {
-      /** @format date-time */
-      startDate?: string;
-      /** @format date-time */
-      endDate?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<void, any>({
-      path: `/api/Student/attendance`,
-      method: "GET",
-      query: query,
-      secure: true,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags Student
    * @name StudentEnrolledGroupsList
    * @request GET:/api/Student/enrolled-groups
    * @secure

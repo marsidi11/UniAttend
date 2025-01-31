@@ -1,3 +1,0 @@
-2025-01-28 00:32:34.155 +01:00 [INF] Starting web application
-2025-01-28 00:33:39.084 +01:00 [WRN] Failed to determine the https port for redirect.
-2025-01-28 00:43:05.985 +01:00 [INF] Starting web application

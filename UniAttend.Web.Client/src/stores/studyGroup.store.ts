@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { 
+import type {
   StudyGroupDto,
   GroupStudentDto,
   CreateStudyGroupCommand,
   UpdateStudyGroupCommand,
-  TransferStudentCommand 
+  TransferStudentCommand
 } from '@/api/generated/data-contracts';
 import { studyGroupApi } from '@/api/apiInstances';
 import { handleError } from '@/utils/errorHandler';
@@ -19,7 +19,7 @@ export const useGroupStore = defineStore('group', () => {
   const error = ref<string | null>(null);
 
   // Getters
-  const activeStudyGroups = computed(() => 
+  const activeStudyGroups = computed(() =>
     studyGroups.value.filter(g => g.isActive)
   );
 
@@ -155,6 +155,23 @@ export const useGroupStore = defineStore('group', () => {
     }
   }
 
+  async function fetchProfessorStudyGroups(professorId: number, academicYearId?: number) {
+    isLoading.value = true;
+    try {
+      const { data } = await studyGroupApi.studyGroupsProfessorDetail(
+        professorId,
+        { academicYearId }
+      );
+      studyGroups.value = data;
+      return data;
+    } catch (err) {
+      handleError(err, error);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     // State
     studyGroups,
@@ -175,6 +192,7 @@ export const useGroupStore = defineStore('group', () => {
     fetchGroupStudents,
     enrollStudents,
     removeStudent,
-    transferStudent
+    transferStudent,
+    fetchProfessorStudyGroups
   };
 });

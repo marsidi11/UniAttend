@@ -142,13 +142,13 @@ const routes = [
         path: 'groups',
         name: 'study-groups',
         component: StudyGroupList,
-        meta: { roles: ['secretary'] }
+        meta: { roles: ['secretary', 'professor'] }
       },
       {
         path: 'groups/:id',
         name: 'group-details',
         component: StudyGroupDetails,
-        meta: { roles: ['secretary'] }
+        meta: { roles: ['secretary', 'professor'] }
       },
       {
         path: 'classrooms',

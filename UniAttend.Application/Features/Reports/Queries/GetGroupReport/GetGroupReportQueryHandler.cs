@@ -33,7 +33,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
                 request.EndDate,
                 cancellationToken);
 
-            var studentAttendance = new List<AttendanceRecordDto>();
+            var studentAttendance = new List<AttendanceRecordReportDto>();
             foreach (var student in studyGroup.Students)
             {
                 var stats = await _attendanceRepository.GetStudentGroupAttendanceAsync(
@@ -43,7 +43,7 @@ namespace UniAttend.Application.Features.Reports.Queries.GetGroupReport
                     request.EndDate,
                     cancellationToken);
 
-                studentAttendance.Add(new AttendanceRecordDto
+                studentAttendance.Add(new AttendanceRecordReportDto
                 {
                     StudentId = student.StudentId,
                     StudentNumber = student.Student?.StudentId ?? "Unknown",

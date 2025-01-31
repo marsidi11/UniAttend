@@ -2,14 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using UniAttend.Application.Features.Reports.DTOs;
-using UniAttend.Application.Features.Reports.Queries;
 using UniAttend.Application.Features.Reports.Queries.GetAttendanceReport;
 using UniAttend.Application.Features.Reports.Queries.GetDepartmentReport;
 using UniAttend.Application.Features.Reports.Queries.GetGroupReport;
 using UniAttend.Application.Features.Reports.Queries.GetStudentReport;
 using UniAttend.API.Extensions;
 using UniAttend.Application.Features.Reports.Queries.GetAcademicYearReport;
-using UniAttend.Application.Features.Reports.Queries.ExportAttendanceReport;
 using UniAttend.Core.Interfaces.Services;
 
 namespace UniAttend.API.Controllers
@@ -145,7 +143,7 @@ namespace UniAttend.API.Controllers
         /// <returns>Filtered attendance report</returns>
         [HttpGet("attendance")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
-        public async Task<ActionResult<AttendanceReportDto>> GetAttendanceReport(
+        public async Task<ActionResult<AttendanceReportRecordDto>> GetAttendanceReport(
             [FromQuery] DateTime startDate,
             [FromQuery] DateTime endDate,
             [FromQuery] int? departmentId,
@@ -180,35 +178,6 @@ namespace UniAttend.API.Controllers
             var query = new GetAcademicYearReportQuery { AcademicYearId = id };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
-        }
-
-        /// <summary>
-        /// Exports an attendance report as PDF
-        /// </summary>
-        /// <param name="studyGroupId">Study group ID</param>
-        /// <param name="startDate">Start date for the report</param>
-        /// <param name="endDate">End date for the report</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>PDF file</returns>
-        [HttpGet("export/attendance")]
-        [Authorize(Roles = "Admin,Secretary,Professor")]
-        public async Task<IActionResult> ExportAttendanceReport(
-            [FromQuery] int studyGroupId,
-            [FromQuery] DateTime startDate,
-            [FromQuery] DateTime endDate,
-            CancellationToken cancellationToken)
-        {
-            var query = new ExportAttendanceReportQuery
-            {
-                StudyGroupId = studyGroupId,
-                StartDate = startDate,
-                EndDate = endDate
-            };
-            var fileContent = await _mediator.Send(query, cancellationToken);
-            return File(
-                fileContent,
-                "application/pdf",
-                $"attendance-report-{studyGroupId}-{DateTime.Now:yyyyMMdd}.pdf");
         }
 
         [HttpGet("export/students/{id}")]

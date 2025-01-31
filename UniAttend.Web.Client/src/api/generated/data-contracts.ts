@@ -68,6 +68,7 @@ export interface AttendanceRecordDto {
   checkInTime?: string;
   checkInMethod?: CheckInMethod;
   isConfirmed?: boolean;
+  isAbsent?: boolean;
   /** @format date-time */
   confirmationTime?: string | null;
   studyGroupName?: string | null;
@@ -76,7 +77,18 @@ export interface AttendanceRecordDto {
   sessionEndTime?: TimeSpan;
 }
 
-export interface AttendanceReportDto {
+export interface AttendanceRecordReportDto {
+  /** @format int32 */
+  studentId?: number;
+  studentNumber?: string | null;
+  fullName?: string | null;
+  /** @format int32 */
+  attendedCourseSessions?: number;
+  /** @format double */
+  attendanceRate?: number;
+}
+
+export interface AttendanceReportRecordDto {
   /** @format date-time */
   startDate?: string;
   /** @format date-time */
@@ -266,7 +278,7 @@ export interface GroupReportDto {
   totalCourseSessions?: number;
   /** @format double */
   averageAttendance?: number;
-  students?: AttendanceRecordDto[] | null;
+  students?: AttendanceRecordReportDto[] | null;
 }
 
 export interface GroupStudentDto {
@@ -372,17 +384,6 @@ export interface ScheduleDto {
   createdAt?: string;
   /** @format date-time */
   updatedAt?: string | null;
-}
-
-export interface AttendanceRecordDto {
-  /** @format int32 */
-  studentId?: number;
-  studentNumber?: string | null;
-  fullName?: string | null;
-  /** @format int32 */
-  attendedCourseSessions?: number;
-  /** @format double */
-  attendanceRate?: number;
 }
 
 export interface StudentReportDto {

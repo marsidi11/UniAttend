@@ -1,13 +1,15 @@
-<template>
+  <template>
   <div class="space-y-6">
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-      <h1 class="text-2xl font-bold text-gray-900">Schedule Management</h1>
-      <Button @click="openCreateModal">Add Schedule</Button>
+      <h1 class="text-2xl font-bold text-gray-900">
+        {{ isProfessor ? 'My Schedule' : 'Schedule Management' }}
+      </h1>
+      <Button v-if="showFilters" @click="openCreateModal">Add Schedule</Button>
     </div>
 
     <!-- Enhanced Filters -->
-    <div class="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow">
+    <div v-if="showFilters" class="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow">
       <!-- Study Group Filter -->
       <div class="w-full sm:w-1/4">
         <label class="block text-sm font-medium text-gray-700">Study Group</label>
@@ -97,6 +99,7 @@ import { useScheduleStore } from '@/stores/schedule.store'
 import { useGroupStore } from '@/stores/studyGroup.store'
 import { useClassroomStore } from '@/stores/classroom.store'
 import { useProfessorStore } from '@/stores/professor.store'
+import { useAuthStore } from '@/stores/auth.store'
 import type {
   ScheduleDto,
   CreateScheduleCommand,
@@ -108,17 +111,21 @@ import Spinner from '@/shared/components/ui/Spinner.vue'
 import ScheduleForm from '../components/ScheduleForm.vue'
 import ScheduleSlot from '../components/ScheduleSlot.vue'
 
-// Initialize stores
+// Initialize stores - Only initialize what's needed based on role
 const scheduleStore = useScheduleStore()
-const groupStore = useGroupStore()
-const classroomStore = useClassroomStore()
-const professorStore = useProfessorStore()
+const authStore = useAuthStore()
+const isProfessor = computed(() => authStore.userRole === 'professor')
 
-// Get store refs
+// Conditional store initialization
+const groupStore = !isProfessor.value ? useGroupStore() : null
+const classroomStore = !isProfessor.value ? useClassroomStore() : null
+const professorStore = !isProfessor.value ? useProfessorStore() : null
+
+// Get store refs - Only get what's needed based on role
 const { schedules, isLoading } = storeToRefs(scheduleStore)
-const { studyGroups } = storeToRefs(groupStore)
-const { classrooms } = storeToRefs(classroomStore)
-const { professors } = storeToRefs(professorStore)
+const studyGroups = !isProfessor.value ? storeToRefs(groupStore!).studyGroups : ref([])  
+const classrooms = !isProfessor.value ? storeToRefs(classroomStore!).classrooms : ref([])
+const professors = !isProfessor.value ? storeToRefs(professorStore!).professors : ref([])
 
 // Component state
 const showModal = ref(false)
@@ -126,6 +133,8 @@ const selectedSchedule = ref<ScheduleDto | null>(null)
 const selectedGroup = ref('')
 const selectedClassroom = ref('')
 const selectedProfessor = ref('')
+
+const showFilters = computed(() => ['admin', 'secretary'].includes(authStore.userRole?.toLowerCase() || ''))
 
 // Constants
 const days = [
@@ -253,33 +262,41 @@ async function handleSubmit(scheduleData: CreateScheduleCommand | UpdateSchedule
   }
 }
 
-// Watch for filter changes
-watch([selectedGroup, selectedClassroom, selectedProfessor], async ([studyGroup, classroom, professor]) => {
-  try {
-    if (professor) {
-      // Use the updated fetchSchedules method that supports professor filtering
-      await scheduleStore.fetchSchedules(undefined, undefined, Number(professor))
-    } else if (classroom) {
-      await scheduleStore.fetchSchedules(undefined, Number(classroom))
-    } else if (studyGroup) {
-      await scheduleStore.fetchSchedules(Number(studyGroup))
-    } else {
-      await scheduleStore.fetchAllSchedules()
+// Modify watch to prevent unnecessary API calls for professors
+watch([selectedGroup, selectedClassroom, selectedProfessor], 
+  async ([studyGroup, classroom, professor]) => {
+    if (isProfessor.value) return // Don't respond to filter changes for professors
+    
+    try {
+      if (professor) {
+        await scheduleStore.fetchSchedules(undefined, undefined, Number(professor))
+      } else if (classroom) {
+        await scheduleStore.fetchSchedules(undefined, Number(classroom))
+      } else if (studyGroup) {
+        await scheduleStore.fetchSchedules(Number(studyGroup))
+      } else {
+        await scheduleStore.fetchAllSchedules()
+      }
+    } catch (err) {
+      console.error('Failed to fetch schedules:', err)
     }
-  } catch (err) {
-    console.error('Failed to fetch schedules:', err)
-  }
 })
 
-// Modify onMounted to only fetch groups and classrooms
+// Modify onMounted for optimized loading
 onMounted(async () => {
   try {
-    await Promise.all([
-      scheduleStore.fetchAllSchedules(),
-      groupStore.fetchStudyGroups(),
-      classroomStore.fetchClassrooms(),
-      professorStore.fetchProfessors()
-    ])
+    if (isProfessor.value && authStore.user?.id) {
+      // Only fetch professor's schedules
+      await scheduleStore.fetchSchedules(undefined, undefined, authStore.user.id)
+    } else {
+      // For admin/secretary fetch all required data
+      await Promise.all([
+        scheduleStore.fetchAllSchedules(),
+        groupStore?.fetchStudyGroups(),
+        classroomStore?.fetchClassrooms(),
+        professorStore?.fetchProfessors()
+      ])
+    }
   } catch (err) {
     console.error('Failed to fetch initial data:', err)
   }

@@ -3,7 +3,7 @@ using UniAttend.Application.Features.Reports.DTOs;
 
 namespace UniAttend.Application.Features.Reports.Queries.GetAttendanceReport
 {
-    public record GetAttendanceReportQuery : IRequest<AttendanceReportDto>
+    public record GetAttendanceReportQuery : IRequest<AttendanceReportRecordDto>
     {
         public DateTime StartDate { get; init; }
         public DateTime EndDate { get; init; }
