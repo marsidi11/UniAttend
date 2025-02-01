@@ -6,9 +6,9 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordCardAttendanc
 {
     public class RecordCardAttendanceCommandHandler : IRequestHandler<RecordCardAttendanceCommand, AttendanceRecordDto>
     {
-        private readonly IAttendanceService _attendanceService;
+        private readonly IAttendanceRecordService _attendanceService;
 
-        public RecordCardAttendanceCommandHandler(IAttendanceService attendanceService)
+        public RecordCardAttendanceCommandHandler(IAttendanceRecordService attendanceService)
         {
             _attendanceService = attendanceService;
         }

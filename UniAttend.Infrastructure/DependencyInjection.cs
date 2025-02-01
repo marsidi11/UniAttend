@@ -63,7 +63,7 @@ namespace UniAttend.Infrastructure
             services.AddScoped<ICardReaderService, CardReaderService>();
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
-            services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IAttendanceRecordService, AttendanceRecordService>();
             services.AddScoped<IPrintService, PdfPrintService>();
             services.AddScoped<ITotpService, TotpService>();
             services.AddScoped<IReportService, FastReportService>();

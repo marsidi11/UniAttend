@@ -1,4 +1,5 @@
 using UniAttend.Core.Entities.Base;
+using UniAttend.Core.Enums;
 
 namespace UniAttend.Core.Entities.Attendance
 {
@@ -6,7 +7,7 @@ namespace UniAttend.Core.Entities.Attendance
     {
         private readonly List<AttendanceRecord> _attendanceRecords = new();
 
-        public CourseSession(int studyGroupId, int classroomId, DateTime date, TimeSpan startTime, TimeSpan endTime, string status)
+        public CourseSession(int studyGroupId, int classroomId, DateTime date, TimeSpan startTime, TimeSpan endTime, SessionStatus status)
         {
             StudyGroupId = studyGroupId;
             ClassroomId = classroomId;
@@ -21,14 +22,14 @@ namespace UniAttend.Core.Entities.Attendance
         public DateTime Date { get; private set; }
         public TimeSpan StartTime { get; private set; }
         public TimeSpan EndTime { get; private set; }
-        public string Status { get; private set; }
+        public SessionStatus Status { get; private set; }
 
         // Navigation properties
         public virtual StudyGroup StudyGroup { get; private set; } = null!;
         public virtual Classroom Classroom { get; private set; } = null!;
         public virtual IReadOnlyCollection<AttendanceRecord> AttendanceRecords => _attendanceRecords.AsReadOnly();
 
-        public void UpdateStatus(string status)
+        public void UpdateStatus(SessionStatus status)
         {
             Status = status;
         }

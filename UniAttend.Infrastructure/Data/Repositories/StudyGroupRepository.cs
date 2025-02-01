@@ -11,39 +11,70 @@ namespace UniAttend.Infrastructure.Data.Repositories
     {
         public StudyGroupRepository(ApplicationDbContext context) : base(context) { }
 
-        public async Task<StudyGroup?> GetWithStudentsAsync(int id, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Retrieves a study group with its students and their associated users.
+        /// </summary>
+        public async Task<StudyGroup?> GetWithStudentsAsync(
+            int id, 
+            CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(g => g.Students)
                     .ThenInclude(gs => gs.Student)
                         .ThenInclude(s => s!.User)
                 .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
 
-        public async Task<IEnumerable<StudyGroup>> GetByProfessorIdAsync(int professorId, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Retrieves study groups by professor ID.
+        /// </summary>
+        public async Task<IEnumerable<StudyGroup>> GetByProfessorIdAsync(
+            int professorId, 
+            CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(g => g.Subject)
                 .Include(g => g.Professor)
                 .Where(g => g.ProfessorId == professorId)
                 .ToListAsync(cancellationToken);
 
-        public async Task<IEnumerable<StudyGroup>> GetBySubjectIdAsync(int subjectId, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Retrieves study groups by subject ID.
+        /// </summary>
+        public async Task<IEnumerable<StudyGroup>> GetBySubjectIdAsync(
+            int subjectId, 
+            CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(g => g.Subject)
                 .Include(g => g.Professor)
                 .Where(g => g.SubjectId == subjectId)
                 .ToListAsync(cancellationToken);
 
-        public async Task<bool> HasStudentAsync(int studyGroupId, int studentId, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Checks if a student exists in a specific study group.
+        /// </summary>
+        public async Task<bool> HasStudentAsync(
+            int studyGroupId, 
+            int studentId, 
+            CancellationToken cancellationToken = default)
             => await DbSet
                 .AnyAsync(g => g.Id == studyGroupId &&
                     g.Students.Any(s => s.StudentId == studentId),
                     cancellationToken);
 
-        public async Task<StudyGroup?> GetWithScheduleAsync(int id, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Retrieves a study group with its schedule.
+        /// </summary>
+        public async Task<StudyGroup?> GetWithScheduleAsync(
+            int id, 
+            CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(g => g.Schedules)
                 .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
 
-        public async Task<AttendanceStats> GetAttendanceStatsAsync(int studyGroupId, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Calculates attendance statistics for a study group.
+        /// </summary>
+        public async Task<AttendanceStats> GetAttendanceStatsAsync(
+            int studyGroupId, 
+            CancellationToken cancellationToken = default)
         {
             var studyGroup = await DbSet
                 .Include(g => g.Students)
@@ -62,10 +93,13 @@ namespace UniAttend.Infrastructure.Data.Repositories
             };
         }
 
+        /// <summary>
+        /// Retrieves study groups by department ID with optional academic year filtering.
+        /// </summary>
         public async Task<IEnumerable<StudyGroup>> GetByDepartmentIdAsync(
-        int departmentId,
-        int? academicYearId = null,
-        CancellationToken cancellationToken = default)
+            int departmentId,
+            int? academicYearId = null,
+            CancellationToken cancellationToken = default)
         {
             var query = DbSet
                 .Include(g => g.Subject)
@@ -78,7 +112,12 @@ namespace UniAttend.Infrastructure.Data.Repositories
             return await query.ToListAsync(cancellationToken);
         }
 
-                public async Task<IEnumerable<StudyGroup>> GetAllWithDetailsAsync(int? academicYearId = null, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Retrieves all study groups with detailed information, optionally filtered by academic year.
+        /// </summary>
+        public async Task<IEnumerable<StudyGroup>> GetAllWithDetailsAsync(
+            int? academicYearId = null, 
+            CancellationToken cancellationToken = default)
         {
             IQueryable<StudyGroup> query = DbSet
                 .Include(g => g.Subject)
@@ -88,35 +127,51 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .Include(g => g.Students)
                     .ThenInclude(gs => gs.Student)
                         .ThenInclude(s => s!.User);
-        
+
             if (academicYearId.HasValue)
             {
                 query = query.Where(g => g.AcademicYearId == academicYearId.Value);
             }
-        
+
             return await query.ToListAsync(cancellationToken);
         }
 
-        public async Task<StudyGroup?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default)
-        => await DbSet
-            .Include(g => g.Students)
-                .ThenInclude(gs => gs.Student)
-                    .ThenInclude(s => s.User)
-            .Include(g => g.Subject)
-            .Include(g => g.Professor)
-                .ThenInclude(p => p.User)
-            .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
+        /// <summary>
+        /// Retrieves a study group by ID with full details.
+        /// </summary>
+        public async Task<StudyGroup?> GetByIdWithDetailsAsync(
+            int id, 
+            CancellationToken cancellationToken = default)
+            => await DbSet
+                .Include(g => g.Students)
+                    .ThenInclude(gs => gs.Student)
+                        .ThenInclude(s => s.User)
+                .Include(g => g.Subject)
+                .Include(g => g.Professor)
+                    .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
 
-        public async Task<bool> ExistsWithNameAsync(string name, int subjectId, int academicYearId, CancellationToken cancellationToken = default)
-        {
-            return await DbSet.AnyAsync(g =>
+        /// <summary>
+        /// Checks if a study group exists with the given name, subject ID, and academic year ID.
+        /// </summary>
+        public async Task<bool> ExistsWithNameAsync(
+            string name, 
+            int subjectId, 
+            int academicYearId, 
+            CancellationToken cancellationToken = default)
+            => await DbSet.AnyAsync(g =>
                 g.Name == name &&
                 g.SubjectId == subjectId &&
                 g.AcademicYearId == academicYearId,
                 cancellationToken);
-        }
 
-        public async Task<IEnumerable<StudyGroup>> GetByProfessorIdAsync(int professorId, int? academicYearId = null, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Retrieves study groups by professor ID with optional academic year filtering.
+        /// </summary>
+        public async Task<IEnumerable<StudyGroup>> GetByProfessorIdAsync(
+            int professorId, 
+            int? academicYearId = null, 
+            CancellationToken cancellationToken = default)
         {
             var query = DbSet
                 .Include(g => g.Subject)
@@ -133,36 +188,41 @@ namespace UniAttend.Infrastructure.Data.Repositories
             return await query.ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<StudyGroup>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
-        {
-            return await DbSet
+        /// <summary>
+        /// Retrieves study groups by student ID.
+        /// </summary>
+        public async Task<IEnumerable<StudyGroup>> GetByStudentIdAsync(
+            int studentId, 
+            CancellationToken cancellationToken = default)
+            => await DbSet
                 .Include(g => g.Students)
                 .Include(g => g.Subject)
                 .Include(g => g.AcademicYear)
                 .Where(g => g.Students.Any(s => s.StudentId == studentId))
                 .ToListAsync(cancellationToken);
-        }
 
+        /// <summary>
+        /// Retrieves study groups for a student.
+        /// </summary>
         public async Task<IEnumerable<StudyGroup>> GetStudentGroupsAsync(
-        int studentId,
-        CancellationToken cancellationToken = default)
-        {
-            return await DbSet
+            int studentId, 
+            CancellationToken cancellationToken = default)
+            => await DbSet
                 .Include(g => g.Subject)
                 .Include(g => g.AcademicYear)
                 .Where(g => g.Students.Any(s => s.StudentId == studentId))
                 .ToListAsync(cancellationToken);
-        }
 
+        /// <summary>
+        /// Retrieves study groups for a professor.
+        /// </summary>
         public async Task<IEnumerable<StudyGroup>> GetProfessorStudyGroupsAsync(
-            int professorId,
+            int professorId, 
             CancellationToken cancellationToken = default)
-        {
-            return await DbSet
+            => await DbSet
                 .Include(g => g.Subject)
                 .Include(g => g.AcademicYear)
                 .Where(g => g.ProfessorId == professorId)
                 .ToListAsync(cancellationToken);
-        }
     }
 }

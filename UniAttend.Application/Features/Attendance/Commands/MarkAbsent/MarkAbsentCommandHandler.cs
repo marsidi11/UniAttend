@@ -5,9 +5,9 @@ namespace UniAttend.Application.Features.Attendance.Commands.MarkAbsent
 {
     public class MarkAbsentCommandHandler : IRequestHandler<MarkAbsentCommand, Unit>
     {
-        private readonly IAttendanceService _attendanceService;
+        private readonly IAttendanceRecordService _attendanceService;
 
-        public MarkAbsentCommandHandler(IAttendanceService attendanceService)
+        public MarkAbsentCommandHandler(IAttendanceRecordService attendanceService)
         {
             _attendanceService = attendanceService;
         }

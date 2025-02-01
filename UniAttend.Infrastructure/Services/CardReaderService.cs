@@ -7,12 +7,12 @@ namespace UniAttend.Infrastructure.Services
     public class CardReaderService : ICardReaderService
     {
         private readonly IClassroomRepository _classroomRepository;
-        private readonly IAttendanceService _attendanceService;
+        private readonly IAttendanceRecordService _attendanceService;
         private readonly ILogger<CardReaderService> _logger;
 
         public CardReaderService(
             IClassroomRepository classroomRepository,
-            IAttendanceService attendanceService,
+            IAttendanceRecordService attendanceService,
             ILogger<CardReaderService> logger)
         {
             _classroomRepository = classroomRepository;

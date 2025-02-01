@@ -10,13 +10,13 @@ namespace UniAttend.Application.Features.Attendance.Commands.RecordOtpAttendance
 {
     public class RecordOtpAttendanceCommandHandler : IRequestHandler<RecordOtpAttendanceCommand, AttendanceRecordDto>
     {
-        private readonly IAttendanceService _attendanceService;
+        private readonly IAttendanceRecordService _attendanceService;
         private readonly ITotpService _totpService;
         private readonly IStudentRepository _studentRepository;
         private readonly IRateLimiter _rateLimiter;
 
         public RecordOtpAttendanceCommandHandler(
-            IAttendanceService attendanceService,
+            IAttendanceRecordService attendanceService,
             ITotpService totpService,
             IStudentRepository studentRepository,
             IRateLimiter rateLimiter)

@@ -1,96 +1,102 @@
   <template>
-  <div class="space-y-6">
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-      <h1 class="text-2xl font-bold text-gray-900">
-        {{ isProfessorOrStudent ? 'My Schedule' : 'Schedule Management' }}
-      </h1>
-      <Button v-if="showFilters" @click="openCreateModal">Add Schedule</Button>
-    </div>
-
-    <!-- Enhanced Filters -->
-    <div v-if="showFilters" class="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow">
-      <!-- Study Group Filter -->
-      <div class="w-full sm:w-1/4">
-        <label class="block text-sm font-medium text-gray-700">Study Group</label>
-        <select v-model="selectedGroup"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-          <option value="">All Groups</option>
-          <option v-for="studyGroup in studyGroups" :key="studyGroup.id" :value="studyGroup.id">
-            {{ studyGroup.name }}
-          </option>
-        </select>
+    <div class="space-y-6">
+      <!-- Header Section -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">
+          {{ isProfessorOrStudent ? 'My Schedule' : 'Schedule Management' }}
+        </h1>
+        <Button v-if="showFilters" @click="openCreateModal">Add Schedule</Button>
       </div>
 
-      <!-- Classroom Filter -->
-      <div class="w-full sm:w-1/4">
-        <label class="block text-sm font-medium text-gray-700">Classroom</label>
-        <select v-model="selectedClassroom"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-          <option value="">All Classrooms</option>
-          <option v-for="classroom in classrooms" :key="classroom.id" :value="classroom.id">
-            {{ classroom.name }}
-          </option>
-        </select>
+      <!-- Enhanced Filters -->
+      <div v-if="showFilters" class="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow">
+        <!-- Study Group Filter -->
+        <div class="w-full sm:w-1/4">
+          <label class="block text-sm font-medium text-gray-700">Study Group</label>
+          <select v-model="selectedGroup"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option value="">All Groups</option>
+            <option v-for="studyGroup in studyGroups" :key="studyGroup.id" :value="studyGroup.id">
+              {{ studyGroup.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Classroom Filter -->
+        <div class="w-full sm:w-1/4">
+          <label class="block text-sm font-medium text-gray-700">Classroom</label>
+          <select v-model="selectedClassroom"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option value="">All Classrooms</option>
+            <option v-for="classroom in classrooms" :key="classroom.id" :value="classroom.id">
+              {{ classroom.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Professor Filter -->
+        <div class="w-full sm:w-1/4">
+          <label class="block text-sm font-medium text-gray-700">Professor</label>
+          <select v-model="selectedProfessor"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option value="">All Professors</option>
+            <option v-for="professor in professors" :key="professor.id" :value="professor.id">
+              {{ professor.fullName }}
+            </option>
+          </select>
+        </div>
       </div>
 
-      <!-- Professor Filter -->
-      <div class="w-full sm:w-1/4">
-        <label class="block text-sm font-medium text-gray-700">Professor</label>
-        <select v-model="selectedProfessor"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-          <option value="">All Professors</option>
-          <option v-for="professor in professors" :key="professor.id" :value="professor.id">
-            {{ professor.fullName }}
-          </option>
-        </select>
-      </div>
-    </div>
+      <!-- Schedule Grid -->
+      <div class="bg-white shadow rounded-lg p-4 sm:p-6 overflow-x-auto">
+        <div v-if="isLoading" class="text-center py-12">
+          <Spinner />
+        </div>
 
-    <!-- Schedule Grid -->
-    <div class="bg-white shadow rounded-lg p-4 sm:p-6 overflow-x-auto">
-      <div v-if="isLoading" class="text-center py-12">
-        <Spinner />
-      </div>
-
-      <!-- Schedule Grid Container -->
-      <div v-else class="min-w-[768px]">
-        <div class="grid grid-cols-6 gap-2 sm:gap-4">
-          <!-- Time Column -->
-          <div class="col-span-1 relative">
-            <div class="h-14 sm:h-16"></div> <!-- Taller header space -->
-            <div v-for="time in timeSlots" :key="time"
-              class="h-24 sm:h-28 flex items-center justify-end pr-4 text-sm font-medium text-gray-500">
-              <div class="bg-gray-50 px-2 py-1 rounded">
-                {{ time }}
+        <!-- Schedule Grid Container -->
+        <div v-else class="min-w-[768px]">
+          <div class="grid grid-cols-6 gap-2 sm:gap-4">
+            <!-- Time Column -->
+            <div class="col-span-1 relative">
+              <!-- Match header height with day headers -->
+              <div class="h-14 sm:h-16 flex items-center justify-center">
+                <span class="text-sm font-medium text-gray-500">Time</span>
+              </div>
+              <!-- Update time slots to match content cell heights -->
+              <div v-for="time in timeSlots" :key="time"
+                class="h-32 sm:h-40 flex items-center justify-end pr-4 text-sm font-medium text-gray-500">
+                <div class="bg-gray-50 px-2 py-1 rounded">
+                  {{ time }}
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Days Columns -->
-          <div v-for="day in days" :key="day.value" class="col-span-1">
-            <div
-              class="h-14 sm:h-16 flex items-center justify-center font-medium bg-indigo-50 rounded-t text-indigo-700">
-              <span class="hidden sm:inline">{{ day.label }}</span>
-              <span class="sm:hidden">{{ day.label.substr(0, 3) }}</span>
-            </div>
-            <div v-for="time in timeSlots" :key="`${day.value}-${time}`"
-              class="h-32 sm:h-40 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1.5 sm:p-3 rounded">
-              <ScheduleSlot :schedules="getSchedulesForSlot(day.value, time)" :current-time="`${time}:00`"
-                @click="slot => handleSlotClick(slot)" @delete="handleDelete" />
+            <!-- Days Columns -->
+            <div v-for="day in days" :key="day.value" class="col-span-1">
+              <div
+                class="h-14 sm:h-16 flex items-center justify-center font-medium bg-indigo-50 rounded-t text-indigo-700">
+                <span class="hidden sm:inline">{{ day.label }}</span>
+                <span class="sm:hidden">{{ day.label.substr(0, 3) }}</span>
+              </div>
+              <!-- Only render slots for defined time slots -->
+              <div v-for="time in timeSlots" :key="`${day.value}-${time}`"
+                class="h-32 sm:h-40 border border-gray-100 hover:bg-gray-50 transition-colors duration-200 p-1.5 sm:p-3 rounded">
+                <ScheduleSlot :schedules="getSchedulesForSlot(day.value, time)" :current-time="time"
+                  :is-start-slot="isStartTimeSlot(day.value, time)" @click="slot => handleSlotClick(slot)"
+                  @delete="handleDelete" />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Create/Edit Schedule Modal -->
-    <Modal v-model="showModal" :title="modalTitle">
-      <ScheduleForm v-if="showModal" :schedule="selectedSchedule" :study-groups="studyGroups" :classrooms="classrooms"
-        @submit="handleSubmit" @cancel="showModal = false" />
-    </Modal>
-  </div>
-</template>
+      <!-- Create/Edit Schedule Modal -->
+      <Modal v-model="showModal" :title="modalTitle">
+        <ScheduleForm v-if="showModal" :schedule="selectedSchedule" :study-groups="studyGroups" :classrooms="classrooms"
+          @submit="handleSubmit" @cancel="showModal = false" />
+      </Modal>
+    </div>
+  </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
@@ -114,7 +120,7 @@ import ScheduleSlot from '../components/ScheduleSlot.vue'
 // Initialize stores - Only initialize what's needed based on role
 const scheduleStore = useScheduleStore()
 const authStore = useAuthStore()
-const isProfessorOrStudent = computed(() => 
+const isProfessorOrStudent = computed(() =>
   ['professor', 'student'].includes(authStore.userRole || '')
 )
 
@@ -125,7 +131,7 @@ const professorStore = !isProfessorOrStudent.value ? useProfessorStore() : null
 
 // Get store refs - Only get what's needed based on role
 const { schedules, isLoading } = storeToRefs(scheduleStore)
-const studyGroups = !isProfessorOrStudent.value ? storeToRefs(groupStore!).studyGroups : ref([])  
+const studyGroups = !isProfessorOrStudent.value ? storeToRefs(groupStore!).studyGroups : ref([])
 const classrooms = !isProfessorOrStudent.value ? storeToRefs(classroomStore!).classrooms : ref([])
 const professors = !isProfessorOrStudent.value ? storeToRefs(professorStore!).professors : ref([])
 
@@ -149,7 +155,8 @@ const days = [
 
 const timeSlots = [
   '08:00', '09:00', '10:00', '11:00', '12:00',
-  '13:00', '14:00', '15:00', '16:00', '17:00'
+  '13:00', '14:00', '15:00', '16:00', '17:00',
+  '18:00', '19:00', '20:00'
 ]
 
 // Computed properties
@@ -182,30 +189,23 @@ const filteredSchedules = computed(() => {
 
 // Methods
 function getSchedulesForSlot(day: string, time: string) {
-  const schedules = filteredSchedules.value.filter(schedule => {
+  return filteredSchedules.value.filter(schedule => {
     if (schedule.dayOfWeek !== getDayNumber(day)) return false
-    const slotMinutes = timeToMinutes(time)
-    const startMinutes = timeToMinutes(schedule.startTime?.toString() || '00:00')
-    const endMinutes = timeToMinutes(schedule.endTime?.toString() || '00:00')
-    return slotMinutes >= startMinutes && slotMinutes < endMinutes
-  })
 
-  // Sort schedules by type for consistent display order
-  return schedules.sort((a, b) => {
-    // Prioritize display order: groups -> classrooms -> professors
-    const getTypeOrder = (s: ScheduleDto) => {
-      if (s.studyGroupId) return 1
-      if (s.classroomId) return 2
-      return 3
-    }
-    return getTypeOrder(a) - getTypeOrder(b)
+    const slotTime = timeToMinutes(time)
+    const scheduleStart = timeToMinutes(schedule.startTime?.toString() || '')
+    const scheduleEnd = timeToMinutes(schedule.endTime?.toString() || '')
+
+    // Only show schedule in slots between start and end time
+    return slotTime >= scheduleStart && slotTime < scheduleEnd
   })
 }
 
-// Helper function to convert time string to minutes
 function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(':').map(Number);
-  return (hours * 60) + (minutes || 0);
+  // Handle potential time formats
+  const cleanTime = time.split('.')[0] // Remove any milliseconds
+  const [hours, minutes] = cleanTime.split(':').map(Number)
+  return (hours * 60) + (minutes || 0)
 }
 
 // Add helper function to convert day string to number
@@ -218,6 +218,15 @@ function getDayNumber(day: string): number {
     'friday': 5
   }
   return dayMap[day]
+}
+
+function isStartTimeSlot(day: string, time: string): boolean {
+  return filteredSchedules.value.some(schedule => {
+    if (schedule.dayOfWeek !== getDayNumber(day)) return false
+    const slotTime = timeToMinutes(time)
+    const startTime = timeToMinutes(schedule.startTime?.toString() || '')
+    return slotTime === startTime
+  })
 }
 
 function openCreateModal() {
@@ -265,10 +274,10 @@ async function handleSubmit(scheduleData: CreateScheduleCommand | UpdateSchedule
 }
 
 // Modify watch to prevent unnecessary API calls for professors
-watch([selectedGroup, selectedClassroom, selectedProfessor], 
+watch([selectedGroup, selectedClassroom, selectedProfessor],
   async ([studyGroup, classroom, professor]) => {
     if (isProfessorOrStudent.value) return // Don't respond to filter changes for professors
-    
+
     try {
       if (professor) {
         await scheduleStore.fetchSchedules(undefined, undefined, Number(professor))
@@ -282,7 +291,7 @@ watch([selectedGroup, selectedClassroom, selectedProfessor],
     } catch (err) {
       console.error('Failed to fetch schedules:', err)
     }
-})
+  })
 
 // Modify onMounted for optimized loading
 onMounted(async () => {

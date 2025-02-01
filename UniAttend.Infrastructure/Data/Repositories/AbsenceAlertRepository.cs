@@ -9,28 +9,53 @@ namespace UniAttend.Infrastructure.Data.Repositories
     {
         public AbsenceAlertRepository(ApplicationDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<AbsenceAlert>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
-            => await DbSet
-                .Include(aa => aa.Student)
-                .Include(aa => aa.StudyGroup)
-                .Where(aa => aa.StudentId == studentId)
+        /// <summary>
+        /// Gets absence alerts by student ID.
+        /// </summary>
+        public async Task<IEnumerable<AbsenceAlert>> GetByStudentIdAsync(
+            int studentId,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(a => a.StudyGroup)
+                    .ThenInclude(sg => sg.Subject)
+                .Where(a => a.StudentId == studentId)
                 .ToListAsync(cancellationToken);
+        }
 
-        public async Task<IEnumerable<AbsenceAlert>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default)
-            => await DbSet
+        /// <summary>
+        /// Gets absence alerts by study group ID.
+        /// </summary>
+        public async Task<IEnumerable<AbsenceAlert>> GetByGroupIdAsync(
+            int studyGroupId,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
                 .Include(aa => aa.Student)
                 .Include(aa => aa.StudyGroup)
                 .Where(aa => aa.StudyGroupId == studyGroupId)
                 .ToListAsync(cancellationToken);
+        }
 
-        public async Task<IEnumerable<AbsenceAlert>> GetUnsentAlertsAsync(CancellationToken cancellationToken = default)
-            => await DbSet
+        /// <summary>
+        /// Gets all unsent absence alerts.
+        /// </summary>
+        public async Task<IEnumerable<AbsenceAlert>> GetUnsentAlertsAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
                 .Include(aa => aa.Student)
                 .Include(aa => aa.StudyGroup)
                 .Where(aa => !aa.EmailSent)
                 .ToListAsync(cancellationToken);
+        }
 
-        public async Task MarkAlertAsSentAsync(int alertId, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Marks an absence alert as sent.
+        /// </summary>
+        public async Task MarkAlertAsSentAsync(
+            int alertId,
+            CancellationToken cancellationToken = default)
         {
             var alert = await GetByIdAsync(alertId, cancellationToken);
             if (alert != null)
@@ -40,11 +65,19 @@ namespace UniAttend.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<bool> HasActiveAlertAsync(int studentId, int studyGroupId, CancellationToken cancellationToken = default)
-            => await DbSet.AnyAsync(aa => 
-                aa.StudentId == studentId && 
-                aa.StudyGroupId == studyGroupId && 
-                !aa.EmailSent, 
+        /// <summary>
+        /// Checks if there is an active unsent absence alert for the specified student and study group.
+        /// </summary>
+        public async Task<bool> HasActiveAlertAsync(
+            int studentId,
+            int studyGroupId,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet.AnyAsync(a =>
+                a.StudentId == studentId &&
+                a.StudyGroupId == studyGroupId &&
+                !a.EmailSent,
                 cancellationToken);
+        }
     }
 }

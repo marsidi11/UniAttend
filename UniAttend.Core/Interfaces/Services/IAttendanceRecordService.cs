@@ -5,7 +5,7 @@ namespace UniAttend.Core.Interfaces.Services
     /// <summary>
     /// Provides attendance management operations for the university attendance system
     /// </summary>
-    public interface IAttendanceService
+    public interface IAttendanceRecordService
     {
         /// <summary>
         /// Records attendance using a student's ID card
@@ -21,11 +21,6 @@ namespace UniAttend.Core.Interfaces.Services
         /// Confirms attendance records for a specific course session
         /// </summary>
         Task<bool> ConfirmAttendanceAsync(int courseSessionId, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Generates alerts for students with high absence rates
-        /// </summary>
-        Task GenerateAbsenceAlertsAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Validates if a student can record attendance for a specific class

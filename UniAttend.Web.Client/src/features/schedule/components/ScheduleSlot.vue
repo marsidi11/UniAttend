@@ -99,7 +99,7 @@ function getCardcourseSessions(schedule: ScheduleDto) {
 
 function formatTimeString(time: string | TimeObject | unknown): string {
   if (typeof time === 'string') {
-    return time.substring(0, 5)
+    return time.split('.')[0].substring(0, 5)
   }
   if (time && typeof time === 'object' && 'hours' in time && 'minutes' in time) {
     const timeObj = time as TimeObject
@@ -118,7 +118,7 @@ function isFirstSlot(schedule: ScheduleDto): boolean {
 
 function timeToMinutes(time: string): number {
   const [hours, minutes] = time.split(':').map(Number)
-  return (hours || 0) * 60 + (minutes || 0)
+  return (hours * 60) + minutes
 }
 </script>
 
