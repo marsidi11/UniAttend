@@ -232,7 +232,6 @@ const navigationSections: NavigationSections = {
   Professor: [
     { to: '/dashboard/professor', icon: 'dashboard', text: 'Dashboard' },
     { to: '/dashboard/schedule', icon: 'schedule', text: 'My Schedule' },
-    { to: '/dashboard/attendance/records', icon: 'fact_check', text: 'Attendance' },
     { to: '/dashboard/groups', icon: 'groups', text: 'My Groups' },
     { to: '/dashboard/reports', icon: 'analytics', text: 'Reports' }
   ],

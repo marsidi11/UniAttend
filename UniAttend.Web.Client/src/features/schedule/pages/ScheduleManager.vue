@@ -151,6 +151,8 @@ const days = [
   { value: 'wednesday', label: 'Wednesday' },
   { value: 'thursday', label: 'Thursday' },
   { value: 'friday', label: 'Friday' },
+  { value: 'saturday', label: 'Saturday' },
+  { value: 'sunday', label: 'Sunday' }
 ] as const
 
 const timeSlots = [
@@ -215,7 +217,9 @@ function getDayNumber(day: string): number {
     'tuesday': 2,
     'wednesday': 3,
     'thursday': 4,
-    'friday': 5
+    'friday': 5,
+    'saturday': 6,
+    'sunday': 7
   }
   return dayMap[day]
 }

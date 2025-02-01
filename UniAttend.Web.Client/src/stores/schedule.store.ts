@@ -46,9 +46,9 @@ export const useScheduleStore = defineStore('schedule', () => {
   }
 
   async function fetchSchedules(
-    studyGroupId?: number, 
-    studentId?: number, 
-    classroomId?: number, 
+    studyGroupId?: number,
+    studentId?: number,
+    classroomId?: number,
     professorId?: number
   ) {
     isLoading.value = true;

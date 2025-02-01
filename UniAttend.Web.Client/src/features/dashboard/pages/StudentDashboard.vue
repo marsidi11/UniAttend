@@ -40,7 +40,7 @@
               </div>
 
               <!-- Add check-in options when session is active -->
-              <div v-if="session.status === 'Active'" class="flex gap-2">
+              <div v-if="session.status === SessionStatus.Active" class="flex gap-2">
                 <Button @click="router.push(`/dashboard/attendance/otp-check-in/${session.id}`)" variant="secondary"
                   size="sm">
                   Check-in with OTP
@@ -126,7 +126,7 @@ import AttendanceList from '@/features/attendance/components/AttendanceList.vue'
 
 const router = useRouter()
 const studentStore = useStudentStore()
-const attendanceStore =useAttendanceStore()
+const attendanceStore = useAttendanceStore()
 const courseSessionStore = useCourseSessionStore()
 
 // State
@@ -138,10 +138,21 @@ const attendanceStats = ref<AttendanceStatsDto>({
   attendanceRate: 0,
 })
 
+enum SessionStatus {
+  Scheduled = 0,
+  Active = 1,
+  Completed = 2,
+  Closed = 3
+}
+
+interface ExtendedCourseSession extends Omit<CourseSessionDto, 'status'> {
+  status: SessionStatus;
+}
+
 const recentAttendance = ref<AttendanceRecordDto[]>([])
 const isLoadingGroups = ref(false)
 const enrolledGroups = ref<UserGroupDto[]>([])
-const todayActiveSessions = ref<CourseSessionDto[]>([])
+const todayActiveSessions = ref<ExtendedCourseSession[]>([])
 
 // Computed
 const absenceRate = computed(() => {
@@ -156,17 +167,17 @@ function getAbsenceStatus(rate: number): 'success' | 'warning' | 'error' {
   return 'error'
 }
 
-function getSessionStatus(session: CourseSessionDto): 'success' | 'warning' | 'info' {
-  if (session.status === 'Completed') return 'success'
-  if (session.status === 'Active') return 'warning'
+function getSessionStatus(session: ExtendedCourseSession): 'success' | 'warning' | 'info' {
+  if (session.status === SessionStatus.Completed) return 'success'
+  if (session.status === SessionStatus.Active) return 'warning'
   return 'info'
 }
 
-function getSessionStatusText(session: CourseSessionDto): string {
-  switch (session.status?.toLowerCase()) {
-    case 'completed':
+function getSessionStatusText(session: ExtendedCourseSession): string {
+  switch (session.status) {
+    case SessionStatus.Completed:
       return 'Attended'
-    case 'active':
+    case SessionStatus.Active:
       return 'In Progress'
     default:
       return 'Upcoming'
@@ -217,10 +228,15 @@ async function loadTodayActiveSessions() {
     const sessions = await courseSessionStore.fetchCourseSessions({
       date: today
     })
-    // Update the filter to use correct property names from UserGroupDto
-    todayActiveSessions.value = sessions.filter(session =>
-      enrolledGroups.value.some(group => group.studyGroupId === session.studyGroupId)
-    )
+
+    todayActiveSessions.value = sessions
+      .filter(session => enrolledGroups.value.some(group => group.studyGroupId === session.studyGroupId))
+      .map((session): ExtendedCourseSession => ({
+        ...session,
+        status: (typeof session.status === 'number'
+          ? session.status
+          : SessionStatus.Scheduled) as unknown as SessionStatus
+      }))
   } catch (err) {
     console.error('Failed to load today\'s sessions:', err)
   } finally {

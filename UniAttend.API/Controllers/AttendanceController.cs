@@ -11,6 +11,8 @@ using UniAttend.API.Extensions;
 using UniAttend.Core.Enums;
 using UniAttend.Application.Features.Attendance.Commands.MarkAbsent;
 using UniAttend.Core.Interfaces.Services;
+using System.Net.Sockets;
+using Microsoft.Extensions.Logging;
 
 namespace UniAttend.API.Controllers
 {
@@ -24,17 +26,20 @@ namespace UniAttend.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly INetworkValidationService _networkValidationService;
+        private readonly ILogger<AttendanceController> _logger;
 
         /// <summary>
         /// Initializes a new instance of the AttendanceController.
         /// </summary>
         public AttendanceController(
-            IMediator mediator,
-            INetworkValidationService networkValidationService)
+        IMediator mediator,
+        INetworkValidationService networkValidationService,
+        ILogger<AttendanceController> logger) // Add logger parameter
         {
-            _mediator = mediator;
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _networkValidationService = networkValidationService ??
                 throw new ArgumentNullException(nameof(networkValidationService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -55,17 +60,24 @@ namespace UniAttend.API.Controllers
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> RecordOtpAttendance(RecordOtpAttendanceCommand command)
         {
-            // Get client IP
             var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+            _logger.LogInformation($"Client IP: {clientIp}");
+
             if (string.IsNullOrEmpty(clientIp))
             {
                 return BadRequest("Could not determine client IP address");
             }
 
-            // Validate network
+            // Force IPv4 if IPv6
+            if (HttpContext.Connection.RemoteIpAddress?.AddressFamily == AddressFamily.InterNetworkV6)
+            {
+                clientIp = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+                _logger.LogInformation($"Mapped IPv6 to IPv4: {clientIp}"); // Add logging
+            }
+
             if (!_networkValidationService.IsOnAllowedNetwork(clientIp))
             {
-                return BadRequest("Must be on classroom network to check in");
+                return BadRequest($"Must be on classroom network to check in. IP: {clientIp}");
             }
 
             command.StudentId = User.GetUserId();

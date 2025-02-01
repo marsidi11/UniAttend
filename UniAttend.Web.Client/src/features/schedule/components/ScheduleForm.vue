@@ -44,6 +44,8 @@
         <option :value="dayMapping.wednesday">Wednesday</option>
         <option :value="dayMapping.thursday">Thursday</option>
         <option :value="dayMapping.friday">Friday</option>
+        <option :value="dayMapping.saturday">Saturday</option>
+        <option :value="dayMapping.sunday">Sunday</option>
       </select>
     </div>
 
@@ -117,7 +119,9 @@ const dayMapping = {
   tuesday: 2,
   wednesday: 3,
   thursday: 4,
-  friday: 5
+  friday: 5,
+  saturday: 6,
+  sunday: 7
 } as const
 
 const form = ref({

@@ -39,34 +39,29 @@
                   <span class="ml-2">{{ session.classroomName }}</span>
                 </p>
               </div>
-                            <div class="flex gap-2">
-                <Button v-if="!isSessionActive(session)" 
-                  @click="startSession(session)" 
-                  variant="primary" 
-                  :disabled="startingSessionId === session.studyGroupId ||
-                    todayScheduledSessions.some(s =>
-                      s.studyGroupId === session.studyGroupId &&
-                      s.status?.toLowerCase() === 'active'
-                    )">
+              <div class="flex gap-2">
+                <Button v-if="!isSessionActive(session)" @click="startSession(session)" variant="primary" :disabled="startingSessionId === session.studyGroupId ||
+                  todayScheduledSessions.some(s =>
+                    s.studyGroupId === session.studyGroupId &&
+                    s.status === SessionStatus.Active
+                  )">
                   {{ startingSessionId === session.studyGroupId ? 'Starting...' : 'Start Session' }}
                 </Button>
-                
+
                 <!-- Show End Session whenever session is active -->
-                <Button v-if="isSessionActive(session) && session.id" 
-                  @click="closeSession(session.id)"
+                <Button v-if="isSessionActive(session) && session.id" @click="closeSession(session.id)"
                   variant="danger">
                   End Session
                 </Button>
-              
+
                 <!-- Show Confirm Attendance if not confirmed -->
                 <Button v-if="isSessionActive(session) && !isSessionConfirmed(session)"
-                  @click="confirmSession(session.id!)" 
-                  variant="primary">
+                  @click="confirmSession(session.id!)" variant="primary">
                   Confirm Attendance
                 </Button>
-              
+
                 <Badge :status="getSessionStatus(session)">
-                  {{ session.status }}
+                  {{ getSessionStatusText(session) }}
                 </Badge>
               </div>
             </div>
@@ -93,8 +88,8 @@ import { useAuthStore } from '@/stores/auth.store'
 import type {
   CourseSessionDto,
   AttendanceRecordDto,
-  OpenCourseSessionCommand,
-  TimeSpan
+  TimeSpan,
+  SessionStatus as ApiSessionStatus
 } from '@/api/generated/data-contracts'
 import Button from '@/shared/components/ui/Button.vue'
 import StatCard from '@/shared/components/ui/StatCard.vue'
@@ -104,9 +99,17 @@ import AttendanceList from '@/features/attendance/components/AttendanceList.vue'
 
 type BadgeStatus = 'success' | 'warning' | 'error' | 'info'
 
-interface ExtendedCourseSession extends CourseSessionDto {
+enum SessionStatus {
+  Scheduled = 0,
+  Active = 1,
+  Completed = 2,
+  Closed = 3
+}
+
+interface ExtendedCourseSession extends Omit<CourseSessionDto, 'status'> {
   isConfirmed: boolean;
-  status: string;
+  status: SessionStatus;
+  id?: number;
 }
 
 interface DashboardStats {
@@ -145,6 +148,7 @@ const isLoadingAttendance = ref(false)
 const startingSessionId = ref<number | null>(null)
 const activeSessionId = ref<number | null>(null)
 const pollInterval = ref<number | null>(null)
+const activeSessionsMap = ref(new Map<number, boolean>())
 
 // Utility functions
 function formatTimeString(time: TimeSpan | undefined): string {
@@ -155,6 +159,20 @@ function formatTimeString(time: TimeSpan | undefined): string {
   const minutes = typeof time.minutes === 'number' ? time.minutes.toString().padStart(2, '0') : '00';
 
   return `${hours}:${minutes}`;
+}
+
+function getSessionStatusText(session: ExtendedCourseSession): string {
+  switch (session.status) {
+    case SessionStatus.Active:
+      return 'In Progress';
+    case SessionStatus.Completed:
+    case SessionStatus.Closed:
+      return 'Completed';
+    case SessionStatus.Scheduled:
+      return 'Scheduled';
+    default:
+      return 'Unknown';
+  }
 }
 
 async function markStudentAbsent(record: AttendanceRecordDto) {
@@ -169,7 +187,7 @@ async function markStudentAbsent(record: AttendanceRecordDto) {
 }
 
 function isSessionActive(session: ExtendedCourseSession): boolean {
-  return session.status?.toLowerCase() === 'active'
+  return session.status === SessionStatus.Active;
 }
 
 function isSessionConfirmed(session: ExtendedCourseSession): boolean {
@@ -186,10 +204,18 @@ async function confirmSession(sessionId: number) {
 }
 
 function getSessionStatus(session: CourseSessionDto | ExtendedCourseSession): BadgeStatus {
-  const status = session.status?.toLowerCase()
-  if (status === 'active') return 'success'
-  if (status === 'scheduled') return 'info'
-  return 'info'
+  const status = typeof session.status === 'number' ? session.status : SessionStatus.Scheduled;
+  switch (status) {
+    case SessionStatus.Active:
+      return 'warning'; // Active sessions should be warning to draw attention
+    case SessionStatus.Completed:
+    case SessionStatus.Closed:
+      return 'success'; // Completed/closed sessions should be success
+    case SessionStatus.Scheduled:
+      return 'info';
+    default:
+      return 'info';
+  }
 }
 
 // Session management functions
@@ -200,36 +226,47 @@ async function startSession(session: ExtendedCourseSession) {
   startingSessionId.value = session.studyGroupId!
 
   try {
-    const command: OpenCourseSessionCommand = {
-      studyGroupId: session.studyGroupId!,
-      classroomId: session.classroomId!,
-      courseSessionId: 0,
-      date: new Date().toISOString(),
-      startTime: session.startTime!,
-      endTime: session.endTime!
+    // Wrap command in a command object as expected by API
+    const data = {
+      command: {
+        studyGroupId: session.studyGroupId!,
+        classroomId: session.classroomId!,
+        courseSessionId: 0,
+        date: new Date().toISOString(),
+        startTime: {
+          hours: session.startTime?.hours || 0,
+          minutes: session.startTime?.minutes || 0,
+          seconds: 0,
+        },
+        endTime: {
+          hours: session.endTime?.hours || 0,
+          minutes: session.endTime?.minutes || 0,
+          seconds: 0,
+        }
+      }
     }
 
-    const newSession = await courseSessionStore.OpenCourseSession(command)
+    const newSession = await courseSessionStore.OpenCourseSession(data.command)
     if (!newSession?.id) throw new Error('Failed to create session')
 
     // Immediately update local state
     const sessionIndex = todayScheduledSessions.value.findIndex(
       s => s.studyGroupId === session.studyGroupId
     )
-    
+
     if (sessionIndex !== -1) {
       const updatedSession: ExtendedCourseSession = {
         ...todayScheduledSessions.value[sessionIndex],
         id: newSession.id,
-        status: 'active',
+        status: SessionStatus.Active,
         isConfirmed: false
       }
       todayScheduledSessions.value[sessionIndex] = updatedSession
-      
+
       // Start attendance tracking
       await loadSessionAttendance(newSession.id)
       startAttendancePolling(newSession.id)
-      
+
       // Update dashboard stats
       stats.value = {
         ...stats.value,
@@ -305,14 +342,23 @@ async function closeSession(sessionId: number) {
   }
 }
 
+function parseTime(timeStr: string | undefined): { hours: number; minutes: number } | undefined {
+  if (!timeStr) return undefined;
+  const parts = timeStr.split(':');
+  if (parts.length < 2) return undefined;
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  return { hours, minutes };
+}
+
 async function loadDashboardData() {
   isLoading.value = true
   try {
     const today = new Date()
 
     // 1. Fetch all required data
-    const [schedules, activeSessions, attendanceStats] = await Promise.all([
-      scheduleStore.fetchSchedules(undefined, undefined, authStore.user?.id),
+    const [schedules, todaySessions, attendanceStats] = await Promise.all([
+      scheduleStore.fetchSchedules(undefined, undefined, undefined, authStore.user?.id),
       courseSessionStore.fetchCourseSessions({
         date: today,
         professorId: authStore.user?.id
@@ -323,35 +369,41 @@ async function loadDashboardData() {
     // 2. Clear previous state
     todayScheduledSessions.value = []
 
-    // 3. First handle active sessions
-    const activeSessionsMap = new Map()
-    activeSessions?.forEach(session => {
-      if (session.status?.toLowerCase() === 'active') {
-        activeSessionsMap.set(session.studyGroupId, true)
+    // 3. Handle all today's sessions (active, completed, and closed)
+    todaySessions?.forEach((session: CourseSessionDto) => {
+      if (session.studyGroupId !== undefined) {
+        activeSessionsMap.value.set(session.studyGroupId, true)
         const sessionObject: ExtendedCourseSession = {
           ...session,
-          status: 'active',
+          status: (typeof session.status === 'number'
+            ? (session.status as ApiSessionStatus as unknown as SessionStatus)
+            : SessionStatus.Scheduled),
           isConfirmed: false
         }
         todayScheduledSessions.value.push(sessionObject)
-        
-        // Start polling for active sessions
-        startAttendancePolling(session.id!)
-        loadSessionAttendance(session.id!)
+
+        if (session.id && sessionObject.status === SessionStatus.Active) {
+          startAttendancePolling(session.id)
+          loadSessionAttendance(session.id)
+        }
       }
     })
 
-    // 4. Then add scheduled sessions that aren't active yet
+    // 4. Add remaining scheduled sessions that haven't started yet
     const todaySchedules = schedules.filter(schedule => {
       const scheduleDay = new Date().getDay()
-      return schedule.dayOfWeek === scheduleDay && !activeSessionsMap.has(schedule.studyGroupId)
+      return schedule.dayOfWeek === scheduleDay &&
+        schedule.studyGroupId !== undefined &&
+        !activeSessionsMap.value.get(schedule.studyGroupId)
     })
 
     todaySchedules.forEach(schedule => {
       const sessionObject: ExtendedCourseSession = {
         ...schedule,
+        startTime: parseTime(schedule.startTime as unknown as string),
+        endTime: parseTime(schedule.endTime as unknown as string),
         id: undefined,
-        status: 'scheduled',
+        status: SessionStatus.Scheduled,
         isConfirmed: false
       }
       todayScheduledSessions.value.push(sessionObject)
@@ -366,11 +418,12 @@ async function loadDashboardData() {
 
     // 6. Update stats
     stats.value = {
-      activeCourseSessions: activeSessions?.filter(s => s.status?.toLowerCase() === 'active').length || 0,
-      pendingConfirmations: activeSessions?.filter(s => {
-        const session = s as ExtendedCourseSession
-        return !session.isConfirmed && s.status?.toLowerCase() === 'active'
-      }).length || 0,
+      activeCourseSessions: todayScheduledSessions.value.filter(s =>
+        s.status === SessionStatus.Active
+      ).length,
+      pendingConfirmations: todayScheduledSessions.value.filter(s =>
+        s.status === SessionStatus.Active && !s.isConfirmed
+      ).length,
       averageAttendance: calculateAverageAttendance(attendanceStats)
     }
 

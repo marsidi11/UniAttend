@@ -43,6 +43,13 @@ namespace UniAttend.Infrastructure.Services
                     return false;
                 }
 
+                // Special handling for localhost
+                if (clientIp == "::1" || clientIp == "127.0.0.1" || clientIp == "0.0.0.1")
+                {
+                    _logger.LogInformation("Allowing localhost access");
+                    return true;
+                }
+
                 if (!IPAddress.TryParse(clientIp, out var ipAddress))
                 {
                     _logger.LogWarning("Failed to parse client IP address: {ClientIp}", clientIp);

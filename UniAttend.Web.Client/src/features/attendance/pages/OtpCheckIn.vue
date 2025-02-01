@@ -17,30 +17,12 @@
         </div>
 
         <!-- Success Message -->
-        <div 
-          v-if="isSuccess" 
-          class="mb-4 p-4 bg-green-50 text-green-700 rounded-md flex items-center"
-        >
+        <div v-if="isSuccess" class="mb-4 p-4 bg-green-50 text-green-700 rounded-md flex items-center">
           <span class="material-icons mr-2">check_circle</span>
           Check-in successful!
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-6">
-          <!-- Class ID -->
-          <div>
-            <label for="courseSessionId" class="block text-sm font-medium text-gray-700">
-              Class ID
-            </label>
-            <input
-              id="courseSessionId"
-              v-model="form.courseSessionId"
-              type="number"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              :disabled="isLoading"
-            />
-          </div>
-
           <!-- OTP Code -->
           <div>
             <label for="otpCode" class="block text-sm font-medium text-gray-700">
@@ -48,7 +30,7 @@
             </label>
             <input
               id="otpCode"
-              v-model="form.otpCode"
+              v-model="form.otpCode" 
               type="text"
               required
               maxlength="6"
@@ -63,23 +45,14 @@
           </div>
 
           <div>
-            <Button
-              type="submit"
-              :loading="isLoading"
-              :disabled="!isFormValid"
-              class="w-full"
-            >
+            <Button type="submit" :loading="isLoading" :disabled="!isFormValid" class="w-full">
               Check In
             </Button>
           </div>
         </form>
 
         <div class="mt-6">
-          <Button
-            variant="secondary"
-            class="w-full"
-            @click="$router.push('/dashboard')"
-          >
+          <Button variant="secondary" class="w-full" @click="$router.push('/dashboard')">
             Back to Dashboard
           </Button>
         </div>
@@ -89,13 +62,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAttendanceStore } from '@/stores/attendance.store'
 import Button from '@/shared/components/ui/Button.vue'
 import { VerificationType } from '@/api/generated/data-contracts'
 
 const router = useRouter()
+const route = useRoute()
 const attendanceStore = useAttendanceStore()
 
 const isLoading = ref(false)
@@ -105,6 +79,16 @@ const isSuccess = ref(false)
 const form = ref({
   courseSessionId: '',
   otpCode: ''
+})
+
+// Get courseSessionId from route on mount
+onMounted(() => {
+  const id = route.params.id
+  if (!id || Array.isArray(id)) {
+    error.value = 'Invalid session ID'
+    return
+  }
+  form.value.courseSessionId = id
 })
 
 const isFormValid = computed(() => {
@@ -130,7 +114,7 @@ async function handleSubmit() {
     await attendanceStore.recordOtpAttendance({
       courseSessionId: Number(form.value.courseSessionId),
       otpCode: form.value.otpCode,
-      verificationType: VerificationType.Value1, // TOTP
+      verificationType: VerificationType.Value1,
       studentId: 0 // Will be set by backend from token
     })
     
