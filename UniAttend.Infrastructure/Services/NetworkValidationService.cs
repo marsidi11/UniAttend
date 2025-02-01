@@ -54,7 +54,7 @@ namespace UniAttend.Infrastructure.Services
                     ipAddress = ipAddress.MapToIPv4();
                 }
 
-                var subnet = IPNetwork.Parse(_settings.ClassroomSubnet); 
+                var subnet = IPNetwork.Parse(_settings.ClassroomSubnet);
                 return subnet.Contains(ipAddress);
             }
             catch (Exception ex)

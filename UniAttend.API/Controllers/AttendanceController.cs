@@ -14,6 +14,9 @@ using UniAttend.Core.Interfaces.Services;
 
 namespace UniAttend.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing attendance actions.
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
@@ -22,6 +25,9 @@ namespace UniAttend.API.Controllers
         private readonly IMediator _mediator;
         private readonly INetworkValidationService _networkValidationService;
 
+        /// <summary>
+        /// Initializes a new instance of the AttendanceController.
+        /// </summary>
         public AttendanceController(
             IMediator mediator,
             INetworkValidationService networkValidationService)
@@ -31,6 +37,9 @@ namespace UniAttend.API.Controllers
                 throw new ArgumentNullException(nameof(networkValidationService));
         }
 
+        /// <summary>
+        /// Records attendance using a student's card.
+        /// </summary>
         [HttpPost("card")]
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> RecordCardAttendance(RecordCardAttendanceCommand command)
@@ -39,6 +48,9 @@ namespace UniAttend.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Records attendance using one-time password.
+        /// </summary>
         [HttpPost("otp")]
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> RecordOtpAttendance(RecordOtpAttendanceCommand command)
@@ -62,6 +74,9 @@ namespace UniAttend.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Confirms attendance for the course session.
+        /// </summary>
         [Authorize(Roles = "Professor")]
         [HttpPost("courseSessions/{courseSessionId}/confirm")]
         public async Task<IActionResult> ConfirmAttendance(int courseSessionId)
@@ -75,7 +90,7 @@ namespace UniAttend.API.Controllers
         }
 
         /// <summary>
-        /// Gets attendance records for a specific class
+        /// Gets attendance records for a specific class.
         /// </summary>
         [HttpGet("courseSessions/{courseSessionId}")]
         [Authorize(Roles = "Professor")]
@@ -94,7 +109,7 @@ namespace UniAttend.API.Controllers
         }
 
         /// <summary>
-        /// Gets attendance records for the authenticated student
+        /// Gets attendance records for the authenticated student.
         /// </summary>
         [HttpGet("student")]
         [Authorize(Roles = "Student, Secretary, Professor")]
@@ -114,7 +129,7 @@ namespace UniAttend.API.Controllers
         }
 
         /// <summary>
-        /// Marks a student as absent for a specific class
+        /// Marks a student as absent for a specific class.
         /// </summary>
         [Authorize(Roles = "Professor")]
         [HttpPost("courseSessions/{courseSessionId}/students/{studentId}/absent")]

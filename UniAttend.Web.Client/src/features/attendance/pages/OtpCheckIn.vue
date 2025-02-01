@@ -91,11 +91,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-// import { useOtpStore } from '@/stores/otp.store'
+import { useAttendanceStore } from '@/stores/attendance.store'
 import Button from '@/shared/components/ui/Button.vue'
+import { VerificationType } from '@/api/generated/data-contracts'
 
 const router = useRouter()
-const otpStore = useOtpStore()
+const attendanceStore = useAttendanceStore()
 
 const isLoading = ref(false)
 const error = ref('')
@@ -114,7 +115,6 @@ const isFormValid = computed(() => {
 
 function handleOtpInput(event: Event) {
   const input = event.target as HTMLInputElement
-  // Only allow numbers
   input.value = input.value.replace(/\D/g, '')
   form.value.otpCode = input.value
 }
@@ -127,10 +127,15 @@ async function handleSubmit() {
   isSuccess.value = false
 
   try {
-    await otpStore.validateOtp(form.value.otpCode, Number(form.value.courseSessionId))
+    await attendanceStore.recordOtpAttendance({
+      courseSessionId: Number(form.value.courseSessionId),
+      otpCode: form.value.otpCode,
+      verificationType: VerificationType.Value1, // TOTP
+      studentId: 0 // Will be set by backend from token
+    })
+    
     isSuccess.value = true
     
-    // Redirect after successful check-in
     setTimeout(() => {
       router.push('/dashboard/attendance')
     }, 2000)
