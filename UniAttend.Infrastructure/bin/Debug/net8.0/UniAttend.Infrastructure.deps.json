@@ -10,6 +10,7 @@
         "dependencies": {
           "FastReport.OpenSource": "2025.1.0",
           "FastReport.OpenSource.Export.PdfSimple": "2025.1.0",
+          "IPNetwork2": "3.0.712",
           "MailKit": "4.9.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.0",
           "Microsoft.CodeAnalysis.Common": "4.5.0",
@@ -107,6 +108,14 @@
           "lib/net6.0/Humanizer.dll": {
             "assemblyVersion": "2.14.0.0",
             "fileVersion": "2.14.1.48190"
+          }
+        }
+      },
+      "IPNetwork2/3.0.712": {
+        "runtime": {
+          "lib/net8.0/System.Net.IPNetwork.dll": {
+            "assemblyVersion": "3.0.712.0",
+            "fileVersion": "3.0.712.0"
           }
         }
       },
@@ -1791,6 +1800,13 @@
       "sha512": "sha512-lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
       "path": "humanizer.core/2.14.1",
       "hashPath": "humanizer.core.2.14.1.nupkg.sha512"
+    },
+    "IPNetwork2/3.0.712": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qkf4RTqAwkpXfbaMwcVt1fvGaqkwMOwHmZO0e0iiE7s5yXvQ29TqjmO81H05djMb02VWOhoT10+nMKUDTRKK+A==",
+      "path": "ipnetwork2/3.0.712",
+      "hashPath": "ipnetwork2.3.0.712.nupkg.sha512"
     },
     "itext/9.0.0": {
       "type": "package",

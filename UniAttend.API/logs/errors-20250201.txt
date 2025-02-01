@@ -1,7 +1,3 @@
-2025-02-01 00:13:48.760 +01:00 [INF] Starting web application
-2025-02-01 00:16:52.356 +01:00 [WRN] Failed to determine the https port for redirect.
-2025-02-01 15:44:22.010 +01:00 [INF] Starting web application
-2025-02-01 15:45:41.242 +01:00 [WRN] Failed to determine the https port for redirect.
 2025-02-01 15:45:48.115 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
@@ -828,7 +824,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:53.873 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:53.875 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -842,7 +838,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:53.875 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:53.873 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -1318,7 +1314,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:54.335 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:54.336 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -1332,7 +1328,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:54.336 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:54.335 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -1388,7 +1384,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:54.506 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:54.507 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -1402,7 +1398,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:54.507 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:54.506 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -1570,7 +1566,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:54.831 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:54.830 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -1584,7 +1580,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:54.830 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:54.831 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -1780,20 +1776,6 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:55.064 +01:00 [ERR] An unhandled exception occurred
-UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
-   at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
-   at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
-   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
 2025-02-01 15:45:55.098 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
@@ -1823,6 +1805,20 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
 2025-02-01 15:45:55.106 +01:00 [ERR] An unhandled exception occurred
+UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
+   at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
+   at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
+2025-02-01 15:45:55.064 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -2214,7 +2210,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:55.636 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:55.664 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -2228,7 +2224,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:55.664 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:55.636 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -2438,7 +2434,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:55.937 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:55.941 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -2452,7 +2448,7 @@ UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh to
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
-2025-02-01 15:45:55.941 +01:00 [ERR] An unhandled exception occurred
+2025-02-01 15:45:55.937 +01:00 [ERR] An unhandled exception occurred
 UniAttend.Shared.Exceptions.UnauthorizedException: Invalid or expired refresh token
    at UniAttend.Application.Features.Auth.Commands.RefreshToken.RefreshTokenCommandHandler.Handle(RefreshTokenCommand request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Auth\Commands\RefreshToken\RefreshTokenCommandHandler.cs:line 31
    at UniAttend.API.Controllers.Auth.AuthController.RefreshToken(RefreshTokenCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\Auth\AuthController.cs:line 37
@@ -2731,6 +2727,111 @@ System.InvalidCastException: Can't convert VarChar to Int32
    at UniAttend.Application.Features.Reports.Queries.GetAttendanceReport.GetAttendanceReportQueryHandler.Handle(GetAttendanceReportQuery request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Reports\Queries\GetAttendanceReport\GetAttendanceReportQueryHandler.cs:line 25
    at UniAttend.API.Controllers.ReportsController.GetAttendanceReport(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 137
    at lambda_method221(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
+2025-02-01 15:54:33.463 +01:00 [ERR] An exception occurred while iterating over the results of a query for context type 'UniAttend.Infrastructure.Data.ApplicationDbContext'.
+System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method89(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method89(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+2025-02-01 15:54:33.481 +01:00 [ERR] An unhandled exception occurred
+System.InvalidOperationException: Error fetching attendance records: Can't convert VarChar to Int32
+ ---> System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method89(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at UniAttend.Infrastructure.Data.Repositories.ReportRepository.GetAttendanceRecordsAsync(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Data\Repositories\ReportRepository.cs:line 58
+   --- End of inner exception stack trace ---
+   at UniAttend.Infrastructure.Data.Repositories.ReportRepository.GetAttendanceRecordsAsync(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Data\Repositories\ReportRepository.cs:line 62
+   at UniAttend.Application.Features.Reports.Queries.GetAttendanceReport.GetAttendanceReportQueryHandler.Handle(GetAttendanceReportQuery request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Reports\Queries\GetAttendanceReport\GetAttendanceReportQueryHandler.cs:line 25
+   at UniAttend.API.Controllers.ReportsController.GetAttendanceReport(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 137
+   at lambda_method29(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
+2025-02-01 15:59:05.616 +01:00 [ERR] An exception occurred while iterating over the results of a query for context type 'UniAttend.Infrastructure.Data.ApplicationDbContext'.
+System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method85(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method85(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+2025-02-01 15:59:05.637 +01:00 [ERR] An unhandled exception occurred
+System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method85(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at UniAttend.Infrastructure.Data.Repositories.ReportRepository.GetAttendanceRecordsAsync(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Data\Repositories\ReportRepository.cs:line 60
+   at UniAttend.Application.Features.Reports.Queries.GetAttendanceReport.GetAttendanceReportQueryHandler.Handle(GetAttendanceReportQuery request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Reports\Queries\GetAttendanceReport\GetAttendanceReportQueryHandler.cs:line 25
+   at UniAttend.API.Controllers.ReportsController.GetAttendanceReport(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 137
+   at lambda_method30(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
+2025-02-01 16:03:17.958 +01:00 [ERR] An exception occurred while iterating over the results of a query for context type 'UniAttend.Infrastructure.Data.ApplicationDbContext'.
+System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method86(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method86(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+2025-02-01 16:03:17.976 +01:00 [ERR] An unhandled exception occurred
+System.InvalidOperationException: Error fetching attendance records: Can't convert VarChar to Int32
+ ---> System.InvalidCastException: Can't convert VarChar to Int32
+   at MySqlConnector.Core.Row.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 247
+   at MySqlConnector.MySqlDataReader.GetInt32(Int32 ordinal) in /_/src/MySqlConnector/MySqlDataReader.cs:line 240
+   at lambda_method86(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at UniAttend.Infrastructure.Data.Repositories.ReportRepository.GetAttendanceRecordsAsync(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Data\Repositories\ReportRepository.cs:line 58
+   --- End of inner exception stack trace ---
+   at UniAttend.Infrastructure.Data.Repositories.ReportRepository.GetAttendanceRecordsAsync(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Data\Repositories\ReportRepository.cs:line 62
+   at UniAttend.Application.Features.Reports.Queries.GetAttendanceReport.GetAttendanceReportQueryHandler.Handle(GetAttendanceReportQuery request, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Application\Features\Reports\Queries\GetAttendanceReport\GetAttendanceReportQueryHandler.cs:line 25
+   at UniAttend.API.Controllers.ReportsController.GetAttendanceReport(DateTime startDate, DateTime endDate, Nullable`1 departmentId, Nullable`1 subjectId, Nullable`1 studyGroupId, CancellationToken cancellationToken) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 137
+   at lambda_method28(Closure, Object)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)

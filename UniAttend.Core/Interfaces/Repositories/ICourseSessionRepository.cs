@@ -21,5 +21,7 @@ namespace UniAttend.Core.Interfaces.Repositories
             DateTime endDate,
             int? studyGroupId = null,
             CancellationToken cancellationToken = default);
+
+        Task<CourseSession> GetByIdWithClassroomAsync(int courseSessionId);
     }
 }

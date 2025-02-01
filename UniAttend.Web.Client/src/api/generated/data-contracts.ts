@@ -157,7 +157,7 @@ export interface CourseSessionDto {
   date?: string;
   startTime?: TimeSpan;
   endTime?: TimeSpan;
-  status?: string | null;
+  status?: SessionStatus;
 }
 
 export interface CreateAcademicYearCommand {
@@ -384,6 +384,14 @@ export interface ScheduleDto {
   createdAt?: string;
   /** @format date-time */
   updatedAt?: string | null;
+}
+
+/** @format int32 */
+export enum SessionStatus {
+  Value0 = 0,
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
 }
 
 export interface StudentReportDto {

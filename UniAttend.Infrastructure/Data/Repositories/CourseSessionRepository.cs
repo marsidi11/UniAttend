@@ -174,5 +174,22 @@ namespace UniAttend.Infrastructure.Data.Repositories
                     cs.Date.Date == DateTime.Today,
                     cancellationToken);
         }
+
+        /// <summary>
+        /// Retrieves a CourseSession by its unique identifier with related Classroom entity.
+        /// </summary>
+        public async Task<CourseSession> GetByIdWithClassroomAsync(int courseSessionId)
+        {
+            var session = await DbSet
+                .Include(x => x.Classroom)
+                .FirstOrDefaultAsync(x => x.Id == courseSessionId);
+        
+            if (session == null)
+            {
+                throw new KeyNotFoundException($"Course session with ID {courseSessionId} not found");
+            }
+        
+            return session;
+        }
     }
 }

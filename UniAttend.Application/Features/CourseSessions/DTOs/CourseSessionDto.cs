@@ -1,3 +1,5 @@
+using UniAttend.Core.Enums;
+
 namespace UniAttend.Application.Features.CourseSessions.DTOs
 {
     public class CourseSessionDto
@@ -10,6 +12,6 @@ namespace UniAttend.Application.Features.CourseSessions.DTOs
         public DateTime Date { get; init; }
         public TimeSpan StartTime { get; init; }
         public TimeSpan EndTime { get; init; }
-        public string Status { get; init; } = string.Empty;
+        public SessionStatus Status { get; init; }
     }
 }

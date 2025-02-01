@@ -18,7 +18,10 @@ namespace UniAttend.Infrastructure.Data.Configurations
             builder.Property(x => x.Date).IsRequired();
             builder.Property(x => x.StartTime).IsRequired();
             builder.Property(x => x.EndTime).IsRequired();
-            builder.Property(x => x.Status).IsRequired().HasMaxLength(50);
+            builder.Property(x => x.Status)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasConversion<string>(); 
 
             // Relationships
             builder.HasOne(x => x.StudyGroup)

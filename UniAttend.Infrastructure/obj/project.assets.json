@@ -105,6 +105,19 @@
           }
         }
       },
+      "IPNetwork2/3.0.712": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/System.Net.IPNetwork.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/System.Net.IPNetwork.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "itext/9.0.0": {
         "type": "package",
         "dependencies": {
@@ -3273,6 +3286,32 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "IPNetwork2/3.0.712": {
+      "sha512": "qkf4RTqAwkpXfbaMwcVt1fvGaqkwMOwHmZO0e0iiE7s5yXvQ29TqjmO81H05djMb02VWOhoT10+nMKUDTRKK+A==",
+      "type": "package",
+      "path": "ipnetwork2/3.0.712",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "ipnetwork2.3.0.712.nupkg.sha512",
+        "ipnetwork2.nuspec",
+        "lib/net462/System.Net.IPNetwork.dll",
+        "lib/net462/System.Net.IPNetwork.xml",
+        "lib/net47/System.Net.IPNetwork.dll",
+        "lib/net47/System.Net.IPNetwork.xml",
+        "lib/net48/System.Net.IPNetwork.dll",
+        "lib/net48/System.Net.IPNetwork.xml",
+        "lib/net6.0/System.Net.IPNetwork.dll",
+        "lib/net6.0/System.Net.IPNetwork.xml",
+        "lib/net8.0/System.Net.IPNetwork.dll",
+        "lib/net8.0/System.Net.IPNetwork.xml",
+        "lib/netstandard2.0/System.Net.IPNetwork.dll",
+        "lib/netstandard2.0/System.Net.IPNetwork.xml",
+        "lib/netstandard2.1/System.Net.IPNetwork.dll",
+        "lib/netstandard2.1/System.Net.IPNetwork.xml"
       ]
     },
     "itext/9.0.0": {
@@ -8862,6 +8901,7 @@
     "net8.0": [
       "FastReport.OpenSource >= 2025.1.0",
       "FastReport.OpenSource.Export.PdfSimple >= 2025.1.0",
+      "IPNetwork2 >= 3.0.712",
       "MailKit >= 4.9.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.0",
       "Microsoft.CodeAnalysis.Common >= 4.5.0",
@@ -8947,6 +8987,10 @@
           "FastReport.OpenSource.Export.PdfSimple": {
             "target": "Package",
             "version": "[2025.1.0, )"
+          },
+          "IPNetwork2": {
+            "target": "Package",
+            "version": "[3.0.712, )"
           },
           "MailKit": {
             "target": "Package",

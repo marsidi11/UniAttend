@@ -1,17 +1,20 @@
+using System;
+
 namespace UniAttend.Infrastructure.Settings
 {
+    /// <summary>
+    /// Configuration settings for network validation.
+    /// </summary>
     public class NetworkSettings
     {
-        public string[] AllowedIpRanges { get; set; } = Array.Empty<string>();
-        public string[] AllowedMacAddresses { get; set; } = Array.Empty<string>();
-        public LocationBoundary CampusBoundary { get; set; } = new();
-    }
+        /// <summary>
+        /// Gets or sets the subnet range for classroom network (e.g. "192.168.1.0/24").
+        /// </summary>
+        public string ClassroomSubnet { get; set; } = string.Empty;
 
-    public class LocationBoundary
-    {
-        public double NorthLatitude { get; set; }
-        public double SouthLatitude { get; set; }
-        public double EastLongitude { get; set; }
-        public double WestLongitude { get; set; }
+        /// <summary>
+        /// Gets or sets the allowed IP range for client connections.
+        /// </summary>
+        public string AllowedIpRange { get; set; } = string.Empty;
     }
 }

@@ -209,6 +209,10 @@
               "target": "Package",
               "version": "[2025.1.0, )"
             },
+            "IPNetwork2": {
+              "target": "Package",
+              "version": "[3.0.712, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.9.0, )"

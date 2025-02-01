@@ -52,6 +52,7 @@ namespace UniAttend.Infrastructure
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IAcademicYearRepository, AcademicYearRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
+            services.AddScoped<INetworkValidationService, NetworkValidationService>();
 
             // Register Core Services
             services.AddSingleton<IExceptionHandler, ExceptionHandler>();

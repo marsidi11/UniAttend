@@ -10,6 +10,7 @@ using UniAttend.Application.Features.Attendance.DTOs;
 using UniAttend.API.Extensions;
 using UniAttend.Core.Enums;
 using UniAttend.Application.Features.Attendance.Commands.MarkAbsent;
+using UniAttend.Core.Interfaces.Services;
 
 namespace UniAttend.API.Controllers
 {
@@ -19,13 +20,19 @@ namespace UniAttend.API.Controllers
     public class AttendanceController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly INetworkValidationService _networkValidationService;
 
-        public AttendanceController(IMediator mediator)
+        public AttendanceController(
+            IMediator mediator,
+            INetworkValidationService networkValidationService)
         {
             _mediator = mediator;
+            _networkValidationService = networkValidationService ??
+                throw new ArgumentNullException(nameof(networkValidationService));
         }
 
         [HttpPost("card")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> RecordCardAttendance(RecordCardAttendanceCommand command)
         {
             var result = await _mediator.Send(command);
@@ -33,8 +40,22 @@ namespace UniAttend.API.Controllers
         }
 
         [HttpPost("otp")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> RecordOtpAttendance(RecordOtpAttendanceCommand command)
         {
+            // Get client IP
+            var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (string.IsNullOrEmpty(clientIp))
+            {
+                return BadRequest("Could not determine client IP address");
+            }
+
+            // Validate network
+            if (!_networkValidationService.IsOnAllowedNetwork(clientIp))
+            {
+                return BadRequest("Must be on classroom network to check in");
+            }
+
             command.StudentId = User.GetUserId();
             command.VerificationType = VerificationType.Totp;
             var result = await _mediator.Send(command);
