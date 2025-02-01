@@ -8,25 +8,41 @@ using UniAttend.Infrastructure.Auth.Settings;
 
 namespace UniAttend.Infrastructure.Auth.Services
 {
+    /// <summary>
+    /// Provides functionalities for generating and validating JWT tokens.
+    /// </summary>
     public class JwtService : IJwtService
-{
-    private readonly JwtSettings _jwtSettings;
-
-    public JwtService(JwtSettings jwtSettings)
     {
-        _jwtSettings = jwtSettings ?? throw new ArgumentNullException(nameof(jwtSettings));
-        
-        if (string.IsNullOrEmpty(jwtSettings.Key))
-            throw new InvalidOperationException("JWT:Key is not configured in appsettings.json");
-        
-        if (string.IsNullOrEmpty(jwtSettings.Issuer))
-            throw new InvalidOperationException("JWT:Issuer is not configured in appsettings.json");
-        
-        if (string.IsNullOrEmpty(jwtSettings.Audience))
-            throw new InvalidOperationException("JWT:Audience is not configured in appsettings.json");
-    }
+        private readonly JwtSettings _jwtSettings;
 
-    public string GenerateToken(IEnumerable<Claim> claims)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JwtService"/> class.
+        /// </summary>
+        /// <param name="jwtSettings">The JWT configuration settings.</param>
+        /// <exception cref="ArgumentNullException">Thrown if jwtSettings is null.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if required JWT settings (Key, Issuer, Audience) are missing.
+        /// </exception>
+        public JwtService(JwtSettings jwtSettings)
+        {
+            _jwtSettings = jwtSettings ?? throw new ArgumentNullException(nameof(jwtSettings));
+
+            if (string.IsNullOrEmpty(jwtSettings.Key))
+                throw new InvalidOperationException("JWT:Key is not configured in appsettings.json");
+
+            if (string.IsNullOrEmpty(jwtSettings.Issuer))
+                throw new InvalidOperationException("JWT:Issuer is not configured in appsettings.json");
+
+            if (string.IsNullOrEmpty(jwtSettings.Audience))
+                throw new InvalidOperationException("JWT:Audience is not configured in appsettings.json");
+        }
+
+        /// <summary>
+        /// Generates a JWT token with the specified claims.
+        /// </summary>
+        /// <param name="claims">A collection of claims to include in the token.</param>
+        /// <returns>A signed JWT token string.</returns>
+        public string GenerateToken(IEnumerable<Claim> claims)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -42,6 +58,11 @@ namespace UniAttend.Infrastructure.Auth.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        /// <summary>
+        /// Validates the specified JWT token.
+        /// </summary>
+        /// <param name="token">The JWT token string to validate.</param>
+        /// <returns>A <see cref="ClaimsPrincipal"/> extracted from the validated token.</returns>
         public ClaimsPrincipal ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -61,6 +82,10 @@ namespace UniAttend.Infrastructure.Auth.Services
             return tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
         }
 
+        /// <summary>
+        /// Generates a secure random refresh token.
+        /// </summary>
+        /// <returns>A new refresh token as a base64 encoded string.</returns>
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
@@ -69,6 +94,11 @@ namespace UniAttend.Infrastructure.Auth.Services
             return Convert.ToBase64String(randomNumber);
         }
 
+        /// <summary>
+        /// Extracts the claims principal from an expired JWT token.
+        /// </summary>
+        /// <param name="token">The expired JWT token string.</param>
+        /// <returns>A <see cref="ClaimsPrincipal"/> extracted from the expired token.</returns>
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

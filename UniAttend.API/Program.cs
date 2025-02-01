@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Serilog;
 using Serilog.Events;
-using UniAttend.Infrastructure.Configuration;
 using UniAttend.API.Middleware;
 using UniAttend.Application;
 using UniAttend.Infrastructure;

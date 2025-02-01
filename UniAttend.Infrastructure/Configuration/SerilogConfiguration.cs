@@ -2,11 +2,20 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace UniAttend.Infrastructure.Configuration
 {
+    /// <summary>
+    /// Provides configuration for Serilog logging.
+    /// </summary>
     public static class SerilogConfiguration
     {
+        /// <summary>
+        /// Configures logging for the host builder using Serilog.
+        /// </summary>
+        /// <param name="builder">The IHostBuilder to configure.</param>
+        /// <returns>The configured IHostBuilder.</returns>
         public static IHostBuilder ConfigureLogging(this IHostBuilder builder)
         {
             return builder.UseSerilog((context, services, configuration) =>

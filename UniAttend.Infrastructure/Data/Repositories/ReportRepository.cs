@@ -5,6 +5,9 @@ using UniAttend.Core.Entities.Attendance;
 
 namespace UniAttend.Infrastructure.Data.Repositories
 {
+    /// <summary>
+    /// Repository for managing report related queries.
+    /// </summary>
     public class ReportRepository : IReportRepository
     {
         private readonly ApplicationDbContext _context;
@@ -14,6 +17,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        /// <summary>
+        /// Retrieves attendance records within a date range, optionally filtered by department, subject, or study group.
+        /// </summary>
         public async Task<IEnumerable<AttendanceRecord>> GetAttendanceRecordsAsync(
             DateTime startDate,
             DateTime endDate,
@@ -32,28 +38,31 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
             if (departmentId.HasValue)
             {
-                query = query.Where(ar => ar.CourseSession != null && 
-                                        ar.CourseSession.StudyGroup != null && 
-                                        ar.CourseSession.StudyGroup.Subject != null && 
-                                        ar.CourseSession.StudyGroup.Subject.DepartmentId == departmentId.Value);
+                query = query.Where(ar => ar.CourseSession != null &&
+                                           ar.CourseSession.StudyGroup != null &&
+                                           ar.CourseSession.StudyGroup.Subject != null &&
+                                           ar.CourseSession.StudyGroup.Subject.DepartmentId == departmentId.Value);
             }
 
             if (subjectId.HasValue)
             {
-                query = query.Where(ar => ar.CourseSession != null && 
-                                        ar.CourseSession.StudyGroup != null && 
-                                        ar.CourseSession.StudyGroup.SubjectId == subjectId.Value);
+                query = query.Where(ar => ar.CourseSession != null &&
+                                           ar.CourseSession.StudyGroup != null &&
+                                           ar.CourseSession.StudyGroup.SubjectId == subjectId.Value);
             }
 
             if (studyGroupId.HasValue)
             {
-                query = query.Where(ar => ar.CourseSession != null && 
-                                        ar.CourseSession.StudyGroupId == studyGroupId.Value);
+                query = query.Where(ar => ar.CourseSession != null &&
+                                           ar.CourseSession.StudyGroupId == studyGroupId.Value);
             }
 
             return await query.ToListAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Retrieves students with high absence based on the given threshold.
+        /// </summary>
         public async Task<IEnumerable<Student>> GetStudentsWithHighAbsenceAsync(
             double absenceThreshold,
             CancellationToken cancellationToken = default)
@@ -91,6 +100,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
             return studentsWithHighAbsence;
         }
 
+        /// <summary>
+        /// Calculates the attendance percentage for a student in a study group.
+        /// </summary>
         private async Task<double> CalculateStudentAttendancePercentage(
             int studentId,
             int studyGroupId,
@@ -101,7 +113,7 @@ namespace UniAttend.Infrastructure.Data.Repositories
 
             if (totalCourseSessions == 0)
             {
-                return 100; // No Course Sessions held yet
+                return 100;
             }
 
             var attendedCourseSessions = await _context.Set<AttendanceRecord>()

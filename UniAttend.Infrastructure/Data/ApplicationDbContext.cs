@@ -8,12 +8,11 @@ using UniAttend.Infrastructure.Data.Configurations;
 namespace UniAttend.Infrastructure.Data
 {
     /// <summary>
-    /// Represents the main database context for the application,
-    /// handling entity configurations and database operations.
+    /// Main database context.
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
@@ -31,11 +30,13 @@ namespace UniAttend.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            
+            // Configure User.Role as string with a maximum length.
             modelBuilder.Entity<User>()
-        .Property(e => e.Role)
-        .HasConversion<string>()
-        .HasMaxLength(50);
-        
+                .Property(e => e.Role)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
     }

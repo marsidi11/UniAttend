@@ -6,18 +6,18 @@ using UniAttend.Infrastructure.Data.Repositories.Base;
 namespace UniAttend.Infrastructure.Data.Repositories
 {
     /// <summary>
-    /// Repository implementation for managing Schedule entities in the database.
-    /// Handles academic timetabling, classroom allocation, and schedule conflict detection.
+    /// Repository implementation for managing Schedule entities.
     /// </summary>
-    /// <remarks>
-    /// This repository is part of the Infrastructure layer and implements the DDD pattern.
-    /// It manages the persistence of schedule data and provides specialized queries for
-    /// academic scheduling operations.
-    /// </remarks>
     public class ScheduleRepository : BaseRepository<Schedule>, IScheduleRepository
     {
+        /// <summary>
+        /// Initializes a new instance of the ScheduleRepository class.
+        /// </summary>
         public ScheduleRepository(ApplicationDbContext context) : base(context) { }
 
+        /// <summary>
+        /// Retrieves all schedules with related details.
+        /// </summary>
         public async Task<IEnumerable<Schedule>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default)
         {
             return await DbSet
@@ -32,12 +32,18 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Retrieves a schedule by its identifier with related details.
+        /// </summary>
         public override async Task<Schedule?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
             => await DbSet
                 .Include(s => s.StudyGroup)
                 .Include(s => s.Classroom)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
+        /// <summary>
+        /// Retrieves schedules for a specific professor.
+        /// </summary>
         public async Task<IEnumerable<Schedule>> GetByProfessorIdAsync(
             int professorId,
             CancellationToken cancellationToken = default)
@@ -55,6 +61,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Retrieves schedules for a specific study group.
+        /// </summary>
         public async Task<IEnumerable<Schedule>> GetByGroupIdAsync(int studyGroupId, CancellationToken cancellationToken = default)
         {
             return await DbSet
@@ -68,6 +77,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Retrieves schedules for a specific classroom.
+        /// </summary>
         public async Task<IEnumerable<Schedule>> GetByClassroomIdAsync(int classroomId, CancellationToken cancellationToken)
         {
             return await DbSet
@@ -81,6 +93,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Checks if there is any time conflict for a schedule in a classroom.
+        /// </summary>
         public async Task<bool> HasTimeConflictAsync(
             int classroomId,
             int dayOfWeek,
@@ -89,8 +104,8 @@ namespace UniAttend.Infrastructure.Data.Repositories
             int? excludeScheduleId = null,
             CancellationToken cancellationToken = default)
         {
-            var query = DbSet.Where(s => 
-                s.ClassroomId == classroomId && 
+            var query = DbSet.Where(s =>
+                s.ClassroomId == classroomId &&
                 s.DayOfWeek == dayOfWeek);
 
             if (excludeScheduleId.HasValue)
@@ -105,16 +120,19 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 cancellationToken);
         }
 
+        /// <summary>
+        /// Checks if there is any classroom scheduling conflict.
+        /// </summary>
         public async Task<bool> HasClassroomConflictAsync(
-            int classroomId, 
+            int classroomId,
             int dayOfWeek,
             TimeSpan startTime,
             TimeSpan endTime,
             int? excludeScheduleId = null,
             CancellationToken cancellationToken = default)
         {
-            var query = DbSet.Where(s => 
-                s.ClassroomId == classroomId && 
+            var query = DbSet.Where(s =>
+                s.ClassroomId == classroomId &&
                 s.DayOfWeek == dayOfWeek);
 
             if (excludeScheduleId.HasValue)
@@ -129,6 +147,9 @@ namespace UniAttend.Infrastructure.Data.Repositories
                 cancellationToken);
         }
 
+        /// <summary>
+        /// Checks if there is any scheduling conflict for a study group.
+        /// </summary>
         public async Task<bool> HasGroupConflictAsync(
             int studyGroupId,
             int dayOfWeek,
@@ -137,8 +158,8 @@ namespace UniAttend.Infrastructure.Data.Repositories
             int? excludeScheduleId = null,
             CancellationToken cancellationToken = default)
         {
-            var query = DbSet.Where(s => 
-                s.StudyGroupId == studyGroupId && 
+            var query = DbSet.Where(s =>
+                s.StudyGroupId == studyGroupId &&
                 s.DayOfWeek == dayOfWeek);
 
             if (excludeScheduleId.HasValue)
