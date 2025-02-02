@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" TextQuality="Regular" ReportInfo.Created="2024-01-01" ReportInfo.Modified="2024-01-01">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2024-01-01" ReportInfo.Modified="2024-01-01">
   <Dictionary>
-    <TableDataSource Name="AttendanceRecords">
+    <TableDataSource Name="AttendanceRecords" ReferenceName="AttendanceData.AttendanceRecords">
       <Column Name="Date" DataType="System.DateTime"/>
       <Column Name="StudyGroup" DataType="System.String"/>
-      <Column Name="Status" DataType="System.String"/> 
+      <Column Name="Status" DataType="System.String"/>
       <Column Name="CheckInTime" DataType="System.DateTime"/>
       <Column Name="ConfirmationTime" DataType="System.DateTime"/>
       <Column Name="SessionTime" DataType="System.String"/>
     </TableDataSource>
     <Parameter Name="StudentName" DataType="System.String"/>
-    <Parameter Name="StudentId" DataType="System.String"/> 
+    <Parameter Name="StudentId" DataType="System.String"/>
     <Parameter Name="DateRange" DataType="System.String"/>
     <Parameter Name="TotalRecords" DataType="System.Int32"/>
     <Parameter Name="TotalPresent" DataType="System.Int32"/>
@@ -19,58 +19,60 @@
   </Dictionary>
   <ReportPage Name="Page1" Watermark.Font="Arial, 60pt" Margins="20,20,20,20">
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="132.3">
-      <TextObject Name="Text1" Left="0" Top="0" Width="718.2" Height="47.25" Text="UniAttend" HorzAlign="Center" VertAlign="Center" Font="Arial, 28pt, style=Bold" TextFill.Color="Navy"/>
-      <TextObject Name="Text2" Left="0" Top="47.25" Width="718.2" Height="37.8" Text="Student Attendance Report" HorzAlign="Center" VertAlign="Center" Font="Arial, 18pt"/>
-      <TextObject Name="Text3" Left="9.45" Top="85.05" Width="699.3" Height="18.9" Text="Name: [StudentName]" Font="Arial, 12pt, style=Bold"/>
-      <TextObject Name="Text4" Left="9.45" Top="103.95" Width="699.3" Height="18.9" Text="Student ID: [StudentId]" Font="Arial, 12pt"/>
+      <TextObject Name="Text1" Left="0" Top="0" Width="718.2" Height="47.25" Text="UniAttend" 
+                 HorzAlign="Center" VertAlign="Center" Font="Arial, 28pt, style=Bold" TextFill.Color="Navy"/>
+      <TextObject Name="Text2" Left="0" Top="47.25" Width="718.2" Height="37.8" 
+                 Text="Student Attendance Report" HorzAlign="Center" VertAlign="Center" Font="Arial, 18pt"/>
+      <TextObject Name="Text3" Left="9.45" Top="85.05" Width="699.3" Height="18.9" 
+                 Text="Name: [StudentName]" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text4" Left="9.45" Top="103.95" Width="699.3" Height="18.9" 
+                 Text="Student ID: [StudentId]" Font="Arial, 12pt"/>
     </ReportTitleBand>
     <PageHeaderBand Name="PageHeader1" Top="136.3" Width="718.2" Height="103.95">
-      <TextObject Name="Text5" Left="9.45" Top="0" Width="699.3" Height="28.35" Text="Report Period: [DateRange]" Font="Arial, 11pt"/>
+      <TextObject Name="Text5" Left="9.45" Top="0" Width="699.3" Height="28.35" 
+                 Text="Report Period: [DateRange]" Font="Arial, 11pt"/>
       <TextObject Name="Text6" Left="9.45" Top="28.35" Width="699.3" Height="37.8" 
                  Text="Total Sessions: [TotalRecords]&#13;&#10;Present: [TotalPresent] | Absent: [TotalAbsent] | Attendance Rate: [AttendanceRate]%" 
                  Font="Arial, 11pt, style=Bold" TextFill.Color="Navy"/>
-      <TableObject Name="HeaderTable" Left="9.45" Top="75.6" Width="699.3" Height="28.35" Border.Lines="All">
-        <TableColumn Width="100"/>
-        <TableColumn Width="159.3"/>
-        <TableColumn Width="100"/>
-        <TableColumn Width="120"/>
-        <TableColumn Width="120"/>
-        <TableColumn Width="100"/>
-        <TableRow>
-          <TableCell Text="Date" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
-          <TableCell Text="Study Group" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
-          <TableCell Text="Status" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
-          <TableCell Text="Check-in" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
-          <TableCell Text="Confirmed" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
-          <TableCell Text="Session Time" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+      <TableObject Name="Table1" Left="9.45" Top="75.6" Width="699.3" Height="28.35" Border.Lines="All">
+        <TableColumn Name="Column1" Width="100"/>
+        <TableColumn Name="Column2" Width="159.3"/>
+        <TableColumn Name="Column3" Width="100"/>
+        <TableColumn Name="Column4" Width="120"/>
+        <TableColumn Name="Column5" Width="120"/>
+        <TableColumn Name="Column6" Width="100"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Date" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Study Group" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Status" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Check-in" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Confirmed" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Name="Cell6" Border.Lines="All" Text="Session Time" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
         </TableRow>
       </TableObject>
     </PageHeaderBand>
     <DataBand Name="Data1" Top="244.25" Width="718.2" Height="28.35" DataSource="AttendanceRecords" EvenStyle="EvenRows">
-      <TableObject Name="Table1" Left="9.45" Width="699.3" Height="28.35" Border.Lines="All">
-        <TableColumn Width="100"/>
-        <TableColumn Width="159.3"/>
-        <TableColumn Width="100"/>
-        <TableColumn Width="120"/>
-        <TableColumn Width="120"/>
-        <TableColumn Width="100"/>
-        <TableRow>
-          <TableCell Text="[AttendanceRecords.Date]" Format="Date" Format.Format="dd/MM/yyyy" Font="Arial, 10pt"/>
-          <TableCell Text="[AttendanceRecords.StudyGroup]" Font="Arial, 10pt"/>
-          <TableCell Text="[AttendanceRecords.Status]" Font="Arial, 10pt"/>
-          <TableCell Text="[AttendanceRecords.CheckInTime]" Format="Time" Format.Format="HH:mm" Font="Arial, 10pt"/>
-          <TableCell Text="[AttendanceRecords.ConfirmationTime]" Format="Time" Format.Format="HH:mm" Font="Arial, 10pt"/>
-          <TableCell Text="[AttendanceRecords.SessionTime]" Font="Arial, 10pt"/>
+      <TableObject Name="Table2" Left="9.45" Width="699.3" Height="28.35" Border.Lines="All">
+        <TableColumn Name="Column7" Width="100"/>
+        <TableColumn Name="Column8" Width="159.3"/>
+        <TableColumn Name="Column9" Width="100"/>
+        <TableColumn Name="Column10" Width="120"/>
+        <TableColumn Name="Column11" Width="120"/>
+        <TableColumn Name="Column12" Width="100"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell7" Border.Lines="All" Text="[AttendanceRecords.Date]" Format="Date" Format.Format="dd/MM/yyyy" Font="Arial, 10pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[AttendanceRecords.StudyGroup]" Font="Arial, 10pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[AttendanceRecords.Status]" Font="Arial, 10pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="[AttendanceRecords.CheckInTime]" Format="Time" Format.Format="HH:mm" Font="Arial, 10pt"/>
+          <TableCell Name="Cell11" Border.Lines="All" Text="[AttendanceRecords.ConfirmationTime]" Format="Time" Format.Format="HH:mm" Font="Arial, 10pt"/>
+          <TableCell Name="Cell12" Border.Lines="All" Text="[AttendanceRecords.SessionTime]" Font="Arial, 10pt"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataFooter1" Top="276.6" Width="718.2" Height="47.25">
-        <TextObject Name="Text7" Left="9.45" Top="9.45" Width="699.3" Height="28.35" 
-                   Text="Total Records: [TotalRecords]&#13;&#10;Generated on: [Date]" Font="Arial, 10pt"/>
-      </DataFooterBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="327.85" Width="718.2" Height="28.35">
-      <TextObject Name="Text8" Left="9.45" Width="699.3" Height="18.9" 
-                 Text="Page [Page] of [TotalPages]" HorzAlign="Right" Font="Arial, 10pt"/>
+    <PageFooterBand Name="PageFooter1" Top="276.6" Width="718.2" Height="37.8">
+      <TextObject Name="Text7" Left="9.45" Width="699.3" Height="28.35" 
+                 Text="Page [Page] of [TotalPages]&#13;&#10;Generated: [Format(&quot;{0:dd/MM/yyyy HH:mm}&quot;, DateTime.Now)]" 
+                 HorzAlign="Right" Font="Arial, 10pt, style=Italic"/>
     </PageFooterBand>
   </ReportPage>
 </Report>

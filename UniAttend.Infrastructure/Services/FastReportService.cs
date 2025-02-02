@@ -6,6 +6,7 @@ using System.Data;
 using UniAttend.Shared.Exceptions;
 using Microsoft.Extensions.Logging;
 using UniAttend.Core.Entities.Attendance;
+using FastReport;
 
 namespace UniAttend.Infrastructure.Services
 {
@@ -52,95 +53,118 @@ namespace UniAttend.Infrastructure.Services
         /// </summary>
         public async Task<byte[]> GenerateStudentReportAsync(int studentId, DateTime? startDate, DateTime? endDate)
         {
-            // Load template
-            var templatePath = Path.Combine(_reportsPath, "StudentReport.frx");
-            if (!File.Exists(templatePath))
+            try
             {
-                throw new FileNotFoundException($"Report template not found at {templatePath}");
-            }
-
-            // Get student data
-            var student = await _studentRepository.GetByIdAsync(studentId, CancellationToken.None);
-            if (student?.User == null)
-            {
-                throw new NotFoundException($"Student or user details not found for ID {studentId}");
-            }
-
-            // Get attendance records
-            var attendance = await _attendanceRepository.GetDetailedStudentAttendanceAsync(
-        studentId, startDate, endDate, CancellationToken.None);
-
-            // Create and populate data table
-            var dataTable = new DataTable();
-            dataTable.Columns.Add("Date", typeof(DateTime));
-            dataTable.Columns.Add("StudyGroup", typeof(string));
-            dataTable.Columns.Add("Status", typeof(string));
-            dataTable.Columns.Add("CheckInTime", typeof(DateTime));
-            dataTable.Columns.Add("ConfirmationTime", typeof(DateTime));
-            dataTable.Columns.Add("SessionTime", typeof(string));
-
-            int totalPresent = 0;
-            int totalAbsent = 0;
-
-            // Add all records
-            foreach (var record in attendance.Where(r => r?.CourseSession != null)
-                                           .OrderByDescending(r => r.CourseSession.Date))
-            {
-                var status = record.IsConfirmed ? (record.IsAbsent ? "Absent" : "Present") : "Pending";
-                if (record.IsConfirmed)
+                // 1. Template and Data Setup
+                var templatePath = Path.Combine(_reportsPath, "StudentReport.frx");
+                if (!File.Exists(templatePath))
                 {
-                    if (record.IsAbsent)
-                        totalAbsent++;
-                    else
-                        totalPresent++;
+                    throw new FileNotFoundException($"Report template not found at {templatePath}");
                 }
 
-                dataTable.Rows.Add(
-                    record.CourseSession.Date,
-                    record.CourseSession.StudyGroup?.Name ?? "Unknown Group",
-                    status,
-                    record.CheckInTime,
-                    record.ConfirmationTime,
-                    $"{record.CourseSession.StartTime.ToString(@"hh\:mm")}-{record.CourseSession.EndTime.ToString(@"hh\:mm")}"
-                );
+                var student = await _studentRepository.GetByIdAsync(studentId, CancellationToken.None)
+                    ?? throw new NotFoundException($"Student {studentId} not found");
+
+                var attendance = await _attendanceRepository.GetDetailedStudentAttendanceAsync(
+                    studentId, startDate, endDate, CancellationToken.None);
+
+                // 2. Initialize Report
+                using var report = new FastReport.Report();
+                report.Load(templatePath);
+
+                // 3. Prepare Data Structure
+                var ds = new DataSet("AttendanceData");
+                var dataTable = new DataTable("AttendanceRecords");
+
+                dataTable.Columns.AddRange(new[] {
+                    new DataColumn("Date", typeof(DateTime)),
+                    new DataColumn("StudyGroup", typeof(string)),
+                    new DataColumn("Status", typeof(string)),
+                    new DataColumn("CheckInTime", typeof(DateTime)),
+                    new DataColumn("ConfirmationTime", typeof(DateTime)),
+                    new DataColumn("SessionTime", typeof(string))
+                });
+
+                // 4. Process Records
+                int totalPresent = 0, totalAbsent = 0;
+
+                foreach (var record in attendance.Where(r => r?.CourseSession != null)
+                                              .OrderByDescending(r => r.CourseSession.Date))
+                {
+                    string status = record.IsConfirmed
+                        ? (record.IsAbsent ? "Absent" : "Present")
+                        : "Pending";
+
+                    if (record.IsConfirmed)
+                    {
+                        if (record.IsAbsent) totalAbsent++;
+                        else totalPresent++;
+                    }
+
+                    dataTable.Rows.Add(
+                        record.CourseSession.Date,
+                        record.CourseSession.StudyGroup?.Name ?? "Unknown Group",
+                        status,
+                        record.CheckInTime,
+                        record.ConfirmationTime,
+                        $"{record.CourseSession.StartTime:hh\\:mm}-{record.CourseSession.EndTime:hh\\:mm}"
+                    );
+                }
+
+                // 5. Register Data
+                ds.Tables.Add(dataTable);
+                report.Dictionary.Clear();
+                report.RegisterData(ds);
+
+                // 6. Configure Data Source
+                var dataBand = report.FindObject("Data1") as DataBand;
+                if (dataBand != null)
+                {
+                    dataBand.DataSource = report.GetDataSource("AttendanceRecords");
+                    dataBand.Sort.Clear();
+                    dataBand.Sort.Add(new Sort("Date", false));
+                }
+
+                // 7. Set Parameters
+                var parameters = new Dictionary<string, object>
+                {
+                    { "StudentName", $"{student.User?.FirstName} {student.User?.LastName}".Trim() },
+                    { "StudentId", student.StudentId ?? "N/A" },
+                    { "DateRange", startDate.HasValue && endDate.HasValue
+                        ? $"{startDate.Value:d} - {endDate.Value:d}"
+                        : "All Time" },
+                    { "TotalRecords", dataTable.Rows.Count },
+                    { "TotalPresent", totalPresent },
+                    { "TotalAbsent", totalAbsent },
+                    { "AttendanceRate", totalPresent + totalAbsent == 0 ? 0m :
+                        Math.Round((decimal)totalPresent / (totalPresent + totalAbsent) * 100, 2) }
+                };
+
+                foreach (var param in parameters)
+                {
+                    report.SetParameterValue(param.Key, param.Value);
+                }
+
+                // 8. Generate PDF
+                report.Prepare(true);
+
+                using var ms = new MemoryStream();
+                var pdfExport = new PDFSimpleExport
+                {
+                    ShowProgress = false,
+                    Subject = $"Attendance Report - {student.User?.FirstName} {student.User?.LastName}",
+                    JpegQuality = 100
+                };
+
+                pdfExport.Export(report, ms);
+                return ms.ToArray();
             }
-
-            // Setup report
-            using var report = new FastReport.Report();
-            report.Load(templatePath);
-            report.Dictionary.Clear();
-
-            // Register data correctly
-            report.RegisterData(dataTable, "AttendanceRecords");
-            report.GetDataSource("AttendanceRecords").Enabled = true;
-
-            // Set parameters
-            report.SetParameterValue("StudentName", $"{student.User.FirstName} {student.User.LastName}".Trim());
-            report.SetParameterValue("StudentId", student.StudentId ?? "N/A");
-            report.SetParameterValue("DateRange", startDate.HasValue && endDate.HasValue
-                ? $"{startDate.Value:d} - {endDate.Value:d}"
-                : "All Dates");
-            report.SetParameterValue("TotalRecords", dataTable.Rows.Count);
-            report.SetParameterValue("TotalPresent", totalPresent);
-            report.SetParameterValue("TotalAbsent", totalAbsent);
-            report.SetParameterValue("AttendanceRate",
-                totalPresent + totalAbsent == 0 ? 0 :
-                Math.Round((decimal)totalPresent / (totalPresent + totalAbsent) * 100, 2));
-
-            // Prepare report
-            report.Prepare();
-
-            // Export with optimized settings
-            using var ms = new MemoryStream();
-            var pdfExport = new PDFSimpleExport
+            catch (Exception ex)
             {
-                ShowProgress = false,
-                Subject = $"Attendance Report - {student.User.FirstName} {student.User.LastName}",
-                JpegQuality = 100
-            };
-
-            pdfExport.Export(report, ms);
-            return ms.ToArray();
+                _logger.LogError(ex, "Failed to generate student report for ID {StudentId}: {Error}",
+                    studentId, ex.Message);
+                throw;
+            }
         }
 
         /// <summary>
