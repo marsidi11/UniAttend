@@ -1,0 +1,41 @@
+2025-02-02 23:29:09.395 +01:00 [INF] Starting web application
+2025-02-02 23:29:47.645 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 23:29:48.705 +01:00 [ERR] Failed to generate student report
+System.InvalidOperationException: Report template is missing required elements (DataBand 'Data1' or DataSource)
+   at UniAttend.Infrastructure.Services.FastReportService.GenerateStudentReportAsync(Int32 studentId, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Services\FastReportService.cs:line 124
+2025-02-02 23:29:48.748 +01:00 [ERR] An unhandled exception occurred
+System.InvalidOperationException: Report template is missing required elements (DataBand 'Data1' or DataSource)
+   at UniAttend.Infrastructure.Services.FastReportService.GenerateStudentReportAsync(Int32 studentId, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Services\FastReportService.cs:line 124
+   at UniAttend.API.Controllers.ReportsController.ExportStudentReport(Int32 id, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 166
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
+2025-02-02 23:31:07.671 +01:00 [INF] Starting web application
+2025-02-02 23:31:10.945 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 23:31:11.844 +01:00 [INF] Raw attendance count: 3
+2025-02-02 23:31:11.847 +01:00 [INF] Filtered attendance count: 3
+2025-02-02 23:31:11.847 +01:00 [INF] DataTable rows count: 3
+2025-02-02 23:31:11.854 +01:00 [ERR] Failed to generate student report for ID 7: Object reference not set to an instance of an object.
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at UniAttend.Infrastructure.Services.FastReportService.GenerateStudentReportAsync(Int32 studentId, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Services\FastReportService.cs:line 123
+2025-02-02 23:31:11.901 +01:00 [ERR] An unhandled exception occurred
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at UniAttend.Infrastructure.Services.FastReportService.GenerateStudentReportAsync(Int32 studentId, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Services\FastReportService.cs:line 123
+   at UniAttend.API.Controllers.ReportsController.ExportStudentReport(Int32 id, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 166
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28

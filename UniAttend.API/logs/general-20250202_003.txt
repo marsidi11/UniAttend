@@ -1,0 +1,6 @@
+2025-02-02 23:14:07.287 +01:00 [INF] Starting web application
+2025-02-02 23:14:12.082 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 23:14:17.067 +01:00 [INF] DataBand configuration - Source: FastReport.Data.VirtualDataSource, RowCount: 1
+2025-02-02 23:15:14.950 +01:00 [INF] Starting web application
+2025-02-02 23:15:16.895 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 23:15:20.060 +01:00 [INF] DataBand configuration - Source: FastReport.Data.VirtualDataSource, RowCount: 1

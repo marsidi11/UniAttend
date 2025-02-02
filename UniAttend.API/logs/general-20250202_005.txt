@@ -1,0 +1,13 @@
+2025-02-02 23:18:30.756 +01:00 [INF] Starting web application
+2025-02-02 23:18:33.264 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 23:18:34.355 +01:00 [INF] Raw attendance count: 3
+2025-02-02 23:18:34.359 +01:00 [INF] Filtered attendance count: 3
+2025-02-02 23:18:34.359 +01:00 [INF] DataTable rows count: 3
+2025-02-02 23:18:36.697 +01:00 [INF] DataBand configuration - Source: FastReport.Data.VirtualDataSource, RowCount: 1
+2025-02-02 23:20:07.673 +01:00 [INF] Starting web application
+2025-02-02 23:20:09.609 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 23:20:10.871 +01:00 [INF] Raw attendance count: 3
+2025-02-02 23:20:10.875 +01:00 [INF] Filtered attendance count: 3
+2025-02-02 23:20:10.875 +01:00 [INF] DataTable rows count: 3
+2025-02-02 23:20:10.882 +01:00 [INF] DataSource rows: 0
+2025-02-02 23:20:13.241 +01:00 [INF] DataBand configuration - Source: FastReport.Data.TableDataSource, RowCount: 1

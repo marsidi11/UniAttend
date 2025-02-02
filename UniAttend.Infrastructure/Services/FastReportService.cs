@@ -111,19 +111,37 @@ namespace UniAttend.Infrastructure.Services
                     );
                 }
 
+                _logger.LogInformation("Raw attendance count: {Count}", attendance.Count());
+                _logger.LogInformation("Filtered attendance count: {Count}",
+                    attendance.Where(r => r?.CourseSession != null).Count());
+                _logger.LogInformation("DataTable rows count: {Count}", dataTable.Rows.Count);
+
                 // 5. Register Data
                 ds.Tables.Add(dataTable);
                 report.Dictionary.Clear();
-                report.RegisterData(ds);
+                report.RegisterData(dataTable, "AttendanceRecords"); // Register table directly
+                report.GetDataSource("AttendanceRecords").Enabled = true;
+
+                // Add this debug log
+                _logger.LogInformation("Initial data source rows: {Count}",
+                    report.GetDataSource("AttendanceRecords").RowCount);
 
                 // 6. Configure Data Source
                 var dataBand = report.FindObject("Data1") as DataBand;
                 if (dataBand != null)
                 {
                     dataBand.DataSource = report.GetDataSource("AttendanceRecords");
-                    dataBand.Sort.Clear();
-                    dataBand.Sort.Add(new Sort("Date", false));
+                    // Remove sorting temporarily for testing
+                    // dataBand.Sort.Clear();
+                    // dataBand.Sort.Add(new Sort("Date", false));
                 }
+
+                // Add another debug log
+                _logger.LogInformation("After binding rows: {Count}",
+                    dataBand?.DataSource?.RowCount ?? 0);
+
+                _logger.LogInformation("DataSource rows: {Count}",
+    report.GetDataSource("AttendanceRecords").RowCount);
 
                 // 7. Set Parameters
                 var parameters = new Dictionary<string, object>
@@ -147,6 +165,12 @@ namespace UniAttend.Infrastructure.Services
 
                 // 8. Generate PDF
                 report.Prepare(true);
+
+                _logger.LogInformation(
+    "DataBand configuration - Source: {DataSource}, RowCount: {RowCount}",
+    dataBand.DataSource,
+    report.Pages[0].AllObjects.OfType<DataBand>().First().RowCount
+);
 
                 using var ms = new MemoryStream();
                 var pdfExport = new PDFSimpleExport
