@@ -46,11 +46,28 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
           credentials: 'include' as RequestCredentials
         };
 
+        // Add specific headers for PDF requests
+        if (input.toString().includes('/export/')) {
+          requestInit.headers = {
+            ...requestInit.headers,
+            'Accept': 'application/pdf',
+            'Content-Type': 'application/json'
+          };
+        }
+
         const response = await fetch(input, requestInit);
 
-        // Handle specific status codes
-        switch (response.status) {
+        // Handle binary responses (PDFs)
+        const contentType = response.headers.get('content-type');
+        if (contentType?.includes('application/pdf')) {
+          if (response.ok) {
+            return response; // Return the raw response for PDF downloads
+          }
+          throw new ApiError('Failed to download PDF', response.status);
+        }
 
+        // Handle specific status codes for JSON responses
+        switch (response.status) {
           case 400: {
             const errorData: ApiErrorResponse = await response.json();
             throw new ApiError(
@@ -77,8 +94,10 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
               throw new ApiError('Authentication required', 401);
             }
           }
+
           case 403:
             throw new ApiError('Access forbidden', 403);
+
           case 404: {
             const errorData = await response.json().catch(() => ({}));
             throw new ApiError(
@@ -87,6 +106,7 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
               errorData
             );
           }
+
           case 422: {
             const validationData = await response.json();
             throw new ApiError(
@@ -95,10 +115,11 @@ export function createApiConfig<SecurityDataType>(): ApiConfig<SecurityDataType>
               validationData
             );
           }
+
           case 500: {
             const serverError = await response.json();
             throw new ApiError(
-              serverError.message || 'Internal server error', // Use server message directly
+              serverError.message || 'Internal server error',
               500,
               serverError
             );

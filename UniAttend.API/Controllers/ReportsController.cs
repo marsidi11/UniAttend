@@ -26,9 +26,10 @@ namespace UniAttend.API.Controllers
         /// <summary>
         /// Initializes a new instance of the ReportsController
         /// </summary>
-        public ReportsController(IMediator mediator)
+        public ReportsController(IMediator mediator, IReportService reportService)
         {
             _mediator = mediator;
+            _reportService = reportService;
         }
 
         /// <summary>
@@ -200,24 +201,6 @@ namespace UniAttend.API.Controllers
                 fileContent,
                 "application/pdf",
                 $"department-report-{id}-{DateTime.Now:yyyyMMdd}.pdf");
-        }
-
-        /// <summary>
-        /// Exports an academic year's attendance report as a PDF
-        /// </summary>
-        [HttpGet("export/attendance/{studyGroupId}")]
-        [Authorize(Roles = "Admin,Secretary,Professor")]
-        public async Task<IActionResult> ExportAttendanceReport(
-            int studyGroupId,
-            [FromQuery] DateTime startDate,
-            [FromQuery] DateTime endDate)
-        {
-            var fileContent = await _reportService.GenerateAttendanceReportAsync(
-                studyGroupId, startDate, endDate);
-            return File(
-                fileContent,
-                "application/pdf",
-                $"attendance-report-{studyGroupId}-{DateTime.Now:yyyyMMdd}.pdf");
         }
     }
 }

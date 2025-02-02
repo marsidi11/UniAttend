@@ -1,12 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp">
+<Report ScriptLanguage="CSharp" TextQuality="Regular" ReportInfo.Created="2024-01-01" ReportInfo.Modified="2024-01-01">
   <Dictionary>
     <TableDataSource Name="DepartmentStats">
-      <Column Name="GroupName" DataType="System.String"/>
       <Column Name="TotalStudents" DataType="System.Int32"/>
       <Column Name="AttendanceRate" DataType="System.Decimal"/>
       <Column Name="PresentCount" DataType="System.Int32"/>
       <Column Name="AbsentCount" DataType="System.Int32"/>
+      <Column Name="PendingCount" DataType="System.Int32"/>
     </TableDataSource>
+    <Parameter Name="DepartmentName" DataType="System.String"/>
+    <Parameter Name="AcademicYear" DataType="System.String"/>
+    <Parameter Name="AverageAttendance" DataType="System.Decimal"/>
+    <Parameter Name="TotalSessions" DataType="System.Int32"/>
   </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt" Margins="20,20,20,20">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="132.3">
+      <TextObject Name="Text1" Left="0" Top="0" Width="718.2" Height="47.25" Text="UniAttend" HorzAlign="Center" VertAlign="Center" Font="Arial, 28pt, style=Bold" TextFill.Color="Navy"/>
+      <TextObject Name="Text2" Left="0" Top="47.25" Width="718.2" Height="37.8" Text="Department Attendance Report" HorzAlign="Center" VertAlign="Center" Font="Arial, 18pt"/>
+      <TextObject Name="Text3" Left="9.45" Top="85.05" Width="699.3" Height="18.9" Text="Department: [DepartmentName]" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text4" Left="9.45" Top="103.95" Width="699.3" Height="18.9" Text="[AcademicYear]" Font="Arial, 12pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="136.3" Width="718.2" Height="103.95">
+      <TextObject Name="Text5" Left="9.45" Top="0" Width="699.3" Height="28.35" Text="Average Attendance Rate: [AverageAttendance]%" Font="Arial, 11pt"/>
+      <TextObject Name="Text6" Left="9.45" Top="28.35" Width="699.3" Height="37.8" 
+                 Text="Total Students: [DepartmentStats.TotalStudents]&#13;&#10;Total Sessions: [TotalSessions]" 
+                 Font="Arial, 11pt, style=Bold" TextFill.Color="Navy"/>
+      <TableObject Name="HeaderTable" Left="9.45" Top="75.6" Width="699.3" Height="28.35" Border.Lines="All">
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableRow>
+          <TableCell Text="Total Students" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Text="Present Count" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Text="Absent Count" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Text="Pending Count" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+          <TableCell Text="Attendance Rate" Font="Arial, 10pt, style=Bold" BackColor="WhiteSmoke"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="244.25" Width="718.2" Height="28.35" DataSource="DepartmentStats" EvenStyle="EvenRows">
+      <TableObject Name="Table1" Left="9.45" Width="699.3" Height="28.35" Border.Lines="All">
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableColumn Width="139.86"/>
+        <TableRow>
+          <TableCell Text="[DepartmentStats.TotalStudents]" Font="Arial, 10pt"/>
+          <TableCell Text="[DepartmentStats.PresentCount]" Font="Arial, 10pt"/>
+          <TableCell Text="[DepartmentStats.AbsentCount]" Font="Arial, 10pt"/>
+          <TableCell Text="[DepartmentStats.PendingCount]" Font="Arial, 10pt"/>
+          <TableCell Text="[DepartmentStats.AttendanceRate]%" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="276.6" Width="718.2" Height="28.35">
+      <TextObject Name="Text8" Left="9.45" Width="699.3" Height="18.9" 
+                 Text="Generated on: [Date]&#13;&#10;Page [Page] of [TotalPages]" HorzAlign="Right" Font="Arial, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
 </Report>

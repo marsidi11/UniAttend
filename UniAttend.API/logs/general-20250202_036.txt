@@ -1,0 +1,18 @@
+2025-02-02 17:07:38.939 +01:00 [INF] Starting web application
+2025-02-02 17:07:54.203 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 17:10:05.854 +01:00 [INF] Starting web application
+2025-02-02 17:10:07.936 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 17:10:08.161 +01:00 [INF] Starting group report generation for GroupID: 2
+2025-02-02 17:10:08.165 +01:00 [INF] Template path: C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Reports\GroupReport.frx
+2025-02-02 17:10:08.548 +01:00 [INF] Retrieved group: 103 Math 2 with 2 students
+2025-02-02 17:10:08.575 +01:00 [INF] Retrieved 0 attendance records
+2025-02-02 17:10:08.575 +01:00 [INF] Filtered to 0 records within date range
+2025-02-02 17:10:08.579 +01:00 [INF] Statistics calculated: Sessions=0, Present=0, Absent=0
+2025-02-02 17:10:08.579 +01:00 [INF] Added 0 rows to data table
+2025-02-02 17:10:08.634 +01:00 [INF] Loading report template
+2025-02-02 17:10:08.648 +01:00 [INF] Registering data source
+2025-02-02 17:10:08.652 +01:00 [INF] Setting report parameters
+2025-02-02 17:10:08.654 +01:00 [INF] Preparing report
+2025-02-02 17:10:08.683 +01:00 [INF] Report prepared successfully
+2025-02-02 17:10:08.684 +01:00 [INF] Exporting report to PDF
+2025-02-02 17:10:08.686 +01:00 [INF] Successfully generated PDF report of 0 bytes

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { 
+import type {
   StudentReportDto,
   GroupReportDto,
   DepartmentReportDto,
@@ -127,13 +127,16 @@ export const useReportStore = defineStore('report', () => {
   }
 
   // Export Functions
-  async function exportStudentReport(id: number, startDate?: Date, endDate?: Date) {
+
+  async function exportStudentReport(id: number, startDate?: string, endDate?: string) {
+    if (isLoading.value) return;
     isLoading.value = true;
     try {
-      await reportApi.reportsExportStudentsDetail(id, {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString()
+      const response = await reportApi.reportsExportStudentsDetail(id, {
+        startDate,
+        endDate
       });
+      await downloadFile(response, `student-report-${id}-${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (err) {
       handleError(err, error);
       throw err;
@@ -143,12 +146,14 @@ export const useReportStore = defineStore('report', () => {
   }
 
   async function exportGroupReport(id: number, startDate?: Date, endDate?: Date) {
+    if (isLoading.value) return;
     isLoading.value = true;
     try {
-      await reportApi.reportsExportGroupsDetail(id, {
+      const response = await reportApi.reportsExportGroupsDetail(id, {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString()
       });
+      await downloadFile(response, `group-report-${id}-${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (err) {
       handleError(err, error);
       throw err;
@@ -158,9 +163,11 @@ export const useReportStore = defineStore('report', () => {
   }
 
   async function exportDepartmentReport(id: number, academicYearId?: number) {
+    if (isLoading.value) return;
     isLoading.value = true;
     try {
-      await reportApi.reportsExportDepartmentsDetail(id, { academicYearId });
+      const response = await reportApi.reportsExportDepartmentsDetail(id, { academicYearId });
+      await downloadFile(response, `department-report-${id}-${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (err) {
       handleError(err, error);
       throw err;
@@ -169,19 +176,15 @@ export const useReportStore = defineStore('report', () => {
     }
   }
 
-  async function exportAttendanceReport(studyGroupId: number, startDate?: Date, endDate?: Date) {
-    isLoading.value = true;
-    try {
-      await reportApi.reportsExportAttendanceDetail(studyGroupId, {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString()
-      });
-    } catch (err) {
-      handleError(err, error);
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
+  // Download file helper
+  async function downloadFile(response: Response, filename: string) {
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 
   return {
@@ -205,7 +208,6 @@ export const useReportStore = defineStore('report', () => {
     // Export Actions
     exportStudentReport,
     exportGroupReport,
-    exportDepartmentReport,
-    exportAttendanceReport
+    exportDepartmentReport
   };
 });

@@ -85,6 +85,7 @@ import { useReportStore } from '@/stores/report.store'
 import { useCourseSessionStore } from '@/stores/courseSession.store'
 import { useScheduleStore } from '@/stores/schedule.store'
 import { useAuthStore } from '@/stores/auth.store'
+import { useGroupStore } from '@/stores/studyGroup.store'
 import type {
   CourseSessionDto,
   AttendanceRecordDto,
@@ -123,6 +124,7 @@ const reportStore = useReportStore()
 const courseSessionStore = useCourseSessionStore()
 const scheduleStore = useScheduleStore()
 const authStore = useAuthStore()
+const groupStore = useGroupStore()
 
 const isLoading = ref(false)
 const isLoadingRecords = ref(false)
@@ -132,14 +134,41 @@ const stats = ref<DashboardStats>({
   averageAttendance: 0
 })
 
-const attendanceActions = [
-  {
-    label: 'Mark Absent',
-    icon: 'person_off',
-    show: (record: AttendanceRecordDto) => !record.isConfirmed && !record.isAbsent,
-    action: (record: AttendanceRecordDto) => markStudentAbsent(record)
+const attendanceActions: Array<{
+  label: string
+  icon?: string
+  show?: (record: AttendanceRecordDto) => boolean
+  action: (record: AttendanceRecordDto) => void | Promise<void>
+}> = [
+    {
+      label: 'Mark Absent',
+      icon: 'person_off',
+      show: (record: AttendanceRecordDto): boolean => {
+        const sessionStudents = enrolledStudents.value.get(record.courseSessionId || 0)
+        return !record.isConfirmed &&
+          !record.isAbsent &&
+          Boolean(sessionStudents?.includes(record.studentId?.toString() || ''))
+      },
+      action: async (record: AttendanceRecordDto) => {
+        if (!record.courseSessionId || !record.studentId) return
+        try {
+          await attendanceStore.markAbsent(record.courseSessionId, record.studentId)
+          await loadSessionAttendance(record.courseSessionId)
+        } catch (err) {
+          console.error('Failed to mark student as absent:', err)
+        }
+      }
+    }
+  ]
+
+async function loadEnrolledStudents(studyGroupId: number) {
+  try {
+    const students = await groupStore.fetchGroupStudents(studyGroupId)
+    enrolledStudents.value.set(studyGroupId, students.map(s => s.studentId?.toString() || ''))
+  } catch (err) {
+    console.error('Failed to load enrolled students:', err)
   }
-]
+}
 
 const recentRecords = ref<AttendanceRecordDto[]>([])
 const todayScheduledSessions = ref<ExtendedCourseSession[]>([])
@@ -149,6 +178,7 @@ const startingSessionId = ref<number | null>(null)
 const activeSessionId = ref<number | null>(null)
 const pollInterval = ref<number | null>(null)
 const activeSessionsMap = ref(new Map<number, boolean>())
+const enrolledStudents = ref<Map<number, string[]>>(new Map())
 
 // Utility functions
 function formatTimeString(time: TimeSpan | undefined): string {
@@ -172,17 +202,6 @@ function getSessionStatusText(session: ExtendedCourseSession): string {
       return 'Scheduled';
     default:
       return 'Unknown';
-  }
-}
-
-async function markStudentAbsent(record: AttendanceRecordDto) {
-  if (!record.courseSessionId || !record.studentId) return;
-
-  try {
-    await attendanceStore.markAbsent(record.courseSessionId, record.studentId);
-    await loadSessionAttendance(record.courseSessionId);
-  } catch (err) {
-    console.error('Failed to mark student as absent:', err);
   }
 }
 
@@ -255,6 +274,7 @@ async function startSession(session: ExtendedCourseSession) {
     )
 
     if (sessionIndex !== -1) {
+      await loadEnrolledStudents(session.studyGroupId!)
       const updatedSession: ExtendedCourseSession = {
         ...todayScheduledSessions.value[sessionIndex],
         id: newSession.id,

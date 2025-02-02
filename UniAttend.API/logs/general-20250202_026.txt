@@ -1,21 +1,20 @@
-2025-02-01 23:29:30.286 +01:00 [INF] Starting web application
-2025-02-01 23:29:35.707 +01:00 [WRN] Failed to determine the https port for redirect.
-2025-02-01 23:35:00.175 +01:00 [INF] Starting web application
-2025-02-01 23:35:04.587 +01:00 [WRN] Failed to determine the https port for redirect.
-2025-02-01 23:35:04.918 +01:00 [ERR] An unhandled exception occurred
-System.ArgumentNullException: Value cannot be null. (Parameter 'logger')
-   at System.ThrowHelper.Throw(String paramName)
-   at Microsoft.Extensions.Logging.LoggerExtensions.Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception exception, String message, Object[] args)
-   at Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(ILogger logger, String message, Object[] args)
-   at UniAttend.API.Controllers.AttendanceController.RecordOtpAttendance(RecordOtpAttendanceCommand command) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\AttendanceController.cs:line 62
+2025-02-02 15:30:40.479 +01:00 [INF] Starting web application
+2025-02-02 15:32:14.736 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 15:32:15.226 +01:00 [ERR] An unhandled exception occurred
+System.FormatException: Input string was not in a correct format.
+   at System.Globalization.TimeSpanFormat.FormatCustomized[TChar](TimeSpan value, ReadOnlySpan`1 format, DateTimeFormatInfo dtfi, ValueListBuilder`1& result)
+   at System.Globalization.TimeSpanFormat.Format(TimeSpan value, String format, IFormatProvider formatProvider)
+   at UniAttend.Infrastructure.Services.FastReportService.GenerateStudentReportAsync(Int32 studentId, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Services\FastReportService.cs:line 91
+   at UniAttend.API.Controllers.ReportsController.ExportStudentReport(Int32 id, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 166
    at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
---- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
    at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
+2025-02-02 15:34:46.595 +01:00 [INF] Starting web application
+2025-02-02 15:35:05.419 +01:00 [WRN] Failed to determine the https port for redirect.

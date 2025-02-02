@@ -143,6 +143,13 @@ builder.Services.AddScoped<AdminSetupService>();
 // Build app
 var app = builder.Build();
 
+// Ensure Reports directory exists
+var reportsPath = Path.Combine(app.Environment.ContentRootPath, "Reports");
+if (!Directory.Exists(reportsPath))
+{
+    Directory.CreateDirectory(reportsPath);
+}
+
 // Configure pipeline
 if (app.Environment.IsDevelopment())
 {

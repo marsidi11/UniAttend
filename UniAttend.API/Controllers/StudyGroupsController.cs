@@ -26,28 +26,37 @@ namespace UniAttend.API.Controllers
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Get all study groups.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<IEnumerable<StudyGroupDto>>> GetAll(
-    [FromQuery] int? academicYearId,
-    CancellationToken cancellationToken)
+            [FromQuery] int? academicYearId,
+            CancellationToken cancellationToken)
         {
             var query = new GetStudyGroupsQuery { AcademicYearId = academicYearId };
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get a study group by ID.
+        /// </summary>
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<StudyGroupDto>> GetById(
-    int id,
-    CancellationToken cancellationToken)
+            int id,
+            CancellationToken cancellationToken)
         {
             var query = new GetStudyGroupByIdQuery { Id = id };
             var result = await _mediator.Send(query, cancellationToken);
             return result != null ? Ok(result) : NotFound();
         }
 
+        /// <summary>
+        /// Get study groups for a specific professor.
+        /// </summary>
         [HttpGet("professor/{professorId}")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<ActionResult<IEnumerable<StudyGroupDto>>> GetProfessorStudyGroups(
@@ -64,6 +73,9 @@ namespace UniAttend.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get students in a study group.
+        /// </summary>
         [HttpGet("{id}/students")]
         public async Task<ActionResult<IEnumerable<GroupStudentDto>>> GetStudents(
             int id,
@@ -74,6 +86,9 @@ namespace UniAttend.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Create a new study group.
+        /// </summary>
         [HttpPost]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<ActionResult<StudyGroupDto>> Create(
@@ -84,6 +99,9 @@ namespace UniAttend.API.Controllers
             return CreatedAtAction(nameof(GetStudents), new { id = result.Id }, result);
         }
 
+        /// <summary>
+        /// Update an existing study group.
+        /// </summary>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<IActionResult> Update(
@@ -98,6 +116,9 @@ namespace UniAttend.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Enroll students in a study group.
+        /// </summary>
         [HttpPost("{id}/students/enroll")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<IActionResult> EnrollStudents(
@@ -112,6 +133,9 @@ namespace UniAttend.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Remove a student from a study group.
+        /// </summary>
         [HttpDelete("{studyGroupId}/students/{studentId}")]
         [Authorize(Roles = "Admin,Secretary")]
         public async Task<IActionResult> RemoveStudent(
@@ -128,6 +152,9 @@ namespace UniAttend.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Transfer a student to another study group.
+        /// </summary>
         [HttpPost("transfer-student")]
         [Authorize(Roles = "Admin,Secretary,Professor")]
         public async Task<IActionResult> TransferStudent(

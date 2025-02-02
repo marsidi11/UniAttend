@@ -52,7 +52,8 @@ namespace UniAttend.Infrastructure
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IAcademicYearRepository, AcademicYearRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
-            services.AddScoped<INetworkValidationService, NetworkValidationService>();
+            services.AddScoped<ICourseSessionRepository, CourseSessionRepository>();
+            services.AddScoped<IGroupStudentRepository, GroupStudentRepository>();
 
             // Register Core Services
             services.AddSingleton<IExceptionHandler, ExceptionHandler>();
@@ -69,9 +70,7 @@ namespace UniAttend.Infrastructure
             services.AddScoped<ITotpService, TotpService>();
             services.AddScoped<IReportService, FastReportService>();
             services.AddScoped<IRateLimiter, RateLimiter>();
-            services.AddScoped<IAttendanceRecordRepository, AttendanceRecordRepository>();
-            services.AddScoped<ICourseSessionRepository, CourseSessionRepository>();
-            services.AddScoped<IGroupStudentRepository, GroupStudentRepository>();
+            services.AddScoped<INetworkValidationService, NetworkValidationService>();
 
             // Add AutoMapper for Infrastructure layer
             services.AddAutoMapper(Assembly.GetExecutingAssembly());

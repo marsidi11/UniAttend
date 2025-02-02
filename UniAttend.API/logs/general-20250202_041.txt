@@ -1,0 +1,65 @@
+2025-02-02 20:03:16.896 +01:00 [INF] Starting web application
+2025-02-02 20:03:18.462 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 20:03:18.713 +01:00 [INF] Starting group report generation for GroupID: 2
+2025-02-02 20:03:18.717 +01:00 [INF] Template path: C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Reports\GroupReport.frx
+2025-02-02 20:03:19.185 +01:00 [INF] Found 2 enrolled students
+2025-02-02 20:03:19.294 +01:00 [INF] Processing 3 attendance records
+2025-02-02 20:03:19.301 +01:00 [INF] Added 3 rows to data table
+2025-02-02 20:03:19.403 +01:00 [INF] Preparing report with 3 records
+2025-02-02 20:05:49.265 +01:00 [INF] Starting web application
+2025-02-02 20:05:49.842 +01:00 [WRN] Failed to determine the https port for redirect.
+2025-02-02 20:05:50.136 +01:00 [INF] Starting group report generation for GroupID: 2
+2025-02-02 20:05:50.141 +01:00 [INF] Template path: C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Reports\GroupReport.frx
+2025-02-02 20:05:50.591 +01:00 [INF] Found 2 enrolled students
+2025-02-02 20:05:50.748 +01:00 [INF] Processing 3 attendance records
+2025-02-02 20:05:50.763 +01:00 [INF] Added 3 rows to data table
+2025-02-02 20:05:50.878 +01:00 [INF] Preparing report with 3 records
+2025-02-02 20:05:50.987 +01:00 [ERR] Failed to generate group report: AttendanceRecords: Table is not connected to the data. Register the data using Report.RegisterData method.
+FastReport.Utils.DataTableException: AttendanceRecords: Table is not connected to the data. Register the data using Report.RegisterData method.
+   at FastReport.Data.TableDataSource.LoadData(ArrayList rows)
+   at FastReport.Data.DataSourceBase.LoadData()
+   at FastReport.Data.DataSourceBase.Init(Relation relation, String filter, SortCollection sort, Boolean useAllParentRows)
+   at FastReport.Data.DataSourceBase.Init(DataSourceBase parentData, String filter, SortCollection sort, Boolean useAllParentRows)
+   at FastReport.DataBand.InitDataSource()
+   at FastReport.Engine.ReportEngine.RunDataBand(DataBand dataBand)
+   at FastReport.Engine.ReportEngine.RunBands(BandCollection bands)
+   at FastReport.Engine.ReportEngine.RunReportPage(ReportPage page)
+   at FastReport.Engine.ReportEngine.RunReportPages()
+   at FastReport.Engine.ReportEngine.RunReportPages(ReportPage page)
+   at FastReport.Engine.ReportEngine.RunPhase2(Boolean append, ReportPage page)
+   at FastReport.Engine.ReportEngine.Run(Boolean runDialogs, Boolean append, Boolean resetDataState, ReportPage page)
+   at FastReport.Engine.ReportEngine.Run(Boolean runDialogs, Boolean append, Boolean resetDataState)
+   at FastReport.Report.Prepare(Boolean append, Boolean resetDataState)
+   at FastReport.Report.Prepare(Boolean append)
+   at FastReport.Report.Prepare()
+   at UniAttend.Infrastructure.Services.FastReportService.GenerateGroupReportAsync(Int32 groupId, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Services\FastReportService.cs:line 235
+2025-02-02 20:05:51.029 +01:00 [ERR] An unhandled exception occurred
+FastReport.Utils.DataTableException: AttendanceRecords: Table is not connected to the data. Register the data using Report.RegisterData method.
+   at FastReport.Data.TableDataSource.LoadData(ArrayList rows)
+   at FastReport.Data.DataSourceBase.LoadData()
+   at FastReport.Data.DataSourceBase.Init(Relation relation, String filter, SortCollection sort, Boolean useAllParentRows)
+   at FastReport.Data.DataSourceBase.Init(DataSourceBase parentData, String filter, SortCollection sort, Boolean useAllParentRows)
+   at FastReport.DataBand.InitDataSource()
+   at FastReport.Engine.ReportEngine.RunDataBand(DataBand dataBand)
+   at FastReport.Engine.ReportEngine.RunBands(BandCollection bands)
+   at FastReport.Engine.ReportEngine.RunReportPage(ReportPage page)
+   at FastReport.Engine.ReportEngine.RunReportPages()
+   at FastReport.Engine.ReportEngine.RunReportPages(ReportPage page)
+   at FastReport.Engine.ReportEngine.RunPhase2(Boolean append, ReportPage page)
+   at FastReport.Engine.ReportEngine.Run(Boolean runDialogs, Boolean append, Boolean resetDataState, ReportPage page)
+   at FastReport.Engine.ReportEngine.Run(Boolean runDialogs, Boolean append, Boolean resetDataState)
+   at FastReport.Report.Prepare(Boolean append, Boolean resetDataState)
+   at FastReport.Report.Prepare(Boolean append)
+   at FastReport.Report.Prepare()
+   at UniAttend.Infrastructure.Services.FastReportService.GenerateGroupReportAsync(Int32 groupId, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.Infrastructure\Services\FastReportService.cs:line 235
+   at UniAttend.API.Controllers.ReportsController.ExportGroupReport(Int32 id, Nullable`1 startDate, Nullable`1 endDate) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Controllers\ReportsController.cs:line 183
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at UniAttend.API.Middleware.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\Users\User\Documents\Coding Projects\UniAttend\UniAttend.API\Middleware\ErrorHandlingMiddleware.cs:line 28
