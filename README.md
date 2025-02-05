@@ -1,49 +1,128 @@
-# UniAttend - Attendance Management System
+# UniAttend
+## Electronic Attendance Management System
 
-## Overview
-UniAttend is a comprehensive attendance management system built for educational institutions using ASP.NET Core 8.0. It enables efficient tracking and management of student attendance with features like real-time monitoring, OTP verification, and detailed analytics.
+UniAttend automates student attendance tracking through card readers and OTP verification, designed specifically for educational institutions to manage and monitor student presence in real-time.
 
-## Features
-- Multi-role authentication (Admin, Professor, Student)
-- Real-time attendance tracking
-- OTP-based attendance verification
-- Card-based attendance recording
-- Detailed attendance reports and analytics
-- Course and session management
+## User Roles & Features
+
+### 👨‍💼 Administrator
+- Department management
+- Academic year configuration
+- Curriculum and subject management
+- User management (Secretary/Professor)
+- System-wide reporting
+
+### 👩‍💼 Academic Secretary
+- Student registration and management
+- Study group administration
+- Student card management (RFID/Barcode simulation)
+- Schedule management:
+  - Create/edit class schedules
+  - Assign classrooms
+  - Set professor teaching hours
+  - Define group timetables
+- Professor-subject-group assignments
+- Generate attendance and schedule reports
+
+### 👨‍🏫 Professor
+- View assigned teaching schedule
+- Manage class sessions:
+  - Start/end sessions
+  - View student attendance
+  - Verify attendance records
+- View subject-group assignments
+- Generate and confirm attendance reports
+- Access personal teaching timetable
+
+### 👨‍🎓 Student
+- View personal class schedule
+- View enrolled groups/subjects
+- Record attendance:
+  - Simulated card scanning (RFID/Barcode)
+  - OTP verification via personal device
+- Track attendance status per subject
+- Receive absence notifications (20% threshold)
+
+## 🛠️ Technology Stack
+
+### Backend
+- ASP.NET Core 8.0
+- Entity Framework Core
+- MySQL Database
+- JWT Authentication
+- Serilog Logging
+- FastReport for PDF Generation
+- OTP.NET for OTP Generation
+- MailKit for Email Services
+
+### Frontend
+- Vue.js 3
+- TypeScript
+- Tailwind CSS
+- Pinia State Management
+- Axios
+- VeeValidate
+
+## Important Notes
+
+### Card Reader Simulation
+The system uses a simulated card reader interface for development and testing:
+- Simulated RFID/Barcode scanning through API endpoints
+- Test card numbers for development
+- Network validation of simulated scans
+
+## 🏗️ Project Architecture
+
+```
+UniAttend/
+├── UniAttend.Core/           # Domain entities, interfaces
+├── UniAttend.Application/    # Business logic, DTOs
+├── UniAttend.Infrastructure/ # External services implementation
+├── UniAttend.API/           # REST API endpoints
+├── UniAttend.Web.Client/    # Vue.js frontend
+└── UniAttend.Shared/        # Shared DTOs and utilities
+```
+
+## ✨ Key Features
+
+### Multi-authentication Methods
+- RFID/Barcode card scanning
+- Network-validated OTP generation
+- Role-based access control
+
+### Real-time Attendance
+- Card reader integration
+- Network validation
+- Session management
+- Attendance confirmation workflow
+
+### Automated Notifications
+- Absence threshold alerts (20%)
 - Email notifications
-- Mobile-friendly interface
-- PDF report generation
 
-## Technology Stack
-- **Backend:** ASP.NET Core 8.0
-- **Frontend:** Vue.js
-- **Database:** MySQL
-- **Authentication:** JWT Bearer
-- **Documentation:** Swagger/OpenAPI
-- **Logging:** Serilog
-- **PDF Generation:** iText7
-- **OTP:** Otp.NET
+### Reporting System
+- Attendance records
+- Group-subject reports
+- Department analytics
+- PDF export capabilities
 
-## Architecture
-Project follows Clean Architecture with:
-- `UniAttend.Core`: Domain entities and interfaces
-- `UniAttend.Application`: Business logic and DTOs
-- `UniAttend.Infrastructure`: External implementations
-- `UniAttend.API`: API endpoints and configuration
-- `UniAttend.Web.Client`: Frontend application
-- `UniAttend.Shared`: Shared DTOs and utilities
+## 🚀 Getting Started
 
-## Getting Started
-1. Clone the repository
-2. Configure database connection in `appsettings.json`
-3. Run migrations: `dotnet ef database update`
-4. Start API: `dotnet run --project UniAttend.API`
-5. Start web client: `cd UniAttend.Web.Client && npm install && npm run serve`
+1. Configure database connection in `appsettings.json`
+2. Run migrations: `dotnet ef database update`
+3. Start API: `dotnet run --project UniAttend.API`
+4. Start web client:
+```bash
+cd UniAttend.Web.Client
+npm install
+npm run serve
+```
 
-## Configuration Requirements
+## ⚙️ Required Configurations
 - Database connection string
-- JWT settings
-- SMTP email settings
-- Admin account credentials
-- Logging paths
-- CORS policies
+- JWT authentication settings
+- SMTP email configuration
+- Admin credentials
+- Card reader endpoints
+- Network validation settings
+- Logging configuration
